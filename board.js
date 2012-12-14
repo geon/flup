@@ -120,17 +120,15 @@ Board.prototype.chargeDropper = function () {
 
 	var timePerPieceWidths = 20;
 
-	this.dropperPieceA.animation = new Animation({
-		from: {x: 9, y: -1},
+	this.dropperPieceA.animation.add(new Animation({
 		to: {x: this.playerPosition, y: -1},
-		duration:( 9 - this.playerPosition) * timePerPieceWidths
-	});
-	this.dropperPieceB.animation = new Animation({
-		from: {x: 9, y: 0},
+		duration: ( 9 - this.playerPosition) * timePerPieceWidths
+	}));
+	this.dropperPieceB.animation.add(new Animation({
 		to: {x: this.playerPosition+1, y: -1},
 		delay: 1 * timePerPieceWidths,
-		duration:( 9 - this.playerPosition) * timePerPieceWidths
-	});
+		duration: ( 9 - this.playerPosition) * timePerPieceWidths
+	}));
 };
 
 
@@ -205,13 +203,12 @@ Board.prototype.applyGameLogic = function () {
 
 			// Animate it.
 			var timePerPieceHeight = 50;
-			this.pieces[putPos].animation = new Animation({
-				from: {x: x, y: yGet},
+			this.pieces[putPos].animation.add(new Animation({
 				to: {x: x, y: yPut},
 				delay: numConsecutive * timePerPieceHeight,
 				duration: Math.sqrt(yPut - yGet) * timePerPieceHeight,
 				interpolation: "easeInQuad"
-			});
+			}));
 			++numConsecutive;
 
 			// Raise the put/put-positions.

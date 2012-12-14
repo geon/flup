@@ -4,8 +4,8 @@
 
 function Animation (options) {
 
-	this.from           = new Coord(options.from);
-	this.to             = new Coord(options.to);
+	this.from           = new Coord(options.from || new Coord({}));
+	this.to             = new Coord(options.to || new Coord({}));
 	this.duration       = options.duration;
 	this.interpolation  = options.interpolation || "sine";
 	this.startTime      = options.startTime || new Date().getTime();
@@ -17,13 +17,19 @@ function Animation (options) {
 };
 
 
+Animation.prototype.getEndTime = function () {
+
+	return this.startTime + this.duration;
+}
+
+
 Animation.prototype.getPosition = function (currentTime) {
 
 	if (currentTime < this.startTime) {
 		return this.from;
 	}
 
-	if (currentTime > this.startTime + this.duration) {
+	if (currentTime > this.getEndTime()) {
 		return this.to;
 	}
 

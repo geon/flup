@@ -6,7 +6,7 @@ function Piece (options) {
 
 	this.color = options.color;
 	this.key = options.key;
-	this.animation = options.animation;
+	this.animation = options.animation || new AnimationQueue();
 };
 
 
