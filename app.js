@@ -182,7 +182,7 @@ App.prototype.startRenderLoop = function () {
 App.prototype.render = function () {
 
 	// Calculate delta time.
-	var currentTime = new Date().getTime()/1000;
+	var currentTime = new Date().getTime();
 	var deltaTime = currentTime - this.lastRenderTime;
 	this.lastRenderTime = currentTime;
 
@@ -221,7 +221,7 @@ App.prototype.render = function () {
 	// FPS counter.
 //	this.context.fillStyle = "black";
 //	this.context.font = "16px Palatino";
-//	this.context.fillText("FPS: " + Math.floor(1/deltaTime), 10, 20);
+//	this.context.fillText("FPS: " + Math.floor(1000/deltaTime), 10, 20);
 };
 
 

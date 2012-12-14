@@ -118,17 +118,18 @@ Board.prototype.chargeDropper = function () {
 	this.dropperPieceB = new Piece(this.getNextPieceInCycle(1));
 	this.consumePiecesFromCycle(2);
 
-	this.dropperPieceA.animation = new PieceAnimation({
+	var timePerPieceWidths = 20;
+
+	this.dropperPieceA.animation = new Animation({
 		from: {x: 9, y: -1},
 		to: {x: this.playerPosition, y: -1},
-		startTime: new Date().getTime()/1000,
-		duration:( 9 - this.playerPosition) * 0.02
+		duration:( 9 - this.playerPosition) * timePerPieceWidths
 	});
-	this.dropperPieceB.animation = new PieceAnimation({
+	this.dropperPieceB.animation = new Animation({
 		from: {x: 9, y: 0},
 		to: {x: this.playerPosition+1, y: -1},
-		startTime: new Date().getTime()/1000 + 0.02,
-		duration:( 9 - this.playerPosition) * 0.02
+		delay: 1 * timePerPieceWidths,
+		duration:( 9 - this.playerPosition) * timePerPieceWidths
 	});
 };
 
@@ -203,11 +204,13 @@ Board.prototype.applyGameLogic = function () {
 			this.pieces[getPos] = undefined;
 
 			// Animate it.
-			this.pieces[putPos].animation = new PieceAnimation({
+			var timePerPieceHeight = 50;
+			this.pieces[putPos].animation = new Animation({
 				from: {x: x, y: yGet},
 				to: {x: x, y: yPut},
-				startTime: new Date().getTime()/1000 + numConsecutive * 50/1000,
-				duration: Math.sqrt(yPut - yGet) * 50/1000
+				delay: numConsecutive * timePerPieceHeight,
+				duration: Math.sqrt(yPut - yGet) * timePerPieceHeight,
+				interpolation: "easeInQuad"
 			});
 			++numConsecutive;
 
