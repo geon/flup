@@ -15,7 +15,7 @@ Piece.size = 32;
 
 Piece.prototype.draw = function (images, context, currentTime, boardCenter, boardScale) {
 
-	var image = images["piece"+(this.color + 1)+".png"];
+	var image = images[(this.key ? "key" : "piece")+(this.color + 1)+".png"];
 
 	var position = this.animation.getPosition(currentTime);
 

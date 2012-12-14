@@ -168,6 +168,9 @@ Board.prototype.animateDropper = function () {
 
 Board.prototype.applyGameLogic = function () {
 
+	// Make Pieces fall.
+	// =================
+
 	/*
 
 	This might seem like an awful lot of code for something as simple as
@@ -238,6 +241,12 @@ Board.prototype.applyGameLogic = function () {
 			--yPut;
 		}
 	}
+
+
+	// Unlock chains.
+	// ==============
+
+
 
 };
 

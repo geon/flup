@@ -51,8 +51,10 @@ function App (options) {
 		"piece2.png",
 		"piece3.png",
 		"piece4.png",
-		"piece5.png",
-		"piece6.png"
+		"key1.png",
+		"key2.png",
+		"key3.png",
+		"key4.png",
 	]).then(function(){
 
 		console.log("Sprites loaded.");
