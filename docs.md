@@ -58,3 +58,7 @@ Board {
 
 
 For the animations, never stall the player input. Treat them only as effects. The player should be able to continue droping pieces and have the game progress like if the animations didn't exist.
+
+
+
+Use an animation que, where you can just add animations with a interpolation, duration and optional delay.

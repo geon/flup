@@ -26,7 +26,7 @@ function Board (options) {
 };
 
 
-Board.size = {x:8, y:16};
+Board.size = {x:8, y:18};
 Board.numColors = 4;
 Board.nonKeyToKeyRatio = 7;
 
@@ -40,12 +40,16 @@ Board.prototype.coordToIndex = function (x, y) {
 Board.prototype.moveLeft = function () {
 	
 	this.playerPosition = Math.max(0, this.playerPosition - 1);
+
+	this.animateDropper();
 };
 
 
 Board.prototype.moveRight = function () {
 	
 	this.playerPosition = Math.min(Board.size.x - (this.playerOrientation % 2 ? 1 : 2), this.playerPosition + 1);
+
+	this.animateDropper();
 };
 
 
@@ -54,6 +58,8 @@ Board.prototype.rotate = function () {
 	this.playerOrientation = ((this.playerOrientation + 1) % 4);
 
 	this.preventDropperFromStickingOutAfterRotation();
+
+	this.animateDropper();
 };
 
 
@@ -70,29 +76,17 @@ Board.prototype.preventDropperFromStickingOutAfterRotation = function () {
 
 Board.prototype.drop = function () {
 	
-	/* Player Orientations:
-	
-		..	a.	..	b.
-		ab	b.	ba	a.
-	*/
+	var coords = this.getDropperCoordinates();
 
-	var aCoord = {
-		x: this.playerPosition + (this.playerOrientation == 2 ? 1 : 0),
-		y: (this.playerOrientation == 1 ? 1 : 0)
-	};
-	var bCoord = {
-		x: this.playerPosition + (this.playerOrientation == 0 ? 1 : 0),
-		y: (this.playerOrientation == 3 ? 1 : 0)
-	};
-	var aPos = this.coordToIndex(aCoord.x, aCoord.y);
-	var bPos = this.coordToIndex(bCoord.x, bCoord.y);
+	var aPos = this.coordToIndex(coords.a.x, coords.a.y);
+	var bPos = this.coordToIndex(coords.b.x, coords.b.y);
 
 	// Make sure the board space is not used, and is not outside the board.
 	if (
 		this.pieces[aPos] ||
 		this.pieces[bPos] ||
-		aCoord.x < 0 || aCoord.x > Board.size.x-1 ||
-		bCoord.x < 0 || bCoord.x > Board.size.x-1
+		coords.a.x < 0 || coords.a.x > Board.size.x-1 ||
+		coords.b.x < 0 || coords.b.x > Board.size.x-1
 	) {
 		return false;
 	}
@@ -109,26 +103,37 @@ Board.prototype.drop = function () {
 };
 
 
-Board.prototype.chargeDropper = function () {
+Board.prototype.getDropperCoordinates = function () {
 
-	this.playerOrientation = 0;
-	this.preventDropperFromStickingOutAfterRotation();	
+	/* Player Orientations:
+	
+		ab	a.	ba	b.
+		..	b.	..	a.
+	*/
+
+	return {
+		a: {
+			x: this.playerPosition + (this.playerOrientation == 2 ? 1 : 0),
+			y: (this.playerOrientation == 3 ? 1 : 0)
+		},
+		b: {
+			x: this.playerPosition + (this.playerOrientation == 0 ? 1 : 0),
+			y: (this.playerOrientation == 1 ? 1 : 0)
+		},
+	};
+}
+
+
+Board.prototype.chargeDropper = function () {
 
 	this.dropperPieceA = new Piece(this.getNextPieceInCycle(0));
 	this.dropperPieceB = new Piece(this.getNextPieceInCycle(1));
 	this.consumePiecesFromCycle(2);
 
-	var timePerPieceWidths = 20;
+	// Set the orientation back to horiz. or vert., but not backwards or upside-down.
+	this.playerOrientation %= 2;
 
-	this.dropperPieceA.animation.add(new Animation({
-		to: {x: this.playerPosition, y: -1},
-		duration: ( 9 - this.playerPosition) * timePerPieceWidths
-	}));
-	this.dropperPieceB.animation.add(new Animation({
-		to: {x: this.playerPosition+1, y: -1},
-		delay: 1 * timePerPieceWidths,
-		duration: ( 9 - this.playerPosition) * timePerPieceWidths
-	}));
+	this.animateDropper();
 };
 
 
@@ -143,6 +148,23 @@ Board.prototype.getNextPieceInCycle = function (index) {
 	return this.pieceCycle[(this.pieceCycleIndex + index) % this.pieceCycle.length];
 };
 
+
+Board.prototype.animateDropper = function () {
+
+	var coords = this.getDropperCoordinates();
+
+	var timePerPieceWidths = 50;
+
+	this.dropperPieceA.animation.add(new Animation({
+		to: coords.a,
+		duration: timePerPieceWidths
+	}));
+	this.dropperPieceB.animation.add(new Animation({
+		to: coords.b,
+		delay: timePerPieceWidths,
+		duration: timePerPieceWidths
+	}));
+}
 
 Board.prototype.applyGameLogic = function () {
 
@@ -298,6 +320,5 @@ Board.prototype.draw = function (images, context, currentTime, center, scale) {
 		center,
 		scale
 	);
-
 };
 

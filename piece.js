@@ -19,7 +19,7 @@ Piece.prototype.draw = function (images, context, currentTime, boardCenter, boar
 
 	var position = this.animation.getPosition(currentTime);
 
-	var disturbance = true;
+	var disturbance = false;
 	var jitterX = (disturbance ? Piece.size*boardScale*0.05 * Math.sin(currentTime/1000 * 27 + position.x + position.y*3) : 0);
 	var jitterY = (disturbance ? Piece.size*boardScale*0.05 * Math.sin(currentTime/1000 * 21 + position.y + position.x*2) : 0);
 	var jitterZ = (disturbance ? Piece.size*boardScale*0.1  * Math.sin(currentTime/1000 * 13 + position.y + position.x*5) : 0);
