@@ -4,8 +4,8 @@
 
 function Coord (options) {
 
-	this.x = options.x || 0;
-	this.y = options.y || 0;
+	this.x = options.x;
+	this.y = options.y;
 };
 
 

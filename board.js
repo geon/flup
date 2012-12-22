@@ -296,7 +296,7 @@ Board.fisherYatesArrayShuffle = function (myArray) {
 }
 
 
-Board.prototype.draw = function (images, context, currentTime, center, scale) {
+Board.prototype.draw = function (context, currentTime, center, scale) {
 
 	// Draw the board pieces.
 	for (var i = 0, length = this.pieces.length; i < length; ++i) {
@@ -305,7 +305,6 @@ Board.prototype.draw = function (images, context, currentTime, center, scale) {
 		if (piece !== undefined) {
 
 			piece.draw(
-				images,
 				context,
 				currentTime,
 				center,
@@ -316,14 +315,12 @@ Board.prototype.draw = function (images, context, currentTime, center, scale) {
 
 	// Draw the dropper pieces.
 	this.dropperPieceA.draw(
-		images,
 		context,
 		currentTime,
 		center,
 		scale
 	);
 	this.dropperPieceB.draw(
-		images,
 		context,
 		currentTime,
 		center,

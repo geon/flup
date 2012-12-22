@@ -40,22 +40,10 @@ function App (options) {
 
 
 
-	this.images = {};
-
-
 
 	var self = this;
 	
-	this.loadImages([
-		"piece1.png",
-		"piece2.png",
-		"piece3.png",
-		"piece4.png",
-		"key1.png",
-		"key2.png",
-		"key3.png",
-		"key4.png",
-	]).then(function(){
+	this.loadSprites().then(function(){
 
 		console.log("Sprites loaded.");
 		
@@ -71,7 +59,7 @@ function App (options) {
 
 App.prototype.getWidth = function () {
 	
-	return Board.size.x * this.pieceSize;
+	return Board.size.x * this.pieceSize * 2;
 }
 
 
@@ -81,24 +69,11 @@ App.prototype.getHeight = function () {
 }
 
 
-App.prototype.loadImages = function (imageFileNames) {
+App.prototype.loadSprites = function () {
 
 	var promises = [];
 	
-	for (var i = 0; i < imageFileNames.length; ++i) {
-
-		var imageFileName = imageFileNames[i];
-		
-		var promise = $.Deferred();
-	
-		var img = new Image();
-		$(img).load(promise.resolve);
-		$(img).error(promise.reject);
-		img.src = 'graphics/'+imageFileName;
-
-		this.images[imageFileName] = img;
-		promises.push(promise);		
-	}
+	promises.push(Piece.getSpriteSheet().loadImage());
 
 	return $.when.apply($, promises);	
 };
@@ -194,29 +169,26 @@ App.prototype.render = function () {
 
 	// Testing dummy opponent boards.
 	this.board.draw(
-		this.images,
 		this.context,
 		currentTime,
 		{x:this.getWidth()*1/8, y:this.getHeight()*2/4},
-		1/4
+		1/2
 	);
 	this.board.draw(
-		this.images,
 		this.context,
 		currentTime,
 		{x:this.getWidth()*7/8, y:this.getHeight()*2/4},
-		1/4
+		1/2
 	);
 
 
 
 	// The player board.
 	this.board.draw(
-		this.images,
 		this.context,
 		currentTime,
 		{x:this.getWidth()/2, y:this.getHeight()/2},
-		1/2
+		1/1
 	);
 
 
