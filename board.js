@@ -5,6 +5,7 @@
 function Board (options) {
 
 	this.pieces = [];
+	this.unlockedPieces = [];
 
 	// // Fill the poard with pieces. 
 	// for (var i = 0; i < 16*8; ++i) {
@@ -31,9 +32,15 @@ Board.numColors = 4;
 Board.nonKeyToKeyRatio = 7;
 
 
-Board.prototype.coordToIndex = function (x, y) {
+Board.coordToIndex = function (x, y) {
 	
 	return x + y * Board.size.x;
+};
+
+
+Board.indexToCoord = function (index) {
+	
+	return new Coord({x:index % Board.size.x, y:Math.floor(index / Board.size.x)});
 };
 
 
@@ -78,8 +85,8 @@ Board.prototype.drop = function () {
 	
 	var coords = this.getDropperCoordinates();
 
-	var aPos = this.coordToIndex(coords.a.x, coords.a.y);
-	var bPos = this.coordToIndex(coords.b.x, coords.b.y);
+	var aPos = Board.coordToIndex(coords.a.x, coords.a.y);
+	var bPos = Board.coordToIndex(coords.b.x, coords.b.y);
 
 	// Make sure the board space is not used, and is not outside the board.
 	if (
@@ -164,12 +171,17 @@ Board.prototype.animateDropper = function () {
 		delay: timePerPieceWidths,
 		duration: timePerPieceWidths
 	}));
-}
+};
+
 
 Board.prototype.applyGameLogic = function () {
 
-	// Make Pieces fall.
-	// =================
+	this.makePiecesFall();
+	this.unlockChains();
+};
+
+
+Board.prototype.makePiecesFall = function () {
 
 	/*
 
@@ -195,7 +207,7 @@ Board.prototype.applyGameLogic = function () {
 		var yPut = Board.size.y - 1;
 
 		// Search for a space that can be filled from above.
-		while (yPut && this.pieces[this.coordToIndex(x, yPut)]) {
+		while (yPut && this.pieces[Board.coordToIndex(x, yPut)]) {
 			--yPut;
 		}
 
@@ -208,7 +220,7 @@ Board.prototype.applyGameLogic = function () {
 		while (yGet >= 0){
 
 			// Search for a piece to put in the empty space.
-			while (!this.pieces[this.coordToIndex(x, yGet)]) {
+			while (!this.pieces[Board.coordToIndex(x, yGet)]) {
 
 				--yGet;
 
@@ -219,8 +231,8 @@ Board.prototype.applyGameLogic = function () {
 				}
 			}
 
-			var getPos = this.coordToIndex(x, yGet);
-			var putPos = this.coordToIndex(x, yPut);
+			var getPos = Board.coordToIndex(x, yGet);
+			var putPos = Board.coordToIndex(x, yPut);
 
 			// Move the piece.
 			this.pieces[putPos] = this.pieces[getPos];
@@ -242,12 +254,111 @@ Board.prototype.applyGameLogic = function () {
 		}
 	}
 
-
-	// Unlock chains.
-	// ==============
+};
 
 
+Board.prototype.unlockChains = function () {
 
+	var foundChains = false;
+
+	for (var i = this.pieces.length - 1; i >= 0; i--) {
+
+		// Look for keys.
+		if (this.pieces[i] && this.pieces[i].key) {
+	
+			var matchingNeighborPositions = this.matchingNeighborsOfPosition(i);
+
+			// If there is at least one pair in the chain...
+			if (matchingNeighborPositions.length) {
+
+				this.unLockChainRecursively(i, this.pieces[i].animation.getLast().getEndTime());
+				foundChains = true;
+			}
+		}
+	};
+
+	if (foundChains) {
+
+		// Fill up the gaps left by the chains.
+		this.makePiecesFall();
+
+		// New chains might have formed.
+		this.unlockChains();
+	}
+};
+
+
+Board.prototype.unLockChainRecursively = function (position, unlockEffectStartTime) {
+
+	// Must search for neighbors before removing the piece matching against.
+	var matchingNeighborPositions = this.matchingNeighborsOfPosition(position);
+
+	var unlockedPiece = this.pieces[position];
+
+	// Another branch of the chain might have reached here before.
+	if (!unlockedPiece) {
+		return;
+	}
+
+	// Move the piece from the play field to the queue of pieces waiting for the unlocking effect.
+	unlockedPiece.unlockEffectStartTime = unlockEffectStartTime;
+	this.unlockedPieces.push(unlockedPiece);
+	this.pieces[position] = undefined;
+
+	// For all matching neighbors...
+	var unlockEffectDelayTime = 200;
+	for (var i = matchingNeighborPositions.length - 1; i >= 0; i--) {
+
+		// Recurse.
+		this.unLockChainRecursively(matchingNeighborPositions[i], unlockEffectStartTime + unlockEffectDelayTime)
+	};
+};
+
+
+Board.prototype.matchingNeighborsOfPosition = function (position) {
+
+	if (!this.pieces[position]) {
+		return [];
+	}
+
+	var neighborPositions = [];
+
+	var coord = Board.indexToCoord(position);
+
+	// Right
+	if (coord.x < Board.size.x - 1) {
+		neighborPositions.push(position + 1)
+	}
+
+	// Left
+	if (coord.x > 0) {
+		neighborPositions.push(position - 1);
+	}
+
+	// Down
+	if (coord.y < Board.size.y - 1) {
+		neighborPositions.push(position + Board.size.x);
+	}
+
+	// Up
+	if (coord.y > 0) {
+		neighborPositions.push(position - Board.size.x);
+	}
+
+
+	var matchingNeighborPositions = [];
+	var color = this.pieces[position].color;
+	for (var i = neighborPositions.length - 1; i >= 0; i--) {
+
+		var neighborPosition = neighborPositions[i];
+
+		if (this.pieces[neighborPosition] && this.pieces[neighborPosition].color == color) {
+
+			matchingNeighborPositions.push(neighborPosition);
+		}
+	};
+
+	return matchingNeighborPositions;
 };
 
 
