@@ -15,7 +15,7 @@ AnimationQueue.prototype.add = function (animation) {
 	// Force the startTime and position to match the end of the previous step.
 	var lastAnimation   = this.getLast();
 	if (lastAnimation) {
-		animation.startTime = Math.max(lastAnimation.getEndTime(), new Date().getTime());
+		animation.startTime = Math.max(animation.startTime, lastAnimation.getEndTime(), new Date().getTime());
 		animation.from      = lastAnimation.to;
 	}
 

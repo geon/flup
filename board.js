@@ -7,10 +7,29 @@ function Board (options) {
 	this.pieces = [];
 	this.unlockedPieces = [];
 
-	// // Fill the poard with pieces. 
-	// for (var i = 0; i < 16*8; ++i) {
-	// 	this.pieces[i] = {color:Math.floor(Math.random() * 4), key:false};
-	// }
+
+	// var colors = [
+	// 	{color: 0}, {color: 0}, {color: 0}, undefined, undefined, undefined, undefined, undefined,
+	// 	{color: 0}, {color: 0}, {color: 0}, undefined, undefined, undefined, undefined, undefined,
+	// 	{color: 0}, {color: 0}, {color: 0}, undefined, undefined, undefined, undefined, undefined,
+	// 	{color: 0}, {color: 0}, {color: 0}, undefined, undefined, undefined, undefined, undefined,
+	// 	{color: 0}, {color: 0}, {color: 0}, undefined, undefined, undefined, undefined, undefined,
+	// 	{color: 0}, {color: 0}, {color: 0}, undefined, undefined, undefined, undefined, undefined,
+	// 	{color: 0}, {color: 0}, {color: 0}, undefined, undefined, undefined, undefined, undefined,
+	// 	{color: 0}, {color: 0}, {color: 0}, undefined, undefined, undefined, undefined, undefined,
+	// 	{color: 0}, {color: 0}, {color: 0}, undefined, undefined, undefined, undefined, undefined,
+	// 	{color: 0}, {color: 0}, {color: 0}, undefined, undefined, undefined, undefined, undefined,
+	// 	{color: 0}, {color: 0}, {color: 0}, undefined, undefined, undefined, undefined, undefined,
+	// 	{color: 0}, {color: 0}, {color: 0}, undefined, undefined, undefined, undefined, undefined,
+	// 	{color: 0}, {color: 0}, {color: 0}, undefined, {color: 0, key:true}, undefined, undefined
+	// ];
+	// for (var i = colors.length - 1; i >= 0; i--) {
+	// 	if (colors[i])
+	// 		this.pieces[i] = new Piece(colors[i]);
+	// };
+	// this.makePiecesFall();
+	// options.pieceCycle[0] = new Piece({color: 0});
+
 
 	this.pieceCycle = options.pieceCycle;
 	this.pieceCycleIndex = 0;
@@ -168,7 +187,6 @@ Board.prototype.animateDropper = function () {
 	}));
 	this.dropperPieceB.animation.add(new Animation({
 		to: coords.b,
-		delay: timePerPieceWidths,
 		duration: timePerPieceWidths
 	}));
 };
@@ -181,7 +199,9 @@ Board.prototype.applyGameLogic = function () {
 };
 
 
-Board.prototype.makePiecesFall = function () {
+Board.prototype.makePiecesFall = function (fallAnimationStartTime) {
+
+	fallAnimationStartTime = fallAnimationStartTime || new Date().getTime();
 
 	/*
 
@@ -239,10 +259,11 @@ Board.prototype.makePiecesFall = function () {
 			this.pieces[getPos] = undefined;
 
 			// Animate it.
-			var timePerPieceHeight = 50;
+			var timePerPieceHeight = 100;
 			this.pieces[putPos].animation.add(new Animation({
 				to: {x: x, y: yPut},
-				delay: numConsecutive * timePerPieceHeight,
+				startTime: fallAnimationStartTime,
+				delay: numConsecutive * 50,
 				duration: Math.sqrt(yPut - yGet) * timePerPieceHeight,
 				interpolation: "easeInQuad"
 			}));
@@ -260,7 +281,6 @@ Board.prototype.makePiecesFall = function () {
 Board.prototype.unlockChains = function () {
 
 	var foundChains = false;
-
 	for (var i = this.pieces.length - 1; i >= 0; i--) {
 
 		// Look for keys.
@@ -271,21 +291,41 @@ Board.prototype.unlockChains = function () {
 			// If there is at least one pair in the chain...
 			if (matchingNeighborPositions.length) {
 
-				this.unLockChainRecursively(i, this.pieces[i].animation.getLast().getEndTime());
 				foundChains = true;
+
+				// As soon as everything has stopped falling...
+				var unlockEffectStartTime = this.maxAnimationEndTime();
+
+				// ...Start the unlocking effect.
+				var unlockEffectDuration = this.unLockChainRecursively(i, unlockEffectStartTime);
+
+				// Fill up the gaps left by the chains, right after the unlocking effect is finished.
+				this.makePiecesFall(unlockEffectStartTime + unlockEffectDuration);
 			}
 		}
 	};
 
 	if (foundChains) {
 
-		// Fill up the gaps left by the chains.
-		this.makePiecesFall();
-
 		// New chains might have formed.
 		this.unlockChains();
 	}
 };
+
+
+Board.prototype.maxAnimationEndTime = function () {
+
+	var maxAnimationEndTime = new Date().getTime();
+	
+	for (var i = this.pieces.length - 1; i >= 0; i--) {
+		
+		if (this.pieces[i]) {
+			maxAnimationEndTime = Math.max(maxAnimationEndTime, this.pieces[i].animation.getLast().getEndTime());
+		}
+	}
+
+	return maxAnimationEndTime;
+}
 
 
 Board.prototype.unLockChainRecursively = function (position, unlockEffectStartTime) {
@@ -297,7 +337,7 @@ Board.prototype.unLockChainRecursively = function (position, unlockEffectStartTi
 
 	// Another branch of the chain might have reached here before.
 	if (!unlockedPiece) {
-		return;
+		return 0;
 	}
 
 	// Move the piece from the play field to the queue of pieces waiting for the unlocking effect.
@@ -306,12 +346,17 @@ Board.prototype.unLockChainRecursively = function (position, unlockEffectStartTi
 	this.pieces[position] = undefined;
 
 	// For all matching neighbors...
-	var unlockEffectDelayTime = 200;
+	var unlockEffectDelayTime = 50;
+	var longestChainDuration = 0;
 	for (var i = matchingNeighborPositions.length - 1; i >= 0; i--) {
 
 		// Recurse.
-		this.unLockChainRecursively(matchingNeighborPositions[i], unlockEffectStartTime + unlockEffectDelayTime)
+		var chainDuration = this.unLockChainRecursively(matchingNeighborPositions[i], unlockEffectStartTime + unlockEffectDelayTime)
+
+		longestChainDuration = Math.max(longestChainDuration, chainDuration);
 	};
+
+	return unlockEffectDelayTime + longestChainDuration;
 };
 
 
@@ -423,6 +468,26 @@ Board.prototype.draw = function (context, currentTime, center, scale) {
 			);
 		}
 	}
+
+
+	// Draw the unlocked pieces, queued for unlopcking effects.
+	for (var i = 0, length = this.unlockedPieces.length; i < length; ++i) {
+
+		var piece = this.unlockedPieces[i];
+
+		if (piece.unlockEffectStartTime > currentTime) {
+
+			piece.draw(
+				context,
+				currentTime,
+				center,
+				scale
+			);
+		}
+
+		// TODO: remove after done, and start effect.
+	}
+
 
 	// Draw the dropper pieces.
 	this.dropperPieceA.draw(
