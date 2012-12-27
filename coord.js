@@ -15,7 +15,7 @@ Coord.add = function (a, b) {
 		x: a.x + b.x,
 		y: a.y + b.y
 	});
-}
+};
 
 
 Coord.scale = function (coord, factor) {
@@ -30,4 +30,17 @@ Coord.scale = function (coord, factor) {
 Coord.prototype.scaled = function (factor) {
 
 	return Coord.scale(this, factor);
-}
+};
+
+
+Coord.prototype.length = function () {
+
+	return Math.sqrt(this.x * this.x + this.y * this.y);
+};
+
+
+Coord.prototype.normalized = function () {
+
+	return Coord.scale(this, 1/this.length());
+};
+

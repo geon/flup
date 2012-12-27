@@ -74,6 +74,7 @@ App.prototype.loadSprites = function () {
 	var promises = [];
 	
 	promises.push(Piece.getSpriteSheet().loadImage());
+	promises.push(UnlockingEffect.getSpriteSheet().loadImage());
 
 	return $.when.apply($, promises);	
 };

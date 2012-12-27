@@ -6,29 +6,22 @@ function Board (options) {
 
 	this.pieces = [];
 	this.unlockedPieces = [];
+	this.unlockingEffects = [];
 
 
-	// var colors = [
-	// 	{color: 0}, {color: 0}, {color: 0}, undefined, undefined, undefined, undefined, undefined,
-	// 	{color: 0}, {color: 0}, {color: 0}, undefined, undefined, undefined, undefined, undefined,
-	// 	{color: 0}, {color: 0}, {color: 0}, undefined, undefined, undefined, undefined, undefined,
-	// 	{color: 0}, {color: 0}, {color: 0}, undefined, undefined, undefined, undefined, undefined,
-	// 	{color: 0}, {color: 0}, {color: 0}, undefined, undefined, undefined, undefined, undefined,
-	// 	{color: 0}, {color: 0}, {color: 0}, undefined, undefined, undefined, undefined, undefined,
-	// 	{color: 0}, {color: 0}, {color: 0}, undefined, undefined, undefined, undefined, undefined,
-	// 	{color: 0}, {color: 0}, {color: 0}, undefined, undefined, undefined, undefined, undefined,
-	// 	{color: 0}, {color: 0}, {color: 0}, undefined, undefined, undefined, undefined, undefined,
-	// 	{color: 0}, {color: 0}, {color: 0}, undefined, undefined, undefined, undefined, undefined,
-	// 	{color: 0}, {color: 0}, {color: 0}, undefined, undefined, undefined, undefined, undefined,
-	// 	{color: 0}, {color: 0}, {color: 0}, undefined, undefined, undefined, undefined, undefined,
-	// 	{color: 0}, {color: 0}, {color: 0}, undefined, {color: 0, key:true}, undefined, undefined
-	// ];
-	// for (var i = colors.length - 1; i >= 0; i--) {
-	// 	if (colors[i])
-	// 		this.pieces[i] = new Piece(colors[i]);
-	// };
-	// this.makePiecesFall();
-	// options.pieceCycle[0] = new Piece({color: 0});
+	var colors = [
+		{color: 0}, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		{color: 0}, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		{color: 0}, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		{color: 0}, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		{color: 0}, {color: 0}, {color: 0}, undefined, undefined, undefined, undefined, undefined
+	];
+	for (var i = colors.length - 1; i >= 0; i--) {
+		if (colors[i])
+			this.pieces[i] = new Piece(colors[i]);
+	};
+	this.makePiecesFall();
+	options.pieceCycle[0] = new Piece({color: 0, key:true});
 
 
 	this.pieceCycle = options.pieceCycle;
@@ -346,7 +339,7 @@ Board.prototype.unLockChainRecursively = function (position, unlockEffectStartTi
 	this.pieces[position] = undefined;
 
 	// For all matching neighbors...
-	var unlockEffectDelayTime = 50;
+	var unlockEffectDelayTime = 25;
 	var longestChainDuration = 0;
 	for (var i = matchingNeighborPositions.length - 1; i >= 0; i--) {
 
@@ -454,6 +447,75 @@ Board.fisherYatesArrayShuffle = function (myArray) {
 
 Board.prototype.draw = function (context, currentTime, center, scale) {
 
+
+
+
+	// Draw the unlocking effects.
+	var doneUnlockingEffectIndices = [];
+	for (var i = this.unlockingEffects.length - 1; i >= 0; i--) {
+	
+		if (!this.unlockingEffects[i].isDone(currentTime)) {
+
+			this.unlockingEffects[i].draw(
+				context,
+				currentTime,
+				center,
+				scale
+			);
+
+		} else {
+
+			doneUnlockingEffectIndices.push(i);
+		};
+	};
+
+	// Remove the unlocking effects when they are done.
+	for (var i = doneUnlockingEffectIndices.length - 1; i >= 0; i--) {
+	
+		this.unlockingEffects.splice(doneUnlockingEffectIndices[i], 1);
+	};
+
+
+
+
+
+
+	// Draw the unlocked pieces, queued for unlocking effects.
+	var donePieceIndices = [];
+	for (var i = 0, length = this.unlockedPieces.length; i < length; ++i) {
+
+		var piece = this.unlockedPieces[i];
+
+		if (piece.unlockEffectStartTime > currentTime) {
+
+			// The piece should still be visible, so draw like normal.
+			piece.draw(
+				context,
+				currentTime,
+				center,
+				scale
+			);
+
+		} else {
+
+			// Remove it from the unlocking queue.
+			donePieceIndices.push(i);
+
+			// Start the unlocking effects.
+			this.unlockingEffects.push(new UnlockingEffect(piece));
+		}
+	}
+
+	// Remove the unlocked pieces from the unlocking effect queue.
+	for (var i = donePieceIndices.length - 1; i >= 0; i--) {
+	
+		this.unlockedPieces.splice(donePieceIndices[i], 1);
+	};
+
+
+
+
+
 	// Draw the board pieces.
 	for (var i = 0, length = this.pieces.length; i < length; ++i) {
 
@@ -467,25 +529,6 @@ Board.prototype.draw = function (context, currentTime, center, scale) {
 				scale
 			);
 		}
-	}
-
-
-	// Draw the unlocked pieces, queued for unlopcking effects.
-	for (var i = 0, length = this.unlockedPieces.length; i < length; ++i) {
-
-		var piece = this.unlockedPieces[i];
-
-		if (piece.unlockEffectStartTime > currentTime) {
-
-			piece.draw(
-				context,
-				currentTime,
-				center,
-				scale
-			);
-		}
-
-		// TODO: remove after done, and start effect.
 	}
 
 
