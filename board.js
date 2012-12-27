@@ -9,19 +9,17 @@ function Board (options) {
 	this.unlockingEffects = [];
 
 
-	var colors = [
-		{color: 0}, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-		{color: 0}, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-		{color: 0}, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-		{color: 0}, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-		{color: 0}, {color: 0}, {color: 0}, undefined, undefined, undefined, undefined, undefined
-	];
-	for (var i = colors.length - 1; i >= 0; i--) {
-		if (colors[i])
-			this.pieces[i] = new Piece(colors[i]);
-	};
-	this.makePiecesFall();
-	options.pieceCycle[0] = new Piece({color: 0, key:true});
+	// var colors = [
+	// 	{color: 1}, {color: 1}, {color: 1}, undefined, undefined, undefined, undefined, undefined,
+	// 	{color: 0}, {color: 0}, {color: 0}, undefined, undefined, undefined, undefined, undefined
+	// ];
+	// for (var i = colors.length - 1; i >= 0; i--) {
+	// 	if (colors[i])
+	// 		this.pieces[i] = new Piece(colors[i]);
+	// };
+	// this.makePiecesFall();
+	// options.pieceCycle[0] = new Piece({color: 0, key:true});
+	// options.pieceCycle[1] = new Piece({color: 1, key:true});
 
 
 	this.pieceCycle = options.pieceCycle;
@@ -274,6 +272,7 @@ Board.prototype.makePiecesFall = function (fallAnimationStartTime) {
 Board.prototype.unlockChains = function () {
 
 	var foundChains = false;
+	var maxUnlockEffectDuration = 0;
 	for (var i = this.pieces.length - 1; i >= 0; i--) {
 
 		// Look for keys.
@@ -292,13 +291,15 @@ Board.prototype.unlockChains = function () {
 				// ...Start the unlocking effect.
 				var unlockEffectDuration = this.unLockChainRecursively(i, unlockEffectStartTime);
 
-				// Fill up the gaps left by the chains, right after the unlocking effect is finished.
-				this.makePiecesFall(unlockEffectStartTime + unlockEffectDuration);
+				maxUnlockEffectDuration = Math.max(maxUnlockEffectDuration, unlockEffectDuration);
 			}
 		}
 	};
 
 	if (foundChains) {
+
+		// Fill up the gaps left by the chains, right after the unlocking effect is finished.
+		this.makePiecesFall(this.maxAnimationEndTime() + maxUnlockEffectDuration);
 
 		// New chains might have formed.
 		this.unlockChains();
