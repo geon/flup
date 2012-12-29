@@ -315,12 +315,15 @@ Board.prototype.unlockChains = function () {
 Board.prototype.maxAnimationEndTime = function () {
 
 	var maxAnimationEndTime = new Date().getTime();
-	
-	for (var i = this.pieces.length - 1; i >= 0; i--) {
-		
-		if (this.pieces[i]) {
 
-			var animationEndTime = this.pieces[i].animationQueue.getEndTime();
+	// Must also check the unlocked pieces waiting for the unlocking effect.
+	var allPieces = this.pieces.concat(this.unlockedPieces); 
+
+	for (var i = allPieces.length - 1; i >= 0; i--) {
+		
+		if (allPieces[i]) {
+
+			var animationEndTime = allPieces[i].animationQueue.getEndTime();
 			if (animationEndTime) {
 
 				maxAnimationEndTime = Math.max(maxAnimationEndTime, animationEndTime);
