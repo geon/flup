@@ -4,16 +4,18 @@
 
 function Animation (options) {
 
-	this.from           = new Coord(options.from || new Coord({}));
-	this.to             = new Coord(options.to || new Coord({}));
+	console.assert(
+		options
+		&& options.to
+		&& options.startTime
+		&& options.duration
+		&& options.interpolation
+	, "Data missing in constructor.");
+
+	this.to             = new Coord(options.to);
+	this.startTime      = options.startTime;
 	this.duration       = options.duration;
-	this.interpolation  = options.interpolation || "sine";
-	this.startTime      = options.startTime || new Date().getTime();
-
-	if (options.delay != undefined) {
-
-		this.startTime += options.delay;
-	}
+	this.interpolation  = options.interpolation;
 };
 
 
@@ -23,28 +25,7 @@ Animation.prototype.getEndTime = function () {
 }
 
 
-Animation.prototype.getPosition = function (currentTime) {
-
-	if (currentTime < this.startTime) {
-		return this.from;
-	}
-
-	if (currentTime > this.getEndTime()) {
-		return this.to;
-	}
-
-	var progress = this.interpolators[this.interpolation](
-		(currentTime - this.startTime) / this.duration
-	);
-
-	return Coord.add(
-		this.from.scaled(1-progress),
-		this.to.scaled(progress)
-	);
-}
-
-
-Animation.prototype.interpolators = {
+Animation.interpolators = {
 	"linear" : function (progress) {
 
 		return progress;
@@ -59,8 +40,8 @@ Animation.prototype.interpolators = {
 	},
 	"sine2" : function (progress) {
 
-		return Animation.prototype.interpolators["sine"](
-			Animation.prototype.interpolators["sine"](progress)
+		return Animation.interpolators["sine"](
+			Animation.interpolators["sine"](progress)
 		);
 	}
 }

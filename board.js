@@ -10,16 +10,16 @@ function Board (options) {
 
 
 	// var colors = [
-	// 	{color: 1}, {color: 1}, {color: 1}, undefined, undefined, undefined, undefined, undefined,
-	// 	{color: 0}, {color: 0}, {color: 0}, undefined, undefined, undefined, undefined, undefined
+	// 	undefined, undefined, {color: 1}, undefined, undefined, undefined, undefined, undefined,
+	// 	undefined, undefined, {color: 0}, undefined, undefined, undefined, undefined, undefined
 	// ];
 	// for (var i = colors.length - 1; i >= 0; i--) {
 	// 	if (colors[i])
 	// 		this.pieces[i] = new Piece(colors[i]);
 	// };
-	// this.makePiecesFall();
+	// this.makePiecesFall(new Date().getTime());
 	// options.pieceCycle[0] = new Piece({color: 0, key:true});
-	// options.pieceCycle[1] = new Piece({color: 1, key:true});
+	// options.pieceCycle[1] = new Piece({color: 0, key:false});
 
 
 	this.pieceCycle = options.pieceCycle;
@@ -58,7 +58,7 @@ Board.prototype.moveLeft = function () {
 	
 	this.playerPosition = Math.max(0, this.playerPosition - 1);
 
-	this.animateDropper();
+	this.animateDropper(new Date().getTime());
 };
 
 
@@ -66,7 +66,7 @@ Board.prototype.moveRight = function () {
 	
 	this.playerPosition = Math.min(Board.size.x - (this.playerOrientation % 2 ? 1 : 2), this.playerPosition + 1);
 
-	this.animateDropper();
+	this.animateDropper(new Date().getTime());
 };
 
 
@@ -76,7 +76,7 @@ Board.prototype.rotate = function () {
 
 	this.preventDropperFromStickingOutAfterRotation();
 
-	this.animateDropper();
+	this.animateDropper(new Date().getTime());
 };
 
 
@@ -143,14 +143,18 @@ Board.prototype.getDropperCoordinates = function () {
 
 Board.prototype.chargeDropper = function () {
 
+	var currentTime = new Date().getTime();
+
 	this.dropperPieceA = new Piece(this.getNextPieceInCycle(0));
+	this.dropperPieceA.animationQueue = new AnimationQueue({x:0, y:0}, currentTime);
 	this.dropperPieceB = new Piece(this.getNextPieceInCycle(1));
+	this.dropperPieceB.animationQueue = new AnimationQueue({x:0, y:0}, currentTime);
 	this.consumePiecesFromCycle(2);
 
 	// Set the orientation back to horiz. or vert., but not backwards or upside-down.
 	this.playerOrientation %= 2;
 
-	this.animateDropper();
+	this.animateDropper(currentTime);
 };
 
 
@@ -166,33 +170,35 @@ Board.prototype.getNextPieceInCycle = function (index) {
 };
 
 
-Board.prototype.animateDropper = function () {
+Board.prototype.animateDropper = function (currentTime) {
 
 	var coords = this.getDropperCoordinates();
 
 	var timePerPieceWidths = 50;
 
-	this.dropperPieceA.animation.add(new Animation({
+	this.dropperPieceA.animationQueue.add({
 		to: coords.a,
-		duration: timePerPieceWidths
-	}));
-	this.dropperPieceB.animation.add(new Animation({
+		duration: timePerPieceWidths,
+		interpolation: "sine",
+		startTime: currentTime
+	});
+	this.dropperPieceB.animationQueue.add({
 		to: coords.b,
-		duration: timePerPieceWidths
-	}));
+		duration: timePerPieceWidths,
+		interpolation: "sine",
+		startTime: currentTime
+	});
 };
 
 
 Board.prototype.applyGameLogic = function () {
 
-	this.makePiecesFall();
+	this.makePiecesFall(new Date().getTime());
 	this.unlockChains();
 };
 
 
 Board.prototype.makePiecesFall = function (fallAnimationStartTime) {
-
-	fallAnimationStartTime = fallAnimationStartTime || new Date().getTime();
 
 	/*
 
@@ -251,13 +257,12 @@ Board.prototype.makePiecesFall = function (fallAnimationStartTime) {
 
 			// Animate it.
 			var timePerPieceHeight = 100;
-			this.pieces[putPos].animation.add(new Animation({
+			this.pieces[putPos].animationQueue.add({
 				to: {x: x, y: yPut},
-				startTime: fallAnimationStartTime,
-				delay: numConsecutive * 50,
+				startTime: fallAnimationStartTime + numConsecutive * 50,
 				duration: Math.sqrt(yPut - yGet) * timePerPieceHeight,
 				interpolation: "easeInQuad"
-			}));
+			});
 			++numConsecutive;
 
 			// Raise the put/put-positions.
@@ -314,7 +319,12 @@ Board.prototype.maxAnimationEndTime = function () {
 	for (var i = this.pieces.length - 1; i >= 0; i--) {
 		
 		if (this.pieces[i]) {
-			maxAnimationEndTime = Math.max(maxAnimationEndTime, this.pieces[i].animation.getLast().getEndTime());
+
+			var animationEndTime = this.pieces[i].animationQueue.getEndTime();
+			if (animationEndTime) {
+
+				maxAnimationEndTime = Math.max(maxAnimationEndTime, animationEndTime);
+			}
 		}
 	}
 

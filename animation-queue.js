@@ -2,24 +2,24 @@
 "use strict";
 
 
-function AnimationQueue (startPosition) {
+function AnimationQueue (startPosition, startTime) {
 
-	startPosition = startPosition || new Coord({});
-
-	this.animations = [new Animation({to:startPosition, from:startPosition, duration:0})];
+	this.from = new Coord(startPosition || {x:0, y:0});
+	this.animations = [];
 };
 
 
-AnimationQueue.prototype.add = function (animation) {
+AnimationQueue.prototype.add = function (animationOptions) {
 
-	// Force the startTime and position to match the end of the previous step.
-	var lastAnimation   = this.getLast();
-	if (lastAnimation) {
-		animation.startTime = Math.max(animation.startTime, lastAnimation.getEndTime(), new Date().getTime());
-		animation.from      = lastAnimation.to;
+	// If there are already animations playing, queue it up. 
+	var endTime = this.getEndTime();
+	if (endTime) {
+
+		animationOptions.startTime = Math.max(animationOptions.startTime, endTime);
 	}
 
-	this.animations.push(animation);
+
+	this.animations.push(new Animation(animationOptions));
 }
 
 
@@ -34,18 +34,53 @@ AnimationQueue.prototype.getLast = function (animation) {
 }
 
 
+AnimationQueue.prototype.getEndTime = function () {
+
+	var lastAnimation = this.getLast();
+
+	return lastAnimation && lastAnimation.getEndTime();
+}
+
+
+AnimationQueue.prototype.getLastTo = function () {
+
+	var lastAnimation = this.getLast();
+
+	return lastAnimation ? lastAnimation.to : this.from;
+}
+
+
 AnimationQueue.prototype.getPosition = function (currentTime) {
+
+	// Remove any expired animations.
+	while (this.animations.length && this.animations[0].getEndTime() < currentTime) {
+		this.from = this.animations.shift().to;
+	}
+
 
 	if (!this.animations.length) {
 
-		return undefined;
+		return this.from;
 	}
 
-	// Remove all but the last animation until one is found that isn't expired.
-	while (this.animations.length > 1 && this.animations[0].getEndTime() < new Date().getTime()) {
 
-		this.animations.shift();
+	// Interpolate.
+
+	var currentAnimation = this.animations[0];
+
+	// Might not be strated yet.
+	if (currentTime < currentAnimation.startTime) {
+		return this.from;
 	}
 
-	return this.animations[0].getPosition(currentTime);
+	var progress = Animation.interpolators[currentAnimation.interpolation](
+		(currentTime - currentAnimation.startTime) / currentAnimation.duration
+	);
+
+	return Coord.add(
+		this.from.scaled(1-progress),
+		currentAnimation.to.scaled(progress)
+	);
+
 }
+

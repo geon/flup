@@ -39,7 +39,7 @@ TODO
 The next few issues on the map:
 
 * Add a visual queue of pieces feeding the dropper.
-* Fix some glitches in the timing of the animations when chains are unlocked. Preferably, pieces in the column above an exploding piece should fall immediately, not after the whole chain is gone.
+* Fix some glitches in the timing of the animations when chains are unlocked. Preferably, pieces in the column above an exploding piece should fall immediately, not after the whole chain is gone. Rewrite the makePiecesFall method.
 * Animation timing is tedious and tricky to get it all just right. Possibly switch to some other method.
 * Add the game over condition.
 * Add actual multiplayer. keyboard sharing is enough as a first step.
@@ -48,6 +48,8 @@ The next few issues on the map:
 * Add music with varying stress levels depending on how close you are to losing.
 * Add sound effects.
 * Sync all visuals and sound effects to the music. Lock the most significant effects to whole beats, and smaller effects to 1/2, 1/4, 1/8, 1/16 of a beat and so on. (The game Rez did this, and it was awesome.) With the existing animation queue system, it should be relatively easy to implement.
+* Switch all new Date().getTime() to passing a current time and limit the delta time. As it is now, it is sometimes problematic to debug stuff where the animation won't care that you have paused the code at a breakpoint in the debugger.
+* Add characters to choose from when starting the game. The character could determine the pattern of the pieces added when someone scores.
 
 Server/Client
 -------------

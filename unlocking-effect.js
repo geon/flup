@@ -5,7 +5,7 @@
 function UnlockingEffect (piece) {
 
 	this.color = piece.color;
-	this.coord = piece.animation.getLast().to;
+	this.coord = piece.animationQueue.getLastTo();
 	this.startTime = piece.unlockEffectStartTime;
 
 	this.initialVelocities = [];

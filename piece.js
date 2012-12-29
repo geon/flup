@@ -6,7 +6,7 @@ function Piece (options) {
 
 	this.color = options.color;
 	this.key = options.key;
-	this.animation = options.animation || new AnimationQueue();
+	this.animationQueue = options.animationQueue || new AnimationQueue();
 };
 
 
@@ -65,7 +65,7 @@ Piece.getSpriteSheetSettings = function () {
 
 Piece.prototype.draw = function (context, currentTime, boardCenter, boardScale) {
 
-	var position = this.animation.getPosition(currentTime);
+	var position = this.animationQueue.getPosition(currentTime);
 
 	var disturbance = false;
 	var jitterX = (disturbance ? Piece.size*boardScale*0.05 * Math.sin(currentTime/1000 * 27 + position.x + position.y*3) : 0);
