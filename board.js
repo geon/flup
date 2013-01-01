@@ -7,6 +7,7 @@ function Board (options) {
 	this.pieces = [];
 	this.unlockedPieces = [];
 	this.unlockingEffects = [];
+	this.dropperQueue = [];
 
 
 	// var colors = [
@@ -22,10 +23,13 @@ function Board (options) {
 	// options.pieceCycle[1] = new Piece({color: 0, key:false});
 
 
-	this.pieceCycle = options.pieceCycle;
-	this.pieceCycleIndex = 0;
 	this.dropperPieceA = undefined;
 	this.dropperPieceB = undefined;
+
+	this.pieceCycle = options.pieceCycle;
+	this.pieceCycleIndex = 0;
+
+	this.fillUpDropperQueue();
 
 	this.playerPosition = Math.floor((8-1)/2); // Ahrg! I want to use Board.size, but it isn't defined yet...
 	this.playerOrientation = 0;
@@ -40,6 +44,8 @@ function Board (options) {
 Board.size = {x:8, y:18};
 Board.numColors = 4;
 Board.nonKeyToKeyRatio = 7;
+Board.dropperQueueVisibleLength = 6;
+Board.dropperTimePerPieceWidth = 200;
 
 
 Board.coordToIndex = function (x, y) {
@@ -143,30 +149,130 @@ Board.prototype.getDropperCoordinates = function () {
 
 Board.prototype.chargeDropper = function () {
 
+	// Set the orientation back to horiz. or vert., but not backwards or upside-down.
+//	this.playerOrientation %= 2;
+
+	if (this.playerOrientation == 2) {
+		this.playerOrientation = 0;
+	}
+
+	if (this.playerOrientation == 1) {
+		this.playerOrientation = 3;
+	}
+
+
+	var coords = this.getDropperCoordinates();
+
+	var timePerPieceWidths = 50;
+
 	var currentTime = new Date().getTime();
 
-	this.dropperPieceA = new Piece(this.getNextPieceInCycle(0));
-	this.dropperPieceA.animationQueue = new AnimationQueue({x:0, y:0}, currentTime);
-	this.dropperPieceB = new Piece(this.getNextPieceInCycle(1));
-	this.dropperPieceB.animationQueue = new AnimationQueue({x:0, y:0}, currentTime);
-	this.consumePiecesFromCycle(2);
+	this.dropperPieceA = this.consumePieceFromDropperQueue();
+	this.dropperPieceB = this.consumePieceFromDropperQueue();
 
-	// Set the orientation back to horiz. or vert., but not backwards or upside-down.
-	this.playerOrientation %= 2;
 
-	this.animateDropper(currentTime);
+	// A needs to wait just beside the queue until B is ready.
+	this.dropperPieceA.animationQueue.add({
+		to: {x: Board.size.x-1, y:0},
+		duration: Board.dropperTimePerPieceWidth,
+		interpolation: "sine",
+		startTime: currentTime
+	});
+
+	if (this.playerOrientation && this.playerPosition < Board.size.x-1) {
+
+		// Make A go via B.
+		this.dropperPieceA.animationQueue.add({
+			to: coords.b,
+			duration: (Board.size.x - coords.b.x) * timePerPieceWidths,
+			interpolation: "sine",
+			startTime: currentTime
+		});
+
+		// Make B stop next to A.
+		this.dropperPieceB.animationQueue.add({
+			to: {x: coords.b.x+1, y:0},
+			duration: (Board.size.x - coords.b.x) * timePerPieceWidths,
+			interpolation: "sine",
+			startTime: currentTime
+		});
+	}
+
+	// Move to final positions.
+	this.dropperPieceA.animationQueue.add({
+		to: coords.a,
+		duration: Coord.distance(this.dropperPieceA.animationQueue.getLastTo(), coords.a) * timePerPieceWidths,
+		interpolation: "sine",
+		startTime: currentTime
+	});
+	this.dropperPieceB.animationQueue.add({
+		to: coords.b,
+		duration: Coord.distance(this.dropperPieceB.animationQueue.getLastTo(), coords.b) * timePerPieceWidths,
+		interpolation: "sine",
+		startTime: currentTime
+	});
+
+
+
 };
 
 
-Board.prototype.consumePiecesFromCycle = function (count) {
+Board.prototype.fillUpDropperQueue = function () {
 
-	this.pieceCycleIndex = (this.pieceCycleIndex + count) % this.pieceCycle.length;
+	while (this.dropperQueue.length < Board.dropperQueueVisibleLength) {
+
+		var piece = this.consumePieceFromCycle();
+
+		this.dropperQueue.push(new Piece({
+			color: piece.color,
+			key: piece.key,
+			animationQueue: new AnimationQueue({
+				x: Board.size.x,
+				y: this.dropperQueue.length
+			}),
+		}));
+	};
+}
+
+
+Board.prototype.consumePieceFromDropperQueue = function () {
+
+	var newPiece = this.consumePieceFromCycle();
+
+	this.dropperQueue.push(new Piece({
+		color: newPiece.color,
+		key: newPiece.key,
+		animationQueue: new AnimationQueue({
+			x: Board.size.x,
+			y: Board.dropperQueueVisibleLength
+		}),
+	}));
+
+	var p = this.dropperQueue.shift();
+
+	var currentTime = new Date().getTime();
+
+	for (var i = 0; i < this.dropperQueue.length; i++) {
+
+		this.dropperQueue[i].animationQueue.add({
+			to: {x: Board.size.x, y: i},
+			duration: Board.dropperTimePerPieceWidth,
+			interpolation: "sine",
+			startTime: (this.dropperQueue[0].animationQueue.getLast() && this.dropperQueue[0].animationQueue.getLast().startTime) || currentTime
+		});
+	};
+
+	return p
 };
 
 
-Board.prototype.getNextPieceInCycle = function (index) {
+Board.prototype.consumePieceFromCycle = function () {
 
-	return this.pieceCycle[(this.pieceCycleIndex + index) % this.pieceCycle.length];
+	var piece = this.pieceCycle[this.pieceCycleIndex];
+
+	this.pieceCycleIndex = (this.pieceCycleIndex + 1) % this.pieceCycle.length;
+
+	return piece;
 };
 
 
@@ -545,6 +651,16 @@ Board.prototype.draw = function (context, currentTime, center, scale) {
 		}
 	}
 
+
+	// Draw the dropper queue.
+	for (var i = 0; i < this.dropperQueue.length; i++) {
+		this.dropperQueue[i].draw(
+			context,
+			currentTime,
+			center,
+			scale
+		);
+	};
 
 	// Draw the dropper pieces.
 	this.dropperPieceA.draw(

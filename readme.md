@@ -38,7 +38,7 @@ TODO
 
 The next few issues on the map:
 
-* Add a visual queue of pieces feeding the dropper.
+* The visual queue of pieces feeding the dropper feels weird when the dropper is vertical. The pieces und up upside-down compared to how they sat in the queue. Feed the queue from above, move the pieces straight to the side, or flip them in the opposite direction at the end.
 * Add a piece-grid background image.
 * Improve the layout and size of the canvas. Full-browser + portrait layout?
 * Add input for touch.
@@ -46,6 +46,7 @@ The next few issues on the map:
 * Pieces in the column above an exploding piece should fall immediately, not after the whole chain is gone.
 * Add the game over condition.
 * Add a time limit to the piece-dropping. 5 seconds initially, and shrinking by a second per minute? After that, the piece will drop automatically whereever the dropper is at the moment.
+* Make the pieces start wiggling nervously as they get close to the upper limit (game over).
 * Add actual multiplayer. keyboard sharing is enough as a first step.
 * Add punishments (extra pieces added from below) to opponents when the player scores multiple chains.
 * Add a start and game over/winner screen.
@@ -54,6 +55,13 @@ The next few issues on the map:
 * Sync all visuals and sound effects to the music. Lock the most significant effects to whole beats, and smaller effects to 1/2, 1/4, 1/8, 1/16 of a beat and so on. (The game Rez did this, and it was awesome.) With the existing animation queue system, it should be relatively easy to implement.
 * Switch all new Date().getTime() to passing a current time and limit the delta time. As it is now, it is sometimes problematic to debug stuff where the animation won't care that you have paused the code at a breakpoint in the debugger.
 * Add characters to choose from when starting the game. The character could determine the pattern of the pieces added when someone scores.
+	* Cute robots?
+	* One pic for menu/gameplay + one broken (exploded robot head) for losers. When losing, shake the sprite .5 seconds, then switch sprite and play break sound effect.
+	* Small, simple animations by switching/moving body part sprites.
+		* Blinking eyes/blinkenlights
+		* Bobbing head to the beat of the music.
+		* Simple disco dance steps.
+		* Hold pieces in the hand and drop them.
 * Add alternative game styles; Single player (for ppoints) with and without piece-dropping time limit.
 * Animation timing is tedious and tricky to get it all just right. Possibly switch to some other method.
 

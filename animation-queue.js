@@ -2,7 +2,7 @@
 "use strict";
 
 
-function AnimationQueue (startPosition, startTime) {
+function AnimationQueue (startPosition) {
 
 	this.from = new Coord(startPosition || {x:0, y:0});
 	this.animations = [];

@@ -18,6 +18,15 @@ Coord.add = function (a, b) {
 };
 
 
+Coord.subtract = function (a, b) {
+
+	return new Coord({
+		x: a.x - b.x,
+		y: a.y - b.y
+	});
+};
+
+
 Coord.scale = function (coord, factor) {
 
 	return new Coord({
@@ -43,4 +52,11 @@ Coord.prototype.normalized = function () {
 
 	return Coord.scale(this, 1/this.length());
 };
+
+
+Coord.distance = function (a, b) {
+
+	return Coord.subtract(a, b).length();
+};
+
 
