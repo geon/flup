@@ -44,9 +44,7 @@ The next few issues on the map:
 * Add input for touch.
 * Switch makePiecesFall to use breadth-first.
 * Pieces in the column above an exploding piece should fall immediately, not after the whole chain is gone.
-* Add the game over condition.
 * Add a time limit to the piece-dropping. 5 seconds initially, and shrinking by a second per minute? After that, the piece will drop automatically whereever the dropper is at the moment.
-* Make the pieces start wiggling nervously as they get close to the upper limit (game over).
 * Add actual multiplayer. keyboard sharing is enough as a first step.
 * Add punishments (extra pieces added from below) to opponents when the player scores multiple chains.
 * Add a start and game over/winner screen.

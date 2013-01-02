@@ -581,7 +581,7 @@ Board.prototype.checkForGameOver = function () {
 
 Board.prototype.startGameOverEffect = function () {
 
-	var currentTime = new Date().getTime();
+	var gameOverEffectStartTime = this.maxAnimationEndTime();
 
 	// Unlock all pieces, from the center and out.
 	for (var i = 0; i < this.pieces.length; i++) {
@@ -590,7 +590,7 @@ Board.prototype.startGameOverEffect = function () {
 
 			var unlockedPiece = this.pieces[i];
 
-			unlockedPiece.unlockEffectStartTime = currentTime + Coord.distance(Board.indexToCoord(i), Coord.scale(Board.size, 0.5)) * Board.gameOverUnlockEffectDelayPerPieceWidth;
+			unlockedPiece.unlockEffectStartTime = gameOverEffectStartTime + Coord.distance(Board.indexToCoord(i), Coord.scale(Board.size, 0.5)) * Board.gameOverUnlockEffectDelayPerPieceWidth;
 			this.unlockedPieces.push(unlockedPiece);
 			this.pieces[i] = undefined;
 		}
@@ -615,6 +615,20 @@ Board.fisherYatesArrayShuffle = function (myArray) {
 
 Board.prototype.draw = function (context, currentTime, center, scale) {
 
+	// Calcukate how much to stress the player. (Piece wobbling increases as they approach the maximum height before game over.)
+	var height = 0;
+	for (var i = 0; i < this.pieces.length; i++) {
+	
+		if (this.pieces[i]) {
+
+			var position = Board.indexToCoord(i);
+			height = Board.size.y - 1 - position.y
+			break;
+		}
+	}
+	var ratio = height/(Board.size.y - 2 - 1);
+	var cutOffPoint = 0.65
+	var disturbance = (ratio < cutOffPoint) ? 0 : ((ratio - cutOffPoint)/(1-cutOffPoint));
 
 
 
@@ -661,7 +675,8 @@ Board.prototype.draw = function (context, currentTime, center, scale) {
 				context,
 				currentTime,
 				center,
-				scale
+				scale,
+				disturbance
 			);
 
 		} else {
@@ -694,7 +709,8 @@ Board.prototype.draw = function (context, currentTime, center, scale) {
 				context,
 				currentTime,
 				center,
-				scale
+				scale,
+				disturbance
 			);
 		}
 	}
@@ -706,7 +722,8 @@ Board.prototype.draw = function (context, currentTime, center, scale) {
 			context,
 			currentTime,
 			center,
-			scale
+			scale,
+			0
 		);
 	};
 
@@ -716,13 +733,15 @@ Board.prototype.draw = function (context, currentTime, center, scale) {
 			context,
 			currentTime,
 			center,
-			scale
+			scale,
+			0
 		);
 		this.dropperPieceB.draw(
 			context,
 			currentTime,
 			center,
-			scale
+			scale,
+			0
 		);
 	}
 };
