@@ -93,6 +93,11 @@ App.prototype.startGame = function () {
 
 	window.addEventListener("keydown", function(event) {
 
+		if (self.board.gameOver) {
+
+			return;
+		}
+
 		if (!self.lastEventWasKeyDown) {
 
 			switch (event.keyCode) {

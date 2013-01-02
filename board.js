@@ -36,6 +36,7 @@ function Board (options) {
 
 	this.serverStateCounter = 0;
 
+	this.gameOver = false;
 
 	this.chargeDropper();
 };
@@ -46,6 +47,8 @@ Board.numColors = 4;
 Board.nonKeyToKeyRatio = 7;
 Board.dropperQueueVisibleLength = 6;
 Board.dropperTimePerPieceWidth = 200;
+
+Board.gameOverUnlockEffectDelayPerPieceWidth = 100;
 
 
 Board.coordToIndex = function (x, y) {
@@ -61,7 +64,7 @@ Board.indexToCoord = function (index) {
 
 
 Board.prototype.moveLeft = function () {
-	
+
 	this.playerPosition = Math.max(0, this.playerPosition - 1);
 
 	this.animateDropper(new Date().getTime());
@@ -98,6 +101,10 @@ Board.prototype.preventDropperFromStickingOutAfterRotation = function () {
 
 
 Board.prototype.drop = function () {
+
+	if (this.gameOver) {
+		return;
+	}
 	
 	var coords = this.getDropperCoordinates();
 
@@ -117,10 +124,13 @@ Board.prototype.drop = function () {
 	// Add the pieces.
 	this.pieces[aPos] = this.dropperPieceA;
 	this.pieces[bPos] = this.dropperPieceB
-	this.chargeDropper();
-
 
 	this.applyGameLogic();
+
+	if (!this.gameOver) {
+
+		this.chargeDropper();
+	}
 
 	return true;
 };
@@ -301,6 +311,7 @@ Board.prototype.applyGameLogic = function () {
 
 	this.makePiecesFall(new Date().getTime());
 	this.unlockChains();
+	this.checkForGameOver();
 };
 
 
@@ -550,6 +561,43 @@ Board.generatePieceCycle = function () {
 };
 
 
+Board.prototype.checkForGameOver = function () {
+
+	for (var i = 0; i < Board.size.x * 2; i++) {
+
+		if (this.pieces[i]) {
+
+			this.gameOver = true;
+
+			this.startGameOverEffect();
+
+			break;
+		}		
+	};
+
+	return false;
+}
+
+
+Board.prototype.startGameOverEffect = function () {
+
+	var currentTime = new Date().getTime();
+
+	// Unlock all pieces, from the center and out.
+	for (var i = 0; i < this.pieces.length; i++) {
+		
+		if (this.pieces[i]) {
+
+			var unlockedPiece = this.pieces[i];
+
+			unlockedPiece.unlockEffectStartTime = currentTime + Coord.distance(Board.indexToCoord(i), Coord.scale(Board.size, 0.5)) * Board.gameOverUnlockEffectDelayPerPieceWidth;
+			this.unlockedPieces.push(unlockedPiece);
+			this.pieces[i] = undefined;
+		}
+	}
+}
+
+
 // http://stackoverflow.com/questions/2450954/how-to-randomize-a-javascript-array
 Board.fisherYatesArrayShuffle = function (myArray) {
 
@@ -663,17 +711,19 @@ Board.prototype.draw = function (context, currentTime, center, scale) {
 	};
 
 	// Draw the dropper pieces.
-	this.dropperPieceA.draw(
-		context,
-		currentTime,
-		center,
-		scale
-	);
-	this.dropperPieceB.draw(
-		context,
-		currentTime,
-		center,
-		scale
-	);
+	if (!this.gameOver) {
+		this.dropperPieceA.draw(
+			context,
+			currentTime,
+			center,
+			scale
+		);
+		this.dropperPieceB.draw(
+			context,
+			currentTime,
+			center,
+			scale
+		);
+	}
 };
 
