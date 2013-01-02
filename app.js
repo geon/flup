@@ -84,24 +84,38 @@ App.prototype.startGame = function () {
 
 	// Set up input.
 	var self = this;
+
+	window.addEventListener("keyup", function(event) {
+
+		self.lastEventWasKeyDown = false;
+
+	}, false);
+
 	window.addEventListener("keydown", function(event) {
-		switch (event.keyCode) {
-			case 37: // Left
-				self.board.moveLeft();
-				break;
-	
-			case 39: // Right
-				self.board.moveRight();
-				break;
-	
-			case 38: // Up
-				self.board.rotate();
-				break;
-	
-			case 40: // Down
-				self.board.drop();
-				break;
+
+		if (!self.lastEventWasKeyDown) {
+
+			switch (event.keyCode) {
+				case 37: // Left
+					self.board.moveLeft();
+					break;
+		
+				case 39: // Right
+					self.board.moveRight();
+					break;
+		
+				case 38: // Up
+					self.board.rotate();
+					break;
+		
+				case 40: // Down
+					self.board.drop();
+					break;
+			}
 		}
+
+		self.lastEventWasKeyDown = true;
+
 	}, false);
 
 	// Set up the server connection.

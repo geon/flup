@@ -42,7 +42,7 @@ The next few issues on the map:
 * Add a piece-grid background image.
 * Improve the layout and size of the canvas. Full-browser + portrait layout?
 * Add input for touch.
-* Switch makePiecesFall toi use breadth-first.
+* Switch makePiecesFall to use breadth-first.
 * Pieces in the column above an exploding piece should fall immediately, not after the whole chain is gone.
 * Add the game over condition.
 * Add a time limit to the piece-dropping. 5 seconds initially, and shrinking by a second per minute? After that, the piece will drop automatically whereever the dropper is at the moment.
