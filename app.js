@@ -6,7 +6,10 @@ function App (options) {
 
 	this.context = options.context;
 
-	this.board = new Board({pieceCycle: Board.generatePieceCycle()});
+	var pieceCycle = Board.generatePieceCycle()
+
+	this.boardA = new Board({pieceCycle: pieceCycle});
+	this.boardB = new Board({pieceCycle: pieceCycle});
 
 	this.pieceSize = 32;
 	
@@ -59,7 +62,7 @@ function App (options) {
 
 App.prototype.getWidth = function () {
 	
-	return Board.size.x * this.pieceSize * 2;
+	return Board.size.x * this.pieceSize * 3;
 }
 
 
@@ -87,39 +90,59 @@ App.prototype.startGame = function () {
 
 	window.addEventListener("keyup", function(event) {
 
-		self.lastEventWasKeyDown = false;
+		self.keydownEventInProgress = undefined;
 
 	}, false);
 
 	window.addEventListener("keydown", function(event) {
 
-		if (self.board.gameOver) {
+		if (self.boardA.gameOver || self.boardB.gameOver) {
 
 			return;
 		}
 
-		if (!self.lastEventWasKeyDown) {
+		if (self.keydownEventInProgress != event.keyCode) {
 
 			switch (event.keyCode) {
+
+				// Player 1.
 				case 37: // Left
-					self.board.moveLeft();
+					self.boardB.moveLeft();
 					break;
 		
 				case 39: // Right
-					self.board.moveRight();
+					self.boardB.moveRight();
 					break;
 		
 				case 38: // Up
-					self.board.rotate();
+					self.boardB.rotate();
 					break;
 		
 				case 40: // Down
-					self.board.drop();
+					self.boardB.drop();
+					break;
+
+
+				// Player 2.
+				case "A".charCodeAt(0): // Left
+					self.boardA.moveLeft();
+					break;
+		
+				case "D".charCodeAt(0): // Right
+					self.boardA.moveRight();
+					break;
+		
+				case "W".charCodeAt(0): // Up
+					self.boardA.rotate();
+					break;
+		
+				case "S".charCodeAt(0): // Down
+					self.boardA.drop();
 					break;
 			}
 		}
 
-		self.lastEventWasKeyDown = true;
+		self.keydownEventInProgress = event.keyCode;
 
 	}, false);
 
@@ -187,27 +210,34 @@ App.prototype.render = function () {
 	this.context.fillStyle = "#eee";
 	this.context.fillRect(0, 0, this.getWidth(), this.getHeight());
 
-	// Testing dummy opponent boards.
-	this.board.draw(
+
+	// // Testing dummy opponent boards.
+	// this.board.draw(
+	// 	this.context,
+	// 	currentTime,
+	// 	{x:this.getWidth()*1/8, y:this.getHeight()*2/4},
+	// 	1/2
+	// );
+	// this.board.draw(
+	// 	this.context,
+	// 	currentTime,
+	// 	{x:this.getWidth()*7/8, y:this.getHeight()*2/4},
+	// 	1/2
+	// );
+
+
+
+	// The player boards.
+	this.boardA.draw(
 		this.context,
 		currentTime,
-		{x:this.getWidth()*1/8, y:this.getHeight()*2/4},
-		1/2
+		{x:this.getWidth()/4*1, y:this.getHeight()/2},
+		1/1
 	);
-	this.board.draw(
+	this.boardB.draw(
 		this.context,
 		currentTime,
-		{x:this.getWidth()*7/8, y:this.getHeight()*2/4},
-		1/2
-	);
-
-
-
-	// The player board.
-	this.board.draw(
-		this.context,
-		currentTime,
-		{x:this.getWidth()/2, y:this.getHeight()/2},
+		{x:this.getWidth()/4*3, y:this.getHeight()/2},
 		1/1
 	);
 
