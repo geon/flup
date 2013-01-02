@@ -39,7 +39,6 @@ TODO
 The next few issues on the map:
 
 * The visual queue of pieces feeding the dropper feels weird when the dropper is vertical. The pieces und up upside-down compared to how they sat in the queue. Feed the queue from above, move the pieces straight to the side, or flip them in the opposite direction at the end.
-* Add a piece-grid background image.
 * Improve the layout and size of the canvas. Full-browser + portrait layout?
 * Add input for touch.
 * Switch makePiecesFall to use breadth-first.
@@ -59,7 +58,7 @@ The next few issues on the map:
 		* Bobbing head to the beat of the music.
 		* Simple disco dance steps.
 		* Hold pieces in the hand and drop them.
-* Add alternative game styles; Single player (for ppoints) with and without piece-dropping time limit.
+* Add alternative game styles; Single player (for points) with and without piece-dropping time limit. Implement as multiple "Game" objects that takes care of the gameplay mechanics and layout differences?
 * Animation timing is tedious and tricky to get it all just right. Possibly switch to some other method.
 
 Server/Client

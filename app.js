@@ -68,7 +68,7 @@ App.prototype.getWidth = function () {
 
 App.prototype.getHeight = function () {
 	
-	return Board.size.y * this.pieceSize;
+	return Board.size.y * this.pieceSize * 1.2;
 }
 
 

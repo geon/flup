@@ -615,7 +615,22 @@ Board.fisherYatesArrayShuffle = function (myArray) {
 
 Board.prototype.draw = function (context, currentTime, center, scale) {
 
-	// Calcukate how much to stress the player. (Piece wobbling increases as they approach the maximum height before game over.)
+	// Draw the board background.
+	context.fillStyle = "rgba(0, 0, 0, 0.1)";
+	for (var i = 0; i < Board.size.x; i++) {
+		
+		var xCenter = (center.x + (i/Board.size.x - 0.5) * Board.size.x*Piece.size*scale + Piece.size/2) - 0.5 * (Piece.size);
+
+		context.fillRect(
+			(xCenter + 2),
+			center.y - (Board.size.y * Piece.size / 2) * scale,
+			(Piece.size - 4) * scale,
+			(Board.size.y * Piece.size) * scale
+		);
+	};
+
+
+	// Calculate how much to stress the player. (Piece wobbling increases as they approach the maximum height before game over.)
 	var height = 0;
 	for (var i = 0; i < this.pieces.length; i++) {
 	
