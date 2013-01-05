@@ -4,6 +4,8 @@
 
 function Board (options) {
 
+	this.gameMode = options.gameMode;
+
 	this.pieces = [];
 	this.unlockedPieces = [];
 	this.unlockingEffects = [];
@@ -46,7 +48,7 @@ Board.size = {x:8, y:18};
 Board.numColors = 4;
 Board.nonKeyToKeyRatio = 7;
 Board.dropperQueueVisibleLength = 6;
-Board.dropperTimePerPieceWidth = 200;
+Board.dropperQueueTimePerPieceWidth = 200;
 
 Board.gameOverUnlockEffectDelayPerPieceWidth = 100;
 
@@ -184,7 +186,7 @@ Board.prototype.chargeDropper = function () {
 	// A needs to wait just beside the queue until B is ready.
 	this.dropperPieceA.animationQueue.add({
 		to: {x: Board.size.x-1, y:0},
-		duration: Board.dropperTimePerPieceWidth,
+		duration: Board.dropperQueueTimePerPieceWidth,
 		interpolation: "sine",
 		startTime: currentTime
 	});
@@ -266,7 +268,7 @@ Board.prototype.consumePieceFromDropperQueue = function () {
 
 		this.dropperQueue[i].animationQueue.add({
 			to: {x: Board.size.x, y: i},
-			duration: Board.dropperTimePerPieceWidth,
+			duration: Board.dropperQueueTimePerPieceWidth,
 			interpolation: "sine",
 			startTime: (this.dropperQueue[0].animationQueue.getLast() && this.dropperQueue[0].animationQueue.getLast().startTime) || currentTime
 		});
@@ -425,6 +427,9 @@ Board.prototype.unlockChains = function () {
 
 		// New chains might have formed.
 		this.unlockChains();
+
+		// The player scored, so punish opponents.
+		this.gameMode.punishOpponents(this);
 	}
 };
 
@@ -595,6 +600,53 @@ Board.prototype.startGameOverEffect = function () {
 			this.pieces[i] = undefined;
 		}
 	}
+}
+
+
+Board.prototype.punish = function () {
+
+	var punishmentAnimationStartTime = this.maxAnimationEndTime();
+
+	// Make room.
+	for (var y = 0; y < Board.size.y-1; y++) {
+		for (var x = 0; x < Board.size.x; x++) {
+
+			this.pieces[Board.coordToIndex(x, y)] = this.pieces[Board.coordToIndex(x, y+1)];
+		}
+	};
+
+	// Add pieces.
+	for (var x = 0; x < Board.size.x; x++) {
+
+		this.pieces[Board.coordToIndex(x, Board.size.y-1)] = new Piece({
+			color: x % Board.numColors,
+			key: false,
+			animationQueue: new AnimationQueue({
+				x: x,
+				y: Board.size.y // Start the animation just outside the board.
+			}),
+		});
+	}
+
+	// Animate.
+	for (var i = 0; i < this.pieces.length; i++) {
+		
+		if (this.pieces[i]) {
+
+			this.pieces[i].animationQueue.add({
+				to: Board.indexToCoord(i),
+				duration: Board.dropperQueueTimePerPieceWidth,
+				interpolation: "sine",
+				startTime: punishmentAnimationStartTime
+			});
+		}
+	}
+
+	// New chains might thave formed.
+	this.unlockChains();
+
+	// The pieces might have risen too high.
+	this.checkForGameOver();
 }
 
 

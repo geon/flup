@@ -8,8 +8,13 @@ function App (options) {
 
 	var pieceCycle = Board.generatePieceCycle()
 
-	this.boardA = new Board({pieceCycle: pieceCycle});
-	this.boardB = new Board({pieceCycle: pieceCycle});
+	this.gameMode = new GameMode();
+
+	// TODO: Move this to the GameMode implementation.
+	this.boardA = new Board({pieceCycle: pieceCycle, gameMode: this.gameMode});
+	this.boardB = new Board({pieceCycle: pieceCycle, gameMode: this.gameMode});
+
+	this.gameMode.boards = [this.boardA, this.boardB];
 
 	this.pieceSize = 32;
 	
