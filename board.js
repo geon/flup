@@ -65,6 +65,18 @@ Board.indexToCoord = function (index) {
 };
 
 
+Board.getWidth = function () {
+	
+	return (Board.size.x + 2) * Piece.size;
+}
+
+
+Board.getHeight = function () {
+	
+	return (Board.size.y + 2) * Piece.size;
+}
+
+
 Board.prototype.moveLeft = function () {
 
 	this.playerPosition = Math.max(0, this.playerPosition - 1);

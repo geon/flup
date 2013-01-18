@@ -18,38 +18,30 @@ function App (options) {
 
 	this.pieceSize = 32;
 	
-	this.context.canvas.width = this.getWidth();
-	this.context.canvas.height = this.getHeight();
-
 	this.lastRenderTime = 0;
 
-
-	// Handle Retina Display
-
-	// Find the resolution multiplier.
-	var pixelRatio = 1;
-	if (window.devicePixelRatio) {
-		pixelRatio = window.devicePixelRatio;
-	}
-
-	$(this.context.canvas)
-
-		// Double the number of pixels...
-		.attr('width', this.getWidth() * pixelRatio)
-		.attr('height', this.getHeight() * pixelRatio)
-
-		// ...But keep the displayed size the same.		
-		.css('width', this.getWidth())
-		.css('height', this.getHeight())
-	;
-	
-	// Set the scale factor so we can forget this.
-	this.context.scale(pixelRatio, pixelRatio);			 
+	this.backgroundImage = new Image();
 
 
-
-
+	// Make the canvas resolution match the displayed size.
 	var self = this;
+	function makeCanvasFullWindow (){
+
+		self.context.canvas.width = window.innerWidth * window.devicePixelRatio;
+		self.context.canvas.height = window.innerHeight * window.devicePixelRatio;
+
+		$(self.context.canvas).css({
+			width: window.innerWidth,
+			height: window.innerHeight
+		});
+
+		// Set the scale factor to handle Retina displays. MUST BE DONE AFTER EACH SIZE CHANGE.
+		self.context.scale(window.devicePixelRatio, window.devicePixelRatio);
+	}
+	$(window).resize(makeCanvasFullWindow);
+	makeCanvasFullWindow();
+
+
 	
 	this.loadSprites().then(function(){
 
@@ -67,13 +59,13 @@ function App (options) {
 
 App.prototype.getWidth = function () {
 	
-	return Board.size.x * this.pieceSize * 3;
+	return this.context.canvas.width / window.devicePixelRatio;
 }
 
 
 App.prototype.getHeight = function () {
 	
-	return Board.size.y * this.pieceSize * 1.2;
+	return this.context.canvas.height / window.devicePixelRatio;
 }
 
 
@@ -83,6 +75,13 @@ App.prototype.loadSprites = function () {
 	
 	promises.push(Piece.getSpriteSheet().loadImage());
 	promises.push(UnlockingEffect.getSpriteSheet().loadImage());
+
+	var promise = $.Deferred();
+	$(this.backgroundImage).load(promise.resolve);
+	$(this.backgroundImage).error(promise.reject);
+	this.backgroundImage.src = "graphics/background.jpg";
+
+	promises.push(promise);
 
 	return $.when.apply($, promises);	
 };
@@ -211,38 +210,40 @@ App.prototype.render = function () {
 	var deltaTime = currentTime - this.lastRenderTime;
 	this.lastRenderTime = currentTime;
 
-	// Fill the background.
-	this.context.fillStyle = "#eee";
-	this.context.fillRect(0, 0, this.getWidth(), this.getHeight());
 
+	// Draw the background.
+	var srcAspect = this.backgroundImage.width / this.backgroundImage.height;
+	var dstAspect = this.getWidth()            / this.getHeight();
+	var srcCroppedWidth  = Math.min(this.backgroundImage.width,  this.backgroundImage.width  * dstAspect / srcAspect);
+	var srcCroppedHeight = Math.min(this.backgroundImage.height, this.backgroundImage.height / dstAspect * srcAspect);
+	this.context.drawImage(
+		this.backgroundImage,
 
-	// // Testing dummy opponent boards.
-	// this.board.draw(
-	// 	this.context,
-	// 	currentTime,
-	// 	{x:this.getWidth()*1/8, y:this.getHeight()*2/4},
-	// 	1/2
-	// );
-	// this.board.draw(
-	// 	this.context,
-	// 	currentTime,
-	// 	{x:this.getWidth()*7/8, y:this.getHeight()*2/4},
-	// 	1/2
-	// );
+		// Source xywh - Centered crop to destination aspect.
+		Math.max(0, this.backgroundImage.width  - srcCroppedWidth ) / 2,
+		Math.max(0, this.backgroundImage.height - srcCroppedHeight) / 2,
+		srcCroppedWidth,
+		srcCroppedHeight,
 
+		// Destination xywh - Fill up completely.
+		0,
+		0,
+		this.getWidth(),
+		this.getHeight()
+	);
 
 
 	// The player boards.
 	this.boardA.draw(
 		this.context,
 		currentTime,
-		{x:this.getWidth()/4*1, y:this.getHeight()/2},
+		{x:(this.getWidth() - Board.getWidth() * 2) * 1/3 + Board.getWidth() * 1/2, y:this.getHeight()/2},
 		1/1
 	);
 	this.boardB.draw(
 		this.context,
 		currentTime,
-		{x:this.getWidth()/4*3, y:this.getHeight()/2},
+		{x:(this.getWidth() - Board.getWidth() * 2) * 2/3 + Board.getWidth() * 3/2, y:this.getHeight()/2},
 		1/1
 	);
 
