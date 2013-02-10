@@ -680,7 +680,7 @@ Board.fisherYatesArrayShuffle = function (myArray) {
 Board.prototype.draw = function (context, currentTime, center, scale) {
 
 	// Draw the board background.
-	context.fillStyle = "rgba(0, 0, 0, 0.1)";
+	context.fillStyle = "rgba(255, 255, 255, 0.1)";
 	for (var i = 0; i < Board.size.x; i++) {
 		
 		var xCenter = (center.x + (i/Board.size.x - 0.5) * Board.size.x*Piece.size*scale + Piece.size/2) - 0.5 * (Piece.size);

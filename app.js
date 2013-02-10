@@ -22,6 +22,11 @@ function App (options) {
 
 	this.backgroundImage = new Image();
 
+	this.avatars = [
+		new AvatarAztecJade({character: 0}),
+		new AvatarAztecJade({character: 0})
+	];
+
 
 	// Make the canvas resolution match the displayed size.
 	var self = this;
@@ -75,11 +80,12 @@ App.prototype.loadSprites = function () {
 	
 	promises.push(Piece.getSpriteSheet().loadImage());
 	promises.push(UnlockingEffect.getSpriteSheet().loadImage());
+	promises.push(AvatarAztecJade.getSpriteSheet().loadImage());
 
 	var promise = $.Deferred();
 	$(this.backgroundImage).load(promise.resolve);
 	$(this.backgroundImage).error(promise.reject);
-	this.backgroundImage.src = "graphics/background.jpg";
+	this.backgroundImage.src = "graphics/temple.jpg";
 
 	promises.push(promise);
 
@@ -245,6 +251,19 @@ App.prototype.render = function () {
 		currentTime,
 		{x:(this.getWidth() - Board.getWidth() * 2) * 2/3 + Board.getWidth() * 3/2, y:this.getHeight()/2},
 		1/1
+	);
+
+
+	// Draw the player avatars.
+	this.avatars[0].draw(
+		this.context,
+		currentTime,
+		{x:(this.getWidth() - Board.getWidth() * 2) * 1/3 + Board.getWidth() * -0.1/2, y:this.getHeight()/2 + Board.getWidth()*.65}
+	);
+	this.avatars[1].draw(
+		this.context,
+		currentTime,
+		{x:(this.getWidth() - Board.getWidth() * 2) * 2/3 + Board.getWidth() * 4.1/2, y:this.getHeight()/2 + Board.getWidth()*.65}
 	);
 
 
