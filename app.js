@@ -23,7 +23,7 @@ function App (options) {
 	this.backgroundImage = new Image();
 
 	this.avatars = [
-		new AvatarAztecJade({character: 0}),
+		new AvatarOwl({character: 0}),
 		new AvatarAztecJade({character: 0})
 	];
 
@@ -80,6 +80,7 @@ App.prototype.loadSprites = function () {
 	
 	promises.push(Piece.getSpriteSheet().loadImage());
 	promises.push(UnlockingEffect.getSpriteSheet().loadImage());
+	promises.push(AvatarOwl.getSpriteSheet().loadImage());
 	promises.push(AvatarAztecJade.getSpriteSheet().loadImage());
 
 	var promise = $.Deferred();
