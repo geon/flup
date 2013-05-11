@@ -6,15 +6,7 @@ function App (options) {
 
 	this.context = options.context;
 
-	var pieceCycle = Board.generatePieceCycle()
-
 	this.gameMode = new GameMode();
-
-	// TODO: Move this to the GameMode implementation.
-	this.boardA = new Board({pieceCycle: pieceCycle, gameMode: this.gameMode});
-	this.boardB = new Board({pieceCycle: pieceCycle, gameMode: this.gameMode});
-
-	this.gameMode.boards = [this.boardA, this.boardB];
 
 	this.pieceSize = 32;
 	
@@ -22,10 +14,6 @@ function App (options) {
 
 	this.backgroundImage = new Image();
 
-	this.avatars = [
-		new AvatarOwl({character: 0}),
-		new AvatarAztecJade({character: 0})
-	];
 
 
 	// Make the canvas resolution match the displayed size.
@@ -99,6 +87,9 @@ App.prototype.startGame = function () {
 	// Set up input.
 	var self = this;
 
+
+	// I need to listen to keyup as well, so I can ignore repeated
+	// keydown events from holding the key.
 	window.addEventListener("keyup", function(event) {
 
 		self.keydownEventInProgress = undefined;
@@ -107,50 +98,9 @@ App.prototype.startGame = function () {
 
 	window.addEventListener("keydown", function(event) {
 
-		if (self.boardA.gameOver || self.boardB.gameOver) {
-
-			return;
-		}
-
 		if (self.keydownEventInProgress != event.keyCode) {
 
-			switch (event.keyCode) {
-
-				// Player 1.
-				case 37: // Left
-					self.boardB.moveLeft();
-					break;
-		
-				case 39: // Right
-					self.boardB.moveRight();
-					break;
-		
-				case 38: // Up
-					self.boardB.rotate();
-					break;
-		
-				case 40: // Down
-					self.boardB.drop();
-					break;
-
-
-				// Player 2.
-				case "A".charCodeAt(0): // Left
-					self.boardA.moveLeft();
-					break;
-		
-				case "D".charCodeAt(0): // Right
-					self.boardA.moveRight();
-					break;
-		
-				case "W".charCodeAt(0): // Up
-					self.boardA.rotate();
-					break;
-		
-				case "S".charCodeAt(0): // Down
-					self.boardA.drop();
-					break;
-			}
+			self.gameMode.onKeyDown(event.keyCode);
 		}
 
 		self.keydownEventInProgress = event.keyCode;
@@ -240,33 +190,15 @@ App.prototype.render = function () {
 	);
 
 
-	// The player boards.
-	this.boardA.draw(
+	// Boards and avatars.
+	this.gameMode.draw(
 		this.context,
 		currentTime,
-		{x:(this.getWidth() - Board.getWidth() * 2) * 1/3 + Board.getWidth() * 1/2, y:this.getHeight()/2},
-		1/1
+		{
+			x:this.getWidth(),
+			y:this.getHeight()
+		}
 	);
-	this.boardB.draw(
-		this.context,
-		currentTime,
-		{x:(this.getWidth() - Board.getWidth() * 2) * 2/3 + Board.getWidth() * 3/2, y:this.getHeight()/2},
-		1/1
-	);
-
-
-	// Draw the player avatars.
-	this.avatars[0].draw(
-		this.context,
-		currentTime,
-		{x:(this.getWidth() - Board.getWidth() * 2) * 1/3 + Board.getWidth() * -0.1/2, y:this.getHeight()/2 + Board.getWidth()*.65}
-	);
-	this.avatars[1].draw(
-		this.context,
-		currentTime,
-		{x:(this.getWidth() - Board.getWidth() * 2) * 2/3 + Board.getWidth() * 4.1/2, y:this.getHeight()/2 + Board.getWidth()*.65}
-	);
-
 
 	// FPS counter.
 //	this.context.fillStyle = "black";
