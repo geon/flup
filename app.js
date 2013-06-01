@@ -6,7 +6,7 @@ function App (options) {
 
 	this.context = options.context;
 
-	this.gameMode = new GameMode();
+	this.gameMode = new GameMode2pLocal();
 
 	this.pieceSize = 32;
 	

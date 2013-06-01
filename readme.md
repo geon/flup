@@ -38,13 +38,19 @@ TODO
 
 The next few issues on the map:
 
-* Add punishments (extra pieces added from below) to opponents when the player scores multiple chains.
+* Add characters to choose from when starting the game. The character could determine the pattern of the pieces added when someone scores.
+	* Golden idols!
+	* One pic for menu/gameplay + one broken for losers. When losing, shake the sprite .5 seconds, then switch sprite and play break sound effect.
+	* Small, simple animations by switching/moving body part sprites.
+		* Blinking eyes.
+		* Bobbing head to the beat of the music.
 * Add a start and game over/winner screen.
+* Try how it feels if the droppedd pieces can never land on top of each-other, but will disappear immediately when they land, making room for the piece above. That makes it possible to make the pieces shatter immediately when a chain is made, instead of waiting for everything to settle.
+* Make punishments (extra pieces added from below) depend on the score.
 * Add a time limit to the piece-dropping. 5 seconds initially, and shrinking by a second per minute? After that, the piece will drop automatically whereever the dropper is at the moment.
 * The visual queue of pieces feeding the dropper feels weird when the dropper is vertical. The pieces und up upside-down compared to how they sat in the queue. Feed the queue from above, move the pieces straight to the side, or flip them in the opposite direction at the end.
-* Improve the layout and size of the canvas. Full-browser + portrait layout?
 * Add input for touch.
-* Add a menu system. To begin with, just "Start". Then "Select Game Mode" and "Select Character" as they get implemented.
+* Add a menu system. To begin with, just "Start". Then "Select Game Mode" and "Select Character" as they get implemented. DOM-based?
 * Add alternative game styles; Single player (for points) with and without piece-dropping time limit. Implement as multiple "Game" objects that takes care of the gameplay mechanics and layout differences?
 * Switch makePiecesFall to use breadth-first.
 * Switch all new Date().getTime() to passing a current time and limit the delta time. As it is now, it is sometimes problematic to debug stuff where the animation won't care that you have paused the code at a breakpoint in the debugger.
@@ -52,14 +58,6 @@ The next few issues on the map:
 * Add music with varying stress levels depending on how close you are to losing.
 * Pieces in the column above an exploding piece should fall immediately, not after the whole chain is gone.
 * Sync all visuals and sound effects to the music. Lock the most significant effects to whole beats, and smaller effects to 1/2, 1/4, 1/8, 1/16 of a beat and so on. (The game Rez did this, and it was awesome.) With the existing animation queue system, it should be relatively easy to implement.
-* Add characters to choose from when starting the game. The character could determine the pattern of the pieces added when someone scores.
-	* Cute robots?
-	* One pic for menu/gameplay + one broken (exploded robot head) for losers. When losing, shake the sprite .5 seconds, then switch sprite and play break sound effect.
-	* Small, simple animations by switching/moving body part sprites.
-		* Blinking eyes/blinkenlights
-		* Bobbing head to the beat of the music.
-		* Simple disco dance steps.
-		* Hold pieces in the hand and drop them.
 * Animation timing is tedious and tricky to get it all just right. Possibly switch to some other method.
 
 Server/Client

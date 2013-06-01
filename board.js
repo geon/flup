@@ -441,7 +441,7 @@ Board.prototype.unlockChains = function () {
 		this.unlockChains();
 
 		// The player scored, so punish opponents.
-		this.gameMode.punishOpponents(this);
+		this.gameMode.onUnlockedChains(this);
 	}
 };
 

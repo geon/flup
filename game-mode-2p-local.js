@@ -2,7 +2,7 @@
 "use strict";
 
 
-function GameMode (options) {
+function GameMode2pLocal (options) {
 
 	var pieceCycle = Board.generatePieceCycle()
 
@@ -18,7 +18,13 @@ function GameMode (options) {
 };
 
 
-GameMode.prototype.punishOpponents = function (board) {
+GameMode2pLocal.prototype.onUnlockedChains = function (board) {
+
+	this.punishOpponents(board);
+}
+
+
+GameMode2pLocal.prototype.punishOpponents = function (board) {
 
 	for (var i = 0; i < this.boards.length; i++) {
 
@@ -30,13 +36,13 @@ GameMode.prototype.punishOpponents = function (board) {
 }
 
 
-GameMode.prototype.isGameOver = function () {
+GameMode2pLocal.prototype.isGameOver = function () {
 
 	return this.boards[0].gameOver || this.boards[1].gameOver;
 }
 
 
-GameMode.prototype.onKeyDown = function (keyCode) {
+GameMode2pLocal.prototype.onKeyDown = function (keyCode) {
 
 	if (this.isGameOver()) {
 
@@ -82,7 +88,7 @@ GameMode.prototype.onKeyDown = function (keyCode) {
 	}
 }
 
-GameMode.prototype.draw = function (context, currentTime, appSize) {
+GameMode2pLocal.prototype.draw = function (context, currentTime, appSize) {
 
 	// The player boards.
 	this.boards[0].draw(
