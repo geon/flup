@@ -1,0 +1,133 @@
+
+/// <reference path="GameMode.ts"/>
+/// <reference path="Avatar.ts"/>
+/// <reference path="AvatarOwl.ts"/>
+/// <reference path="AvatarAztecJade.ts"/>
+/// <reference path="Coord.ts"/>
+/// <reference path="Board.ts"/>
+
+
+class GameMode2pLocal implements GameMode {
+
+	boards: Board[];
+	avatars: Avatar[];
+
+
+	constructor () {
+
+		var pieceCycle = Board.generatePieceCycle()
+
+		this.boards = [
+			new Board({pieceCycle: pieceCycle, gameMode: this}),
+			new Board({pieceCycle: pieceCycle, gameMode: this})
+		];
+
+		this.avatars = [
+			new AvatarOwl({character: 0}),
+			new AvatarAztecJade({character: 0})
+		];
+	}
+
+
+	onUnlockedChains (board: Board) {
+
+		this.punishOpponents(board);
+	}
+
+
+	punishOpponents (board: Board) {
+
+		for (var i = 0; i < this.boards.length; i++) {
+
+			if (this.boards[i] != board) {
+
+				this.boards[i].punish();
+			}
+		};
+	}
+
+
+	isGameOver () {
+
+		return this.boards[0].gameOver || this.boards[1].gameOver;
+	}
+
+
+	onKeyDown (keyCode: number) {
+
+		if (this.isGameOver()) {
+
+			return;
+		}
+
+		switch (event.keyCode) {
+
+			// Player 1.
+			case 37: // Left
+				this.boards[1].moveLeft();
+				break;
+
+			case 39: // Right
+				this.boards[1].moveRight();
+				break;
+
+			case 38: // Up
+				this.boards[1].rotate();
+				break;
+
+			case 40: // Down
+				this.boards[1].drop();
+				break;
+
+
+			// Player 2.
+			case "A".charCodeAt(0): // Left
+				this.boards[0].moveLeft();
+				break;
+
+			case "D".charCodeAt(0): // Right
+				this.boards[0].moveRight();
+				break;
+
+			case "W".charCodeAt(0): // Up
+				this.boards[0].rotate();
+				break;
+
+			case "S".charCodeAt(0): // Down
+				this.boards[0].drop();
+				break;
+		}
+	}
+
+
+	draw (context: CanvasRenderingContext2D, currentTime: number, appSize: Coord) {
+
+		// The player boards.
+		this.boards[0].draw(
+			context,
+			currentTime,
+			new Coord({x:(appSize.x - Board.getWidth() * 2) * 1/3 + Board.getWidth() * 1/2, y:appSize.y/2}),
+			1/1
+		);
+		this.boards[1].draw(
+			context,
+			currentTime,
+			new Coord({x:(appSize.x - Board.getWidth() * 2) * 2/3 + Board.getWidth() * 3/2, y:appSize.y/2}),
+			1/1
+		);
+
+
+		// Draw the player avatars.
+		this.avatars[0].draw(
+			context,
+			currentTime,
+			new Coord({x:(appSize.x - Board.getWidth() * 2) * 1/3 + Board.getWidth() * -0.1/2, y:appSize.y/2 + Board.getWidth()*.65})
+		);
+		this.avatars[1].draw(
+			context,
+			currentTime,
+			new Coord({x:(appSize.x - Board.getWidth() * 2) * 2/3 + Board.getWidth() * 4.1/2, y:appSize.y/2 + Board.getWidth()*.65})
+		);
+
+	}
+}
