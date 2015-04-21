@@ -65,31 +65,4 @@ Server/Client
 
 I plan to build a websocket based server for multiplayer. MMO Puzzler anyone? Some notes about it:
 
-server/client
-
-The board tells the server what the player is doing.
-The server keeps track of all boards, and sends them back to the clients when anything changes.
-The server forces each client to drop the pieces after a set time limit.
-The server broadcasts slave board updates to all clients.
-
-This gives us 3 board modes:
-* Server - Receive player input via websocket (left/right/rotate/drop + timed drop) and run them as the authoritative instance.
-* Player - Receive input from the player (left/right/rotate/drop), run them and animate them, send via websocket to the server for verification.
-* Slave - Receive player input via websocket, run them and animate them.
-
-
-
-
-         Browser          socket.io  Server
-
-
-         player --> Board ---------> Board
-
-                          correction
-                          <---------
-
-
-When sending player input to the server and state corrections back, include a serverStateCounter. On the server, ignore any input sent to the wrong state. On the client, only read this value and send with each player input. *Never* set it after initialization, except when recieving a state correction.
-
-A state correction includes all members of the board object, except the piece cycle that never changes.
-
+Just send all input to the server, and broadcast to all players. The input don't affect the local board until they are echoed back. That way we can't get inconsitencies. Nice! If lag becomes a problem, do speculative anmations in parallell with an actual board and overwrite if they diverge.
