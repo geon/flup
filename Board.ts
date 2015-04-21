@@ -50,9 +50,6 @@ class Board {
 		// options.pieceCycle[1] = new Piece({color: 0, key:false});
 
 
-		this.dropperPieceA = undefined;
-		this.dropperPieceB = undefined;
-
 		this.pieceCycle = options.pieceCycle;
 		this.pieceCycleIndex = 0;
 
