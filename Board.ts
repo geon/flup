@@ -58,7 +58,7 @@ class Board {
 
 		this.fillUpDropperQueue();
 
-		this.playerPosition = Math.floor((8-1)/2); // Ahrg! I want to use static size, but it isn't defined yet...
+		this.playerPosition = Math.floor((Board.size.x-1)/2);
 		this.playerOrientation = 0;
 
 		this.serverStateCounter = 0;
