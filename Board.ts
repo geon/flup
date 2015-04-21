@@ -22,8 +22,6 @@ class Board {
 	playerPosition: number;
 	playerOrientation: number;
 
-	serverStateCounter: number;
-
 	gameOver: boolean;
 
 
@@ -57,8 +55,6 @@ class Board {
 
 		this.playerPosition = Math.floor((Board.size.x-1)/2);
 		this.playerOrientation = 0;
-
-		this.serverStateCounter = 0;
 
 		this.gameOver = false;
 
