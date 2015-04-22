@@ -6,12 +6,8 @@
 
 class AvatarOwl implements Avatar {
 
-	character: number;
+	constructor () {
 
-
-	constructor (options: {character: number}) {
-
-		this.character = options.character;
 	}
 
 
@@ -151,6 +147,26 @@ class AvatarOwl implements Avatar {
 			return AvatarOwl.wingFlapCycle.frames[AvatarOwl.wingFlapCycle.currentFrameIndex].name;
 		}
 	};
+
+
+	getPunishRow (width: number, y: number) {
+
+		var pieces: Piece[] = [];
+
+		for (var x = 0; x < width; x++) {
+
+			pieces.push(new Piece({
+				color: x % PieceCycle.numColors,
+				key: false,
+				animationQueue: new AnimationQueue(new Coord({
+					x: x,
+					y: y
+				})),
+			}));
+		}
+
+		return pieces;
+	}
 
 
 	draw (context: CanvasRenderingContext2D, currentTime: number, avatarCenter: Coord) {

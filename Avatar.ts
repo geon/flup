@@ -1,7 +1,12 @@
 
+/// <reference path="Piece.ts"/>
+
+
 interface Avatar {
 
-	draw(
+	getPunishRow (width: number, y: number): Piece[];
+
+	draw (
 		context: CanvasRenderingContext2D,
 		currentTime: number,
 		avatarCenter: Coord

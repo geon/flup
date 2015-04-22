@@ -24,8 +24,8 @@ class GameMode2pLocal implements GameMode {
 		];
 
 		this.avatars = [
-			new AvatarOwl({character: 0}),
-			new AvatarAztecJade({character: 0})
+			new AvatarOwl(),
+			new AvatarAztecJade()
 		];
 	}
 
@@ -42,7 +42,7 @@ class GameMode2pLocal implements GameMode {
 
 			if (this.boards[i] != board) {
 
-				this.boards[i].punish();
+				this.boards[i].punish(this.avatars[i]);
 			}
 		};
 	}

@@ -344,7 +344,7 @@ class Board {
 	}
 
 
-	punish () {
+	punish (avatar: Avatar) {
 
 		var punishmentAnimationStartTime = this.maxAnimationEndTime();
 
@@ -357,16 +357,13 @@ class Board {
 		};
 
 		// Add pieces.
-		for (var x = 0; x < Board.size.x; x++) {
+		var row = avatar.getPunishRow(
+			Board.size.x,
+			Board.size.y // Start the animation just outside the Board.
+		);
+		for (var x = 0; x < row.length; x++) {
 
-			this.pieces[Board.coordToIndex(x, Board.size.y-1)] = new Piece({
-				color: x % PieceCycle.numColors,
-				key: false,
-				animationQueue: new AnimationQueue(new Coord({
-					x: x,
-					y: Board.size.y // Start the animation just outside the Board.
-				})),
-			});
+			this.pieces[Board.coordToIndex(x, Board.size.y-1)] = row[x];
 		}
 
 		// Animate.

@@ -6,12 +6,11 @@
 
 class AvatarAztecJade implements Avatar {
 
-	character: number;
+	rowNumber: number;
 
+	constructor () {
 
-	constructor (options: {character: number}) {
-
-		this.character = options.character;
+		this.rowNumber = 0;
 	}
 
 
@@ -72,6 +71,28 @@ class AvatarAztecJade implements Avatar {
 			gridSize: new Coord({x:2, y:2}),
 			spriteSettings: sprites	
 		}
+	}
+
+
+	getPunishRow (width: number, y: number) {
+
+		var pieces: Piece[] = [];
+
+		for (var x = 0; x < width; x++) {
+
+			pieces.push(new Piece({
+				color: (x+this.rowNumber) % PieceCycle.numColors,
+				key: false,
+				animationQueue: new AnimationQueue(new Coord({
+					x: x,
+					y: y
+				})),
+			}));
+		}
+
+		++this.rowNumber;
+
+		return pieces;
 	}
 
 
