@@ -2,6 +2,9 @@
 /// <reference path="Coord.ts"/>
 /// <reference path="UnlockingEffect.ts"/>
 /// <reference path="GameMode.ts"/>
+/// <reference path="DropperQueue.ts"/>
+/// <reference path="Dropper.ts"/>
+/// <reference path="PieceCycle.ts"/>
 
 
 class Board {
@@ -11,28 +14,25 @@ class Board {
 	pieces: Piece[];
 	unlockedPieces: Piece[];
 	unlockingEffects: UnlockingEffect[];
-	dropperQueue: Piece[];
+	pieceCycle: PieceCycle;
+	dropperQueue: DropperQueue;
 
-	dropperPieceA: Piece;
-	dropperPieceB: Piece;
-
-	pieceCycle: Piece[];
-	pieceCycleIndex: number;
-
-	playerPosition: number;
-	playerOrientation: number;
+	dropper: Dropper;
 
 	gameOver: boolean;
 
 
-	constructor (options: {gameMode: GameMode, pieceCycle: Piece[]}) {
+	constructor (options: {gameMode: GameMode, pieceCycle: PieceCycle}) {
 
 		this.gameMode = options.gameMode;
 
 		this.pieces = [];
 		this.unlockedPieces = [];
 		this.unlockingEffects = [];
-		this.dropperQueue = [];
+		this.pieceCycle = options.pieceCycle;
+		this.dropperQueue = new DropperQueue({pieceCycle: this.pieceCycle});
+		this.dropper = new Dropper(this.dropperQueue);
+		this.gameOver = false;
 
 
 		// var colors = [
@@ -48,25 +48,10 @@ class Board {
 		// options.pieceCycle[1] = new Piece({color: 0, key:false});
 
 
-		this.pieceCycle = options.pieceCycle;
-		this.pieceCycleIndex = 0;
-
-		this.fillUpDropperQueue();
-
-		this.playerPosition = Math.floor((Board.size.x-1)/2);
-		this.playerOrientation = 0;
-
-		this.gameOver = false;
-
-		this.chargeDropper();
 	}
 
 
 	static size: Coord = new Coord({x:8, y:18});
-	static numColors: number = 4;
-	static nonKeyToKeyRatio: number = 7;
-	static dropperQueueVisibleLength: number = 6;
-	static dropperQueueTimePerPieceWidth: number = 200;
 
 	static gameOverUnlockEffectDelayPerPieceWidth: number = 100;
 
@@ -92,247 +77,6 @@ class Board {
 	static getHeight () {
 		
 		return (Board.size.y + 2) * Piece.size;
-	}
-
-
-	moveLeft () {
-
-		this.playerPosition = Math.max(0, this.playerPosition - 1);
-
-		this.animateDropper(new Date().getTime());
-	}
-
-
-	moveRight () {
-		
-		this.playerPosition = Math.min(Board.size.x - (this.playerOrientation % 2 ? 1 : 2), this.playerPosition + 1);
-
-		this.animateDropper(new Date().getTime());
-	}
-
-
-	rotate () {
-		
-		this.playerOrientation = ((this.playerOrientation + 1) % 4);
-
-		this.preventDropperFromStickingOutAfterRotation();
-
-		this.animateDropper(new Date().getTime());
-	}
-
-
-	preventDropperFromStickingOutAfterRotation () {
-		
-		// If the orientation is horizontal, and the pieces were at the right wall, now making the last one stick out...
-		if	(!(this.playerOrientation % 2) && this.playerPosition >= Board.size.x - 1) {
-
-			// ...move the pair up just against the wall.
-			this.playerPosition = Board.size.x - 2;
-		}
-	}
-
-
-	drop () {
-
-		if (this.gameOver) {
-			return;
-		}
-		
-		var coords = this.getDropperCoordinates();
-
-		var aPos = Board.coordToIndex(coords.a.x, coords.a.y);
-		var bPos = Board.coordToIndex(coords.b.x, coords.b.y);
-
-		// Make sure the board space is not used, and is not outside the Board.
-		if (
-			this.pieces[aPos] ||
-			this.pieces[bPos] ||
-			coords.a.x < 0 || coords.a.x > Board.size.x-1 ||
-			coords.b.x < 0 || coords.b.x > Board.size.x-1
-		) {
-			return false;
-		}
-		
-		// Add the pieces.
-		this.pieces[aPos] = this.dropperPieceA;
-		this.pieces[bPos] = this.dropperPieceB
-
-		this.applyGameLogic();
-
-		if (!this.gameOver) {
-
-			this.chargeDropper();
-		}
-
-		return true;
-	}
-
-
-	getDropperCoordinates () {
-
-		/* Player Orientations:
-		
-			ab	a.	ba	b.
-			..	b.	..	a.
-		*/
-
-		return {
-			a: new Coord({
-				x: this.playerPosition + (this.playerOrientation == 2 ? 1 : 0),
-				y: (this.playerOrientation == 3 ? 1 : 0)
-			}),
-			b: new Coord({
-				x: this.playerPosition + (this.playerOrientation == 0 ? 1 : 0),
-				y: (this.playerOrientation == 1 ? 1 : 0)
-			}),
-		};
-	}
-
-
-	chargeDropper () {
-
-		// Set the orientation back to horiz. or vert., but not backwards or upside-down.
-	//	this.playerOrientation %= 2;
-
-		if (this.playerOrientation == 2) {
-			this.playerOrientation = 0;
-		}
-
-		if (this.playerOrientation == 1) {
-			this.playerOrientation = 3;
-		}
-
-
-		var coords = this.getDropperCoordinates();
-
-		var timePerPieceWidths = 50;
-
-		var currentTime = new Date().getTime();
-
-		this.dropperPieceA = this.consumePieceFromDropperQueue();
-		this.dropperPieceB = this.consumePieceFromDropperQueue();
-
-
-		// A needs to wait just beside the queue until B is ready.
-		this.dropperPieceA.animationQueue.add(new Animation({
-			to: new Coord({x: Board.size.x-1, y:0}),
-			duration: Board.dropperQueueTimePerPieceWidth,
-			interpolation: "sine",
-			startTime: currentTime
-		}));
-
-		if (this.playerOrientation && this.playerPosition < Board.size.x-1) {
-
-			// Make A go via B.
-			this.dropperPieceA.animationQueue.add(new Animation({
-				to: coords.b,
-				duration: (Board.size.x - coords.b.x) * timePerPieceWidths,
-				interpolation: "sine",
-				startTime: currentTime
-			}));
-
-			// Make B stop next to A.
-			this.dropperPieceB.animationQueue.add(new Animation({
-				to: new Coord({x: coords.b.x+1, y:0}),
-				duration: (Board.size.x - coords.b.x) * timePerPieceWidths,
-				interpolation: "sine",
-				startTime: currentTime
-			}));
-		}
-
-		// Move to final positions.
-		this.dropperPieceA.animationQueue.add(new Animation({
-			to: coords.a,
-			duration: Coord.distance(this.dropperPieceA.animationQueue.getLastTo(), coords.a) * timePerPieceWidths,
-			interpolation: "sine",
-			startTime: currentTime
-		}));
-		this.dropperPieceB.animationQueue.add(new Animation({
-			to: coords.b,
-			duration: Coord.distance(this.dropperPieceB.animationQueue.getLastTo(), coords.b) * timePerPieceWidths,
-			interpolation: "sine",
-			startTime: currentTime
-		}));
-	}
-
-
-	fillUpDropperQueue () {
-
-		while (this.dropperQueue.length < Board.dropperQueueVisibleLength) {
-
-			var piece = this.consumePieceFromCycle();
-
-			this.dropperQueue.push(new Piece({
-				color: piece.color,
-				key: piece.key,
-				animationQueue: new AnimationQueue(new Coord({
-					x: Board.size.x,
-					y: this.dropperQueue.length
-				})),
-			}));
-		};
-	}
-
-
-	consumePieceFromDropperQueue () {
-
-		var newPiece = this.consumePieceFromCycle();
-
-		this.dropperQueue.push(new Piece({
-			color: newPiece.color,
-			key: newPiece.key,
-			animationQueue: new AnimationQueue(new Coord({
-				x: Board.size.x,
-				y: Board.dropperQueueVisibleLength
-			})),
-		}));
-
-		var p = this.dropperQueue.shift();
-
-		var currentTime = new Date().getTime();
-
-		for (var i = 0; i < this.dropperQueue.length; i++) {
-
-			this.dropperQueue[i].animationQueue.add(new Animation({
-				to: new Coord({x: Board.size.x, y: i}),
-				duration: Board.dropperQueueTimePerPieceWidth,
-				interpolation: "sine",
-				startTime: (this.dropperQueue[0].animationQueue.getLast() && this.dropperQueue[0].animationQueue.getLast().startTime) || currentTime
-			}));
-		};
-
-		return p
-	}
-
-
-	consumePieceFromCycle () {
-
-		var piece = this.pieceCycle[this.pieceCycleIndex];
-
-		this.pieceCycleIndex = (this.pieceCycleIndex + 1) % this.pieceCycle.length;
-
-		return piece;
-	}
-
-
-	animateDropper (currentTime: number) {
-
-		var coords = this.getDropperCoordinates();
-
-		var timePerPieceWidths = 50;
-
-		this.dropperPieceA.animationQueue.add(new Animation({
-			to: coords.a,
-			duration: timePerPieceWidths,
-			interpolation: "sine",
-			startTime: currentTime
-		}));
-		this.dropperPieceB.animationQueue.add(new Animation({
-			to: coords.b,
-			duration: timePerPieceWidths,
-			interpolation: "sine",
-			startTime: currentTime
-		}));
 	}
 
 
@@ -563,36 +307,6 @@ class Board {
 	}
 
 
-	static generatePieceCycle () {
-
-		// Create list of all colors.
-		var baseColors = [];
-		var keyColors = [];
-		for (var i = 0; i < Board.numColors; ++i) {
-			baseColors[i] = {color: i, key: false};
-			keyColors[i] = {color: i, key: true};
-		}
-
-		// Create a list of all pieces in the proper ratios.
-		var properRatio = keyColors;
-		for (var i = 0; i < Board.nonKeyToKeyRatio; ++i) {
-			properRatio = properRatio.concat(baseColors);
-		}
-
-		// Repeat the colors so there is a long cycle. 
-		var pieces = [];
-		for (var i = 0; i < 32; ++i) {
-
-			// Shuffle the group of keys and colors separately, so the whole cycle gets the keys/colors evenly distributed.
-			this.fisherYatesArrayShuffle(properRatio);
-		
-			pieces = pieces.concat(properRatio);
-		}
-			
-		return pieces;
-	}
-
-
 	checkForGameOver () {
 
 		for (var i = 0; i < Board.size.x * 2; i++) {
@@ -646,7 +360,7 @@ class Board {
 		for (var x = 0; x < Board.size.x; x++) {
 
 			this.pieces[Board.coordToIndex(x, Board.size.y-1)] = new Piece({
-				color: x % Board.numColors,
+				color: x % PieceCycle.numColors,
 				key: false,
 				animationQueue: new AnimationQueue(new Coord({
 					x: x,
@@ -662,7 +376,7 @@ class Board {
 
 				this.pieces[i].animationQueue.add(new Animation({
 					to: Board.indexToCoord(i),
-					duration: Board.dropperQueueTimePerPieceWidth,
+					duration: DropperQueue.dropperQueueTimePerPieceWidth,
 					interpolation: "sine",
 					startTime: punishmentAnimationStartTime
 				}));
@@ -674,21 +388,6 @@ class Board {
 
 		// The pieces might have risen too high.
 		this.checkForGameOver();
-	}
-
-
-	// http://stackoverflow.com/questions/2450954/how-to-randomize-a-javascript-array
-	static fisherYatesArrayShuffle (myArray) {
-
-		var i = myArray.length;
-		if ( i == 0 ) return false;
-		while ( --i ) {
-			var j = Math.floor( Math.random() * ( i + 1 ) );
-			var tempi = myArray[i];
-			var tempj = myArray[j];
-			myArray[i] = tempj;
-			myArray[j] = tempi;
-		 }
 	}
 
 
@@ -814,33 +513,23 @@ class Board {
 
 
 		// Draw the dropper queue.
-		for (var i = 0; i < this.dropperQueue.length; i++) {
-			this.dropperQueue[i].draw(
-				context,
-				currentTime,
-				center,
-				scale,
-				0,
-				Board.size
-			);
-		};
+		this.dropperQueue.draw(
+			context,
+			currentTime,
+			center,
+			scale,
+			Board.size
+		);
+
 
 		// Draw the dropper pieces.
 		if (!this.gameOver) {
-			this.dropperPieceA.draw(
+
+			this.dropper.draw(
 				context,
 				currentTime,
 				center,
 				scale,
-				0,
-				Board.size
-			);
-			this.dropperPieceB.draw(
-				context,
-				currentTime,
-				center,
-				scale,
-				0,
 				Board.size
 			);
 		}

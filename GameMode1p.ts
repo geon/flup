@@ -4,6 +4,7 @@
 /// <reference path="AvatarOwl.ts"/>
 /// <reference path="Coord.ts"/>
 /// <reference path="Board.ts"/>
+/// <reference path="PieceCycle.ts"/>
 
 
 class GameMode1p implements GameMode {
@@ -14,7 +15,7 @@ class GameMode1p implements GameMode {
 
 	constructor () {
 
-		var pieceCycle = Board.generatePieceCycle()
+		var pieceCycle = new PieceCycle();
 
 		this.board = new Board({pieceCycle: pieceCycle, gameMode: this});
 		this.avatar = new AvatarOwl({character: 0});
@@ -43,19 +44,19 @@ class GameMode1p implements GameMode {
 		switch (event.keyCode) {
 
 			case 37: // Left
-				this.board.moveLeft();
+				this.board.dropper.moveLeft();
 				break;
 
 			case 39: // Right
-				this.board.moveRight();
+				this.board.dropper.moveRight();
 				break;
 
 			case 38: // Up
-				this.board.rotate();
+				this.board.dropper.rotate();
 				break;
 
 			case 40: // Down
-				this.board.drop();
+				this.board.dropper.drop(this.board);
 				break;
 		}
 	}

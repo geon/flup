@@ -5,6 +5,7 @@
 /// <reference path="AvatarAztecJade.ts"/>
 /// <reference path="Coord.ts"/>
 /// <reference path="Board.ts"/>
+/// <reference path="PieceCycle.ts"/>
 
 
 class GameMode2pLocal implements GameMode {
@@ -15,7 +16,7 @@ class GameMode2pLocal implements GameMode {
 
 	constructor () {
 
-		var pieceCycle = Board.generatePieceCycle()
+		var pieceCycle = new PieceCycle();
 
 		this.boards = [
 			new Board({pieceCycle: pieceCycle, gameMode: this}),
@@ -64,37 +65,37 @@ class GameMode2pLocal implements GameMode {
 
 			// Player 1.
 			case 37: // Left
-				this.boards[1].moveLeft();
+				this.boards[1].dropper.moveLeft();
 				break;
 
 			case 39: // Right
-				this.boards[1].moveRight();
+				this.boards[1].dropper.moveRight();
 				break;
 
 			case 38: // Up
-				this.boards[1].rotate();
+				this.boards[1].dropper.rotate();
 				break;
 
 			case 40: // Down
-				this.boards[1].drop();
+				this.boards[1].dropper.drop(this.boards[1]);
 				break;
 
 
 			// Player 2.
 			case "A".charCodeAt(0): // Left
-				this.boards[0].moveLeft();
+				this.boards[0].dropper.moveLeft();
 				break;
 
 			case "D".charCodeAt(0): // Right
-				this.boards[0].moveRight();
+				this.boards[0].dropper.moveRight();
 				break;
 
 			case "W".charCodeAt(0): // Up
-				this.boards[0].rotate();
+				this.boards[0].dropper.rotate();
 				break;
 
 			case "S".charCodeAt(0): // Down
-				this.boards[0].drop();
+				this.boards[0].dropper.drop(this.boards[0]);
 				break;
 		}
 	}
