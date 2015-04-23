@@ -11,16 +11,16 @@ class Dropper {
 	pieceA: Piece;
 	pieceB: Piece;
 
-	playerPosition: number;
-	playerOrientation: number;
+	position: number;
+	orientation: number;
 
 
 	constructor (dropperQueue: DropperQueue) {
 
 		this.dropperQueue = dropperQueue;
 
-		this.playerPosition = Math.floor((Board.size.x-1)/2);
-		this.playerOrientation = 0;
+		this.position = Math.floor((Board.size.x-1)/2);
+		this.orientation = 0;
 
 		this.chargeDropper();
 	}
@@ -28,7 +28,7 @@ class Dropper {
 
 	moveLeft () {
 
-		this.playerPosition = Math.max(0, this.playerPosition - 1);
+		this.position = Math.max(0, this.position - 1);
 
 		this.animateDropper(new Date().getTime());
 	}
@@ -36,7 +36,7 @@ class Dropper {
 
 	moveRight () {
 
-		this.playerPosition = Math.min(Board.size.x - (this.playerOrientation % 2 ? 1 : 2), this.playerPosition + 1);
+		this.position = Math.min(Board.size.x - (this.orientation % 2 ? 1 : 2), this.position + 1);
 
 		this.animateDropper(new Date().getTime());
 	}
@@ -44,7 +44,7 @@ class Dropper {
 
 	rotate () {
 
-		this.playerOrientation = ((this.playerOrientation + 1) % 4);
+		this.orientation = ((this.orientation + 1) % 4);
 
 		this.preventDropperFromStickingOutAfterRotation();
 
@@ -55,10 +55,10 @@ class Dropper {
 	preventDropperFromStickingOutAfterRotation () {
 
 		// If the orientation is horizontal, and the pieces were at the right wall, now making the last one stick out...
-		if	(!(this.playerOrientation % 2) && this.playerPosition >= Board.size.x - 1) {
+		if	(!(this.orientation % 2) && this.position >= Board.size.x - 1) {
 
 			// ...move the pair up just against the wall.
-			this.playerPosition = Board.size.x - 2;
+			this.position = Board.size.x - 2;
 		}
 	}
 
@@ -105,12 +105,12 @@ class Dropper {
 
 		return {
 			a: new Coord({
-				x: this.playerPosition + (this.playerOrientation == 2 ? 1 : 0),
-				y: (this.playerOrientation == 3 ? 1 : 0)
+				x: this.position + (this.orientation == 2 ? 1 : 0),
+				y: (this.orientation == 3 ? 1 : 0)
 			}),
 			b: new Coord({
-				x: this.playerPosition + (this.playerOrientation == 0 ? 1 : 0),
-				y: (this.playerOrientation == 1 ? 1 : 0)
+				x: this.position + (this.orientation == 0 ? 1 : 0),
+				y: (this.orientation == 1 ? 1 : 0)
 			}),
 		};
 	}
@@ -119,14 +119,14 @@ class Dropper {
 	chargeDropper () {
 
 		// Set the orientation back to horiz. or vert., but not backwards or upside-down.
-		//	this.playerOrientation %= 2;
+		//	this.orientation %= 2;
 
-		if (this.playerOrientation == 2) {
-			this.playerOrientation = 0;
+		if (this.orientation == 2) {
+			this.orientation = 0;
 		}
 
-		if (this.playerOrientation == 1) {
-			this.playerOrientation = 3;
+		if (this.orientation == 1) {
+			this.orientation = 3;
 		}
 
 
@@ -148,7 +148,7 @@ class Dropper {
 			startTime: currentTime
 		}));
 
-		if (this.playerOrientation && this.playerPosition < Board.size.x-1) {
+		if (this.orientation && this.position < Board.size.x-1) {
 
 			// Make A go via B.
 			this.pieceA.animationQueue.add(new Animation({
