@@ -67,8 +67,8 @@ class Dropper {
 
 		var coords = this.getCoordinates();
 
-		var aPos = Board.coordToIndex(coords.a.x, coords.a.y);
-		var bPos = Board.coordToIndex(coords.b.x, coords.b.y);
+		var aPos = Board.coordToIndex(coords.a);
+		var bPos = Board.coordToIndex(coords.b);
 
 		// Make sure the board space is not used, and is not outside the Board.
 		if (

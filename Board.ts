@@ -57,9 +57,15 @@ class Board {
 	static gameOverUnlockEffectDelayPerPieceWidth: number = 100;
 
 
-	static coordToIndex (x: number, y: number) {
+	static xyToIndex (x: number, y: number) {
 		
 		return x + y * Board.size.x;
+	}
+
+
+	static coordToIndex (coord: Coord) {
+		
+		return Board.xyToIndex(coord.x, coord.y);
 	}
 
 
@@ -115,7 +121,7 @@ class Board {
 			var yPut = Board.size.y - 1;
 
 			// Search for a space that can be filled from above.
-			while (yPut && this.pieces[Board.coordToIndex(x, yPut)]) {
+			while (yPut && this.pieces[Board.xyToIndex(x, yPut)]) {
 				--yPut;
 			}
 
@@ -128,7 +134,7 @@ class Board {
 			while (yGet >= 0){
 
 				// Search for a piece to put in the empty space.
-				while (!this.pieces[Board.coordToIndex(x, yGet)]) {
+				while (!this.pieces[Board.xyToIndex(x, yGet)]) {
 
 					--yGet;
 
@@ -139,8 +145,8 @@ class Board {
 					}
 				}
 
-				var getPos = Board.coordToIndex(x, yGet);
-				var putPos = Board.coordToIndex(x, yPut);
+				var getPos = Board.xyToIndex(x, yGet);
+				var putPos = Board.xyToIndex(x, yPut);
 
 				// Move the piece.
 				this.pieces[putPos] = this.pieces[getPos];
@@ -353,7 +359,7 @@ class Board {
 		for (var y = 0; y < Board.size.y-1; y++) {
 			for (var x = 0; x < Board.size.x; x++) {
 
-				this.pieces[Board.coordToIndex(x, y)] = this.pieces[Board.coordToIndex(x, y+1)];
+				this.pieces[Board.xyToIndex(x, y)] = this.pieces[Board.xyToIndex(x, y+1)];
 			}
 		};
 
@@ -364,7 +370,7 @@ class Board {
 		);
 		for (var x = 0; x < row.length; x++) {
 
-			this.pieces[Board.coordToIndex(x, Board.size.y-1)] = row[x];
+			this.pieces[Board.xyToIndex(x, Board.size.y-1)] = row[x];
 		}
 
 		// Animate.
