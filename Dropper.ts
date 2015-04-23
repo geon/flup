@@ -52,7 +52,7 @@ class Dropper {
 	}
 
 
-	preventDropperFromStickingOutAfterRotation () {
+	private preventDropperFromStickingOutAfterRotation () {
 
 		// If the orientation is horizontal, and the pieces were at the right wall, now making the last one stick out...
 		if	(!(this.orientation % 2) && this.position >= Board.size.x - 1) {
