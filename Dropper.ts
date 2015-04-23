@@ -8,8 +8,8 @@ class Dropper {
 
 	dropperQueue: DropperQueue;
 
-	dropperPieceA: Piece;
-	dropperPieceB: Piece;
+	pieceA: Piece;
+	pieceB: Piece;
 
 	playerPosition: number;
 	playerOrientation: number;
@@ -81,8 +81,8 @@ class Dropper {
 		}
 
 		// Add the pieces.
-		board.pieces[aPos] = this.dropperPieceA;
-		board.pieces[bPos] = this.dropperPieceB
+		board.pieces[aPos] = this.pieceA;
+		board.pieces[bPos] = this.pieceB
 
 		board.applyGameLogic();
 
@@ -136,12 +136,12 @@ class Dropper {
 
 		var currentTime = new Date().getTime();
 
-		this.dropperPieceA = this.dropperQueue.consumePieceFromDropperQueue();
-		this.dropperPieceB = this.dropperQueue.consumePieceFromDropperQueue();
+		this.pieceA = this.dropperQueue.consumePieceFromDropperQueue();
+		this.pieceB = this.dropperQueue.consumePieceFromDropperQueue();
 
 
 		// A needs to wait just beside the queue until B is ready.
-		this.dropperPieceA.animationQueue.add(new Animation({
+		this.pieceA.animationQueue.add(new Animation({
 			to: new Coord({x: Board.size.x-1, y:0}),
 			duration: DropperQueue.dropperQueueTimePerPieceWidth,
 			interpolation: "sine",
@@ -151,7 +151,7 @@ class Dropper {
 		if (this.playerOrientation && this.playerPosition < Board.size.x-1) {
 
 			// Make A go via B.
-			this.dropperPieceA.animationQueue.add(new Animation({
+			this.pieceA.animationQueue.add(new Animation({
 				to: coords.b,
 				duration: (Board.size.x - coords.b.x) * timePerPieceWidths,
 				interpolation: "sine",
@@ -159,7 +159,7 @@ class Dropper {
 			}));
 
 			// Make B stop next to A.
-			this.dropperPieceB.animationQueue.add(new Animation({
+			this.pieceB.animationQueue.add(new Animation({
 				to: new Coord({x: coords.b.x+1, y:0}),
 				duration: (Board.size.x - coords.b.x) * timePerPieceWidths,
 				interpolation: "sine",
@@ -168,15 +168,15 @@ class Dropper {
 		}
 
 		// Move to final positions.
-		this.dropperPieceA.animationQueue.add(new Animation({
+		this.pieceA.animationQueue.add(new Animation({
 			to: coords.a,
-			duration: Coord.distance(this.dropperPieceA.animationQueue.getLastTo(), coords.a) * timePerPieceWidths,
+			duration: Coord.distance(this.pieceA.animationQueue.getLastTo(), coords.a) * timePerPieceWidths,
 			interpolation: "sine",
 			startTime: currentTime
 		}));
-		this.dropperPieceB.animationQueue.add(new Animation({
+		this.pieceB.animationQueue.add(new Animation({
 			to: coords.b,
-			duration: Coord.distance(this.dropperPieceB.animationQueue.getLastTo(), coords.b) * timePerPieceWidths,
+			duration: Coord.distance(this.pieceB.animationQueue.getLastTo(), coords.b) * timePerPieceWidths,
 			interpolation: "sine",
 			startTime: currentTime
 		}));
@@ -189,13 +189,13 @@ class Dropper {
 
 		var timePerPieceWidths = 50;
 
-		this.dropperPieceA.animationQueue.add(new Animation({
+		this.pieceA.animationQueue.add(new Animation({
 			to: coords.a,
 			duration: timePerPieceWidths,
 			interpolation: "sine",
 			startTime: currentTime
 		}));
-		this.dropperPieceB.animationQueue.add(new Animation({
+		this.pieceB.animationQueue.add(new Animation({
 			to: coords.b,
 			duration: timePerPieceWidths,
 			interpolation: "sine",
@@ -207,7 +207,7 @@ class Dropper {
 	draw (context: CanvasRenderingContext2D, currentTime: number, center: Coord, scale: number, boardSize: Coord) {
 
 		// Draw the dropper pieces.
-		this.dropperPieceA.draw(
+		this.pieceA.draw(
 			context,
 			currentTime,
 			center,
@@ -215,7 +215,7 @@ class Dropper {
 			0,
 			boardSize
 		);
-		this.dropperPieceB.draw(
+		this.pieceB.draw(
 			context,
 			currentTime,
 			center,
