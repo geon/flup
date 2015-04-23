@@ -8,7 +8,7 @@ class Piece {
 	color: number;
 	key: boolean;
 	animationQueue: AnimationQueue;
-	unlockEffectStartTime: number;
+	unlockEffectDelay: number;
 
 
 	constructor (options: {color: number, key: boolean, animationQueue?: AnimationQueue}) {

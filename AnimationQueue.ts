@@ -17,49 +17,47 @@ class AnimationQueue {
 
 	add (animation: Animation) {
 
-		// If there are already animations playing, queue it up. 
-		var endTime = this.getEndTime();
-		if (endTime) {
-
-			animation.startTime = Math.max(animation.startTime, endTime);
-		}
-
 		this.animations.push(animation);
 	}
 
 
-	getLast () {
+	// getLast () {
 
-		if (!this.animations.length) {
+	// 	if (!this.animations.length) {
 
-			return undefined;
-		}
+	// 		return undefined;
+	// 	}
 
-		return this.animations[this.animations.length - 1];
+	// 	return this.animations[this.animations.length - 1];
+	// }
+
+
+	length () {
+
+		return this.animations.length
+			? this.animations
+				.map(animation => animation.length())
+				.reduce((soFar, next) => soFar + next, 0)
+			: null;
 	}
 
 
-	getEndTime () {
+	// getLastTo () {
 
-		var lastAnimation = this.getLast();
+	// 	var lastAnimation = this.getLast();
 
-		return lastAnimation && lastAnimation.getEndTime();
-	}
-
-
-	getLastTo () {
-
-		var lastAnimation = this.getLast();
-
-		return lastAnimation ? lastAnimation.to : this.from;
-	}
+	// 	return lastAnimation ? lastAnimation.to : this.from;
+	// }
 
 
-	getPosition (currentTime: number) {
+	getPosition (delta: number) {
 
 		// Remove any expired animations.
-		while (this.animations.length && this.animations[0].getEndTime() < currentTime) {
-			this.from = this.animations.shift().to;
+		while (this.animations.length && this.animations[0].length() < delta) {
+
+			var animation = this.animations.shift();
+			this.from = animation.to;
+			delta -= animation.length();
 		}
 
 
@@ -73,17 +71,17 @@ class AnimationQueue {
 
 		var currentAnimation = this.animations[0];
 
-		// Might not be strated yet.
-		if (currentTime < currentAnimation.startTime) {
+		// Might not be started yet.
+		if (delta < currentAnimation.delay) {
 			return this.from;
 		}
 
 		var progress = Animation.interpolators[currentAnimation.interpolation](
-			(currentTime - currentAnimation.startTime) / currentAnimation.duration
+			(delta - currentAnimation.delay) / currentAnimation.duration
 		);
 
 		return Coord.add(
-			this.from.scaled(1-progress),
+			this.from.scaled(1 - progress),
 			currentAnimation.to.scaled(progress)
 		);
 	}

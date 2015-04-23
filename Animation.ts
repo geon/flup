@@ -4,23 +4,23 @@
 class Animation {
 
 	to: Coord;
-	startTime: number;
+	delay: number;
 	duration: number;
 	interpolation: string;
 
 
-	constructor (animation: {to: Coord, startTime: number, duration: number, interpolation: string}) {
+	constructor (animation: {to: Coord, delay: number, duration: number, interpolation: string}) {
 
 		this.to            = animation.to;
-		this.startTime     = animation.startTime;
+		this.delay         = animation.delay;
 		this.duration      = animation.duration;
 		this.interpolation = animation.interpolation;
 	}
 
 
-	getEndTime () {
+	length () {
 
-		return this.startTime + this.duration;
+		return this.delay + this.duration;
 	}
 
 
