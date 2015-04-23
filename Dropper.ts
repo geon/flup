@@ -22,7 +22,7 @@ class Dropper {
 		this.position = Math.floor((Board.size.x-1)/2);
 		this.orientation = 0;
 
-		this.chargeDropper();
+		this.charge();
 	}
 
 
@@ -88,7 +88,7 @@ class Dropper {
 
 		if (!board.gameOver) {
 
-			this.chargeDropper();
+			this.charge();
 		}
 
 		return true;
@@ -116,7 +116,7 @@ class Dropper {
 	}
 
 
-	chargeDropper () {
+	private charge () {
 
 		// Set the orientation back to horiz. or vert., but not backwards or upside-down.
 		//	this.orientation %= 2;
