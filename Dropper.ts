@@ -136,8 +136,8 @@ class Dropper {
 
 		var currentTime = new Date().getTime();
 
-		this.pieceA = this.dropperQueue.consumePieceFromDropperQueue();
-		this.pieceB = this.dropperQueue.consumePieceFromDropperQueue();
+		this.pieceA = this.dropperQueue.pop();
+		this.pieceB = this.dropperQueue.pop();
 
 
 		// A needs to wait just beside the queue until B is ready.

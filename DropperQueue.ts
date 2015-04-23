@@ -42,7 +42,7 @@ class DropperQueue {
 	}
 
 
-	consumePieceFromDropperQueue () {
+	pop () {
 
 		var newPiece = this.pieceCycle.consumePieceFromCycle();
 
