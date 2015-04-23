@@ -7,14 +7,14 @@
 
 class DropperQueue {
 
-	dropperQueue: Piece[];
+	pieces: Piece[];
 
 	pieceCycle: PieceCycle;
 
 
 	constructor (options: {pieceCycle: PieceCycle}) {
 
-		this.dropperQueue = [];
+		this.pieces = [];
 
 		this.pieceCycle = options.pieceCycle;
 
@@ -26,16 +26,16 @@ class DropperQueue {
 
 	fillUpDropperQueue () {
 
-		while (this.dropperQueue.length < DropperQueue.dropperQueueVisibleLength) {
+		while (this.pieces.length < DropperQueue.dropperQueueVisibleLength) {
 
 			var piece = this.pieceCycle.consumePieceFromCycle();
 
-			this.dropperQueue.push(new Piece({
+			this.pieces.push(new Piece({
 				color: piece.color,
 				key: piece.key,
 				animationQueue: new AnimationQueue(new Coord({
 					x: Board.size.x,
-					y: this.dropperQueue.length
+					y: this.pieces.length
 				})),
 			}));
 		};
@@ -46,7 +46,7 @@ class DropperQueue {
 
 		var newPiece = this.pieceCycle.consumePieceFromCycle();
 
-		this.dropperQueue.push(new Piece({
+		this.pieces.push(new Piece({
 			color: newPiece.color,
 			key: newPiece.key,
 			animationQueue: new AnimationQueue(new Coord({
@@ -55,17 +55,17 @@ class DropperQueue {
 			})),
 		}));
 
-		var p = this.dropperQueue.shift();
+		var p = this.pieces.shift();
 
 		var currentTime = new Date().getTime();
 
-		for (var i = 0; i < this.dropperQueue.length; i++) {
+		for (var i = 0; i < this.pieces.length; i++) {
 
-			this.dropperQueue[i].animationQueue.add(new Animation({
+			this.pieces[i].animationQueue.add(new Animation({
 				to: new Coord({x: Board.size.x, y: i}),
 				duration: DropperQueue.dropperQueueTimePerPieceWidth,
 				interpolation: "sine",
-				startTime: (this.dropperQueue[0].animationQueue.getLast() && this.dropperQueue[0].animationQueue.getLast().startTime) || currentTime
+				startTime: (this.pieces[0].animationQueue.getLast() && this.pieces[0].animationQueue.getLast().startTime) || currentTime
 			}));
 		};
 
@@ -78,8 +78,8 @@ class DropperQueue {
 	draw (context: CanvasRenderingContext2D, currentTime: number, center: Coord, scale: number, boardSize: Coord) {
 
 		// Draw the dropper queue.
-		for (var i = 0; i < this.dropperQueue.length; i++) {
-			this.dropperQueue[i].draw(
+		for (var i = 0; i < this.pieces.length; i++) {
+			this.pieces[i].draw(
 				context,
 				currentTime,
 				center,
