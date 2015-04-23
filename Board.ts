@@ -5,6 +5,7 @@
 /// <reference path="DropperQueue.ts"/>
 /// <reference path="Dropper.ts"/>
 /// <reference path="PieceCycle.ts"/>
+/// <reference path="Avatar.ts"/>
 
 
 class Board {
