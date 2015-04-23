@@ -14,18 +14,9 @@ class DropperQueue {
 
 	constructor (options: {pieceCycle: PieceCycle}) {
 
-		this.pieces = [];
-
 		this.pieceCycle = options.pieceCycle;
 
-		this.fillUpDropperQueue();
-	}
-
-	static dropperQueueVisibleLength: number = 6;
-	static dropperQueueTimePerPieceWidth: number = 200;
-
-	fillUpDropperQueue () {
-
+		this.pieces = [];
 		while (this.pieces.length < DropperQueue.dropperQueueVisibleLength) {
 
 			var piece = this.pieceCycle.consumePieceFromCycle();
@@ -38,8 +29,12 @@ class DropperQueue {
 					y: this.pieces.length
 				})),
 			}));
-		};
+		}
 	}
+
+
+	static dropperQueueVisibleLength: number = 6;
+	static dropperQueueTimePerPieceWidth: number = 200;
 
 
 	pop () {
