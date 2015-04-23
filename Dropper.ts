@@ -30,7 +30,7 @@ class Dropper {
 
 		this.position = Math.max(0, this.position - 1);
 
-		this.animateDropper(new Date().getTime());
+		this.animate(new Date().getTime());
 	}
 
 
@@ -38,7 +38,7 @@ class Dropper {
 
 		this.position = Math.min(Board.size.x - (this.orientation % 2 ? 1 : 2), this.position + 1);
 
-		this.animateDropper(new Date().getTime());
+		this.animate(new Date().getTime());
 	}
 
 
@@ -48,7 +48,7 @@ class Dropper {
 
 		this.preventDropperFromStickingOutAfterRotation();
 
-		this.animateDropper(new Date().getTime());
+		this.animate(new Date().getTime());
 	}
 
 
@@ -183,7 +183,7 @@ class Dropper {
 	}
 
 
-	animateDropper (currentTime: number) {
+	private animate (currentTime: number) {
 
 		var coords = this.getCoordinates();
 
