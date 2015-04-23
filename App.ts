@@ -9,8 +9,6 @@ class App {
 
 	gameMode: GameMode;
 
-	pieceSize: number;
-	
 	lastRenderTime: number;
 
 	backgroundImage: HTMLImageElement;
@@ -24,8 +22,6 @@ class App {
 		this.context = options.context;
 
 		this.gameMode = new GameMode2pLocal();
-
-		this.pieceSize = 32;
 		
 		this.lastRenderTime = 0;
 
