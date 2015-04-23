@@ -7,10 +7,12 @@
 class AvatarAztecJade implements Avatar {
 
 	rowNumber: number;
+	accumulatedDeltaTime: number;
 
 	constructor () {
 
 		this.rowNumber = 0;
+		this.accumulatedDeltaTime = 0;
 	}
 
 
@@ -96,7 +98,9 @@ class AvatarAztecJade implements Avatar {
 	}
 
 
-	draw (context: CanvasRenderingContext2D, currentTime: number, avatarCenter: Coord) {
+	draw (context: CanvasRenderingContext2D, deltaTime: number, avatarCenter: Coord) {
+
+		this.accumulatedDeltaTime += deltaTime;
 
 		var sprites = AvatarAztecJade.getSprites();
 
@@ -105,7 +109,7 @@ class AvatarAztecJade implements Avatar {
 			y: AvatarAztecJade.size
 		});
 
-		var diskSizeFactor = (1 + Math.sin(currentTime/1000 * 3))/2;
+		var diskSizeFactor = (1 + Math.sin(this.accumulatedDeltaTime/1000 * 3))/2;
 
 		sprites["gold"].draw(
 			context,

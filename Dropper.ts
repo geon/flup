@@ -134,8 +134,6 @@ class Dropper {
 
 		var timePerPieceWidths = 50;
 
-		var currentTime = new Date().getTime();
-
 		this.pieceA = this.dropperQueue.pop();
 		this.pieceB = this.dropperQueue.pop();
 
@@ -145,7 +143,7 @@ class Dropper {
 			to: new Coord({x: Board.size.x-1, y:0}),
 			duration: DropperQueue.dropperQueueTimePerPieceWidth,
 			interpolation: "sine",
-			startTime: currentTime
+			delay: 0
 		}));
 
 		if (this.orientation && this.position < Board.size.x-1) {
@@ -155,7 +153,7 @@ class Dropper {
 				to: coords.b,
 				duration: (Board.size.x - coords.b.x) * timePerPieceWidths,
 				interpolation: "sine",
-				startTime: currentTime
+				delay: 0
 			}));
 
 			// Make B stop next to A.
@@ -163,7 +161,7 @@ class Dropper {
 				to: new Coord({x: coords.b.x+1, y:0}),
 				duration: (Board.size.x - coords.b.x) * timePerPieceWidths,
 				interpolation: "sine",
-				startTime: currentTime
+				delay: 0
 			}));
 		}
 
@@ -172,18 +170,18 @@ class Dropper {
 			to: coords.a,
 			duration: Coord.distance(this.pieceA.animationQueue.getLastTo(), coords.a) * timePerPieceWidths,
 			interpolation: "sine",
-			startTime: currentTime
+			delay: 0
 		}));
 		this.pieceB.animationQueue.add(new Animation({
 			to: coords.b,
 			duration: Coord.distance(this.pieceB.animationQueue.getLastTo(), coords.b) * timePerPieceWidths,
 			interpolation: "sine",
-			startTime: currentTime
+			delay: 0
 		}));
 	}
 
 
-	private animate (currentTime: number) {
+	private animate (deltaTime: number) {
 
 		var coords = this.getCoordinates();
 
@@ -193,23 +191,23 @@ class Dropper {
 			to: coords.a,
 			duration: timePerPieceWidths,
 			interpolation: "sine",
-			startTime: currentTime
+			delay: 0
 		}));
 		this.pieceB.animationQueue.add(new Animation({
 			to: coords.b,
 			duration: timePerPieceWidths,
 			interpolation: "sine",
-			startTime: currentTime
+			delay: 0
 		}));
 	}
 
 
-	draw (context: CanvasRenderingContext2D, currentTime: number, center: Coord, scale: number, boardSize: Coord) {
+	draw (context: CanvasRenderingContext2D, deltaTime: number, center: Coord, scale: number, boardSize: Coord) {
 
 		// Draw the dropper pieces.
 		this.pieceA.draw(
 			context,
-			currentTime,
+			deltaTime,
 			center,
 			scale,
 			0,
@@ -217,7 +215,7 @@ class Dropper {
 		);
 		this.pieceB.draw(
 			context,
-			currentTime,
+			deltaTime,
 			center,
 			scale,
 			0,

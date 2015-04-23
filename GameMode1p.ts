@@ -63,14 +63,14 @@ class GameMode1p implements GameMode {
 
 	draw (
 		context: CanvasRenderingContext2D,
-		currentTime: number,
+		deltaTime: number,
 		appSize: Coord
 	) {
 
 		// The player boards.
 		this.board.draw(
 			context,
-			currentTime,
+			deltaTime,
 			new Coord({x:appSize.x/2, y:appSize.y/2}),
 			1/1
 		);
@@ -78,7 +78,7 @@ class GameMode1p implements GameMode {
 		// Draw the player avatars.
 		this.avatar.draw(
 			context,
-			currentTime,
+			deltaTime,
 			new Coord({x:appSize.x/2+ Board.getWidth() * -1.1/2, y:appSize.y/2 + Board.getWidth()*.65})
 		);
 	}

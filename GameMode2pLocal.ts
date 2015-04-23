@@ -101,18 +101,18 @@ class GameMode2pLocal implements GameMode {
 	}
 
 
-	draw (context: CanvasRenderingContext2D, currentTime: number, appSize: Coord) {
+	draw (context: CanvasRenderingContext2D, deltaTime: number, appSize: Coord) {
 
 		// The player boards.
 		this.boards[0].draw(
 			context,
-			currentTime,
+			deltaTime,
 			new Coord({x:(appSize.x - Board.getWidth() * 2) * 1/3 + Board.getWidth() * 1/2, y:appSize.y/2}),
 			1/1
 		);
 		this.boards[1].draw(
 			context,
-			currentTime,
+			deltaTime,
 			new Coord({x:(appSize.x - Board.getWidth() * 2) * 2/3 + Board.getWidth() * 3/2, y:appSize.y/2}),
 			1/1
 		);
@@ -121,12 +121,12 @@ class GameMode2pLocal implements GameMode {
 		// Draw the player avatars.
 		this.avatars[0].draw(
 			context,
-			currentTime,
+			deltaTime,
 			new Coord({x:(appSize.x - Board.getWidth() * 2) * 1/3 + Board.getWidth() * -0.1/2, y:appSize.y/2 + Board.getWidth()*.65})
 		);
 		this.avatars[1].draw(
 			context,
-			currentTime,
+			deltaTime,
 			new Coord({x:(appSize.x - Board.getWidth() * 2) * 2/3 + Board.getWidth() * 4.1/2, y:appSize.y/2 + Board.getWidth()*.65})
 		);
 

@@ -52,29 +52,28 @@ class DropperQueue {
 
 		var p = this.pieces.shift();
 
-		var currentTime = new Date().getTime();
-
 		for (var i = 0; i < this.pieces.length; i++) {
 
 			this.pieces[i].animationQueue.add(new Animation({
 				to: new Coord({x: Board.size.x, y: i}),
 				duration: DropperQueue.dropperQueueTimePerPieceWidth,
 				interpolation: "sine",
-				startTime: (this.pieces[0].animationQueue.getLast() && this.pieces[0].animationQueue.getLast().startTime) || currentTime
+				delay: 0
+				// delay: this.pieces[0].animationQueue.length() || 0
 			}));
-		};
+		}
 
 		return p
 	}
 
 
-	draw (context: CanvasRenderingContext2D, currentTime: number, center: Coord, scale: number, boardSize: Coord) {
+	draw (context: CanvasRenderingContext2D, deltaTime: number, center: Coord, scale: number, boardSize: Coord) {
 
 		// Draw the dropper queue.
 		for (var i = 0; i < this.pieces.length; i++) {
 			this.pieces[i].draw(
 				context,
-				currentTime,
+				deltaTime,
 				center,
 				scale,
 				0,

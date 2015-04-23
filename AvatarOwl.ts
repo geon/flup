@@ -169,7 +169,7 @@ class AvatarOwl implements Avatar {
 	}
 
 
-	draw (context: CanvasRenderingContext2D, currentTime: number, avatarCenter: Coord) {
+	draw (context: CanvasRenderingContext2D, deltaTime: number, avatarCenter: Coord) {
 
 		var sprites = AvatarOwl.getSprites();
 

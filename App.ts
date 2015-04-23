@@ -166,9 +166,9 @@ class App {
 
 	render () {
 
-		// Calculate delta time.
+		// Calculate delta time. Cap it to make debugging easier.
 		var currentTime = new Date().getTime();
-		var deltaTime = currentTime - this.lastRenderTime;
+		var deltaTime = Math.min(currentTime - this.lastRenderTime, 100);
 		this.lastRenderTime = currentTime;
 
 
@@ -197,7 +197,7 @@ class App {
 		// Boards and avatars.
 		this.gameMode.draw(
 			this.context,
-			currentTime,
+			deltaTime,
 			new Coord ({
 				x:this.getWidth(),
 				y:this.getHeight()

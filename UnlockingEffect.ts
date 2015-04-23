@@ -7,7 +7,7 @@ class UnlockingEffect {
 
 	color: number;
 	coord: Coord;
-	startTime: number;
+	accumulatedDeltaTime: number;
 	initialVelocities: Coord[];
 
 
@@ -15,7 +15,7 @@ class UnlockingEffect {
 
 		this.color = piece.color;
 		this.coord = piece.animationQueue.getLastTo();
-		this.startTime = piece.unlockEffectStartTime;
+		this.accumulatedDeltaTime = 0;
 
 		this.initialVelocities = [];
 		for (var i = 0; i < 8; i++) {
@@ -26,6 +26,7 @@ class UnlockingEffect {
 
 	static size: number = 16;
 	static gravity: number = 0.001;
+	static duration: number = 3000;
 	static sprites = null;
 	static spriteSheet = null;
 
@@ -79,19 +80,22 @@ class UnlockingEffect {
 	}
 
 
-	isDone (currentTime: number) {
+	isDone () {
 
-		return currentTime > this.startTime + 1000 * 3;
+		return this.accumulatedDeltaTime > UnlockingEffect.duration;
 	}
 
 
 	draw (
 		context: CanvasRenderingContext2D,
-		currentTime: number,
+		deltaTime: number,
 		boardCenter: Coord,
 		boardScale: number,
 		boardSize: Coord
 	) {
+
+		this.accumulatedDeltaTime += deltaTime;
+
 
 		var origin = new Coord({
 			x: (boardCenter.x + (this.coord.x/boardSize.x - 0.5) * boardSize.x*Piece.size*boardScale + Piece.size/2) - 0.5 * (UnlockingEffect.size),
@@ -104,8 +108,8 @@ class UnlockingEffect {
 			UnlockingEffect.getSprites()["color "+this.color+", variation "+i].draw(
 				context,
 				{
-					x: origin.x + this.initialVelocities[i].x * (currentTime - this.startTime),
-					y: origin.y + this.initialVelocities[i].y * (currentTime - this.startTime) + UnlockingEffect.gravity * Math.pow(currentTime - this.startTime, 2)
+					x: origin.x + this.initialVelocities[i].x * (this.accumulatedDeltaTime),
+					y: origin.y + this.initialVelocities[i].y * (this.accumulatedDeltaTime) + UnlockingEffect.gravity * this.accumulatedDeltaTime * this.accumulatedDeltaTime
 				},
 				{
 					x: UnlockingEffect.size*boardScale,
@@ -113,5 +117,7 @@ class UnlockingEffect {
 				}
 			);
 		};
+
+		this.accumulatedDeltaTime += deltaTime;
 	}
 }

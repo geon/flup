@@ -6,12 +6,14 @@ class AnimationQueue {
 
 	from: Coord;
 	animations: Animation[];
+	accumulatedDeltaTime: number;
 
 
 	constructor (startPosition?: Coord) {
 
 		this.from = startPosition || new Coord({x:0, y:0});
 		this.animations = [];
+		this.accumulatedDeltaTime = 0;
 	}
 
 
@@ -21,15 +23,15 @@ class AnimationQueue {
 	}
 
 
-	// getLast () {
+	getLast () {
 
-	// 	if (!this.animations.length) {
+		if (!this.animations.length) {
 
-	// 		return undefined;
-	// 	}
+			return undefined;
+		}
 
-	// 	return this.animations[this.animations.length - 1];
-	// }
+		return this.animations[this.animations.length - 1];
+	}
 
 
 	length () {
@@ -42,42 +44,54 @@ class AnimationQueue {
 	}
 
 
-	// getLastTo () {
+	getLastTo () {
 
-	// 	var lastAnimation = this.getLast();
+		var lastAnimation = this.getLast();
 
-	// 	return lastAnimation ? lastAnimation.to : this.from;
-	// }
+		return lastAnimation ? lastAnimation.to : this.from;
+	}
 
 
-	getPosition (delta: number) {
+	getPosition (deltaTime: number) {
 
-		// Remove any expired animations.
-		while (this.animations.length && this.animations[0].length() < delta) {
-
-			var animation = this.animations.shift();
-			this.from = animation.to;
-			delta -= animation.length();
-		}
+		this.accumulatedDeltaTime += deltaTime;
 
 
 		if (!this.animations.length) {
 
+			// Don't carry over delta time to the next animation getting queued up.
+			this.accumulatedDeltaTime = 0;
+
 			return this.from;
+		}
+
+
+		var currentAnimation = this.animations[0];
+
+
+		// Remove any expired animations.
+		while (currentAnimation.length() < this.accumulatedDeltaTime) {
+
+			// Then nex animation should start where this one ended.
+			this.from = currentAnimation.to;
+
+			this.animations.shift();
+
+			// Make the delta time carry over to the next animation.
+			this.accumulatedDeltaTime -= currentAnimation.length();
 		}
 
 
 		// Interpolate.
 
-		var currentAnimation = this.animations[0];
-
 		// Might not be started yet.
-		if (delta < currentAnimation.delay) {
+		if (this.accumulatedDeltaTime < currentAnimation.delay) {
+
 			return this.from;
 		}
 
 		var progress = Animation.interpolators[currentAnimation.interpolation](
-			(delta - currentAnimation.delay) / currentAnimation.duration
+			(this.accumulatedDeltaTime - currentAnimation.delay) / currentAnimation.duration
 		);
 
 		return Coord.add(

@@ -167,7 +167,6 @@ class Board {
 				--yPut;
 			}
 		}
-
 	}
 
 
@@ -218,8 +217,8 @@ class Board {
 		var allPieces = this.pieces.concat(this.unlockedPieces); 
 
 		return allPieces
-			.map(piece => piece.animationQueue.length())
-			.reduce((soFar, next) => Math.max(soFar, next));
+			.map(piece => piece && piece.animationQueue.length())
+			.reduce((soFar, next) => next ? Math.max(soFar, next) : soFar, 0);
 	}
 
 
@@ -421,11 +420,11 @@ class Board {
 		var doneUnlockingEffectIndices = [];
 		for (var i = this.unlockingEffects.length - 1; i >= 0; i--) {
 		
-			if (!this.unlockingEffects[i].isDone(currentTime)) {
+			if (!this.unlockingEffects[i].isDone()) {
 
 				this.unlockingEffects[i].draw(
 					context,
-					currentTime,
+					deltaTime,
 					center,
 					scale,
 					Board.size
@@ -454,17 +453,20 @@ class Board {
 
 			var piece = this.unlockedPieces[i];
 
-			if (piece.unlockEffectDelay > currentTime) {
+			if (piece.unlockEffectDelay > 0) {
 
 				// The piece should still be visible, so draw like normal.
 				piece.draw(
 					context,
-					currentTime,
+					deltaTime,
 					center,
 					scale,
 					disturbance,
 					Board.size
 				);
+
+				// Count down.
+				piece.unlockEffectDelay -= deltaTime;
 
 			} else {
 
@@ -494,7 +496,7 @@ class Board {
 
 				piece.draw(
 					context,
-					currentTime,
+					deltaTime,
 					center,
 					scale,
 					disturbance,
@@ -507,7 +509,7 @@ class Board {
 		// Draw the dropper queue.
 		this.dropperQueue.draw(
 			context,
-			currentTime,
+			deltaTime,
 			center,
 			scale,
 			Board.size
@@ -519,7 +521,7 @@ class Board {
 
 			this.dropper.draw(
 				context,
-				currentTime,
+				deltaTime,
 				center,
 				scale,
 				Board.size
