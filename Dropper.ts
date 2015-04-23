@@ -65,7 +65,7 @@ class Dropper {
 
 	drop (board: Board) {
 
-		var coords = this.getDropperCoordinates();
+		var coords = this.getCoordinates();
 
 		var aPos = Board.coordToIndex(coords.a.x, coords.a.y);
 		var bPos = Board.coordToIndex(coords.b.x, coords.b.y);
@@ -95,7 +95,7 @@ class Dropper {
 	}
 
 
-	getDropperCoordinates () {
+	private getCoordinates () {
 
 		/* Player Orientations:
 
@@ -130,7 +130,7 @@ class Dropper {
 		}
 
 
-		var coords = this.getDropperCoordinates();
+		var coords = this.getCoordinates();
 
 		var timePerPieceWidths = 50;
 
@@ -185,7 +185,7 @@ class Dropper {
 
 	animateDropper (currentTime: number) {
 
-		var coords = this.getDropperCoordinates();
+		var coords = this.getCoordinates();
 
 		var timePerPieceWidths = 50;
 
