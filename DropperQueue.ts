@@ -68,8 +68,6 @@ class DropperQueue {
 	}
 
 
-
-
 	draw (context: CanvasRenderingContext2D, currentTime: number, center: Coord, scale: number, boardSize: Coord) {
 
 		// Draw the dropper queue.
