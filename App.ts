@@ -139,36 +139,28 @@ class App {
 
 	startRenderLoop () {
 
-		var requestAnimFrame: (callback: () => void) => void = (function(){ 
+		var requestAnimFrame: (callback: (currentTime: number) => void) => void = (function(){
 			return window.requestAnimationFrame || 
 			(<any>window).webkitRequestAnimationFrame || 
 			(<any>window).mozRequestAnimationFrame || 
 			(<any>window).oRequestAnimationFrame || 
 			window.msRequestAnimationFrame || 
 			function(callback){ 
-				window.setTimeout(callback, 1000 / 60, new Date().getTime()); 
+				window.setTimeout(callback, 1000 / 60, new Date().getTime());
 			}; 
 		})(); 		
 		
-		// We need a function to run the game over and over.
-		function onEachFrame (callback) {
-
-			// Set up the loop.	
-			var loop = function() { callback(); requestAnimFrame(loop); }
-			loop();
-		};
-
 		// Start the loop.
 		var self = this;
-		onEachFrame(function(){self.render();})
+		function loop (currentTime: number) { self.render(currentTime); requestAnimFrame(loop); }
+		requestAnimFrame(loop);
 	}
 
 
-	render () {
+	render (currentTime: number) {
 
-		// Calculate delta time.
-		var currentTime = new Date().getTime();
-		var deltaTime = currentTime - this.lastRenderTime;
+		// Calculate delta time. Cap it to make debugging easier.
+		var deltaTime = Math.min(currentTime - this.lastRenderTime, 100);
 		this.lastRenderTime = currentTime;
 
 
@@ -197,7 +189,7 @@ class App {
 		// Boards and avatars.
 		this.gameMode.draw(
 			this.context,
-			currentTime,
+			deltaTime,
 			new Coord ({
 				x:this.getWidth(),
 				y:this.getHeight()

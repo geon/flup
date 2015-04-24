@@ -9,7 +9,7 @@ interface GameMode {
 	onKeyDown: (keyCode: number) => void;
 	draw: (
 		context: CanvasRenderingContext2D,
-		currentTime: number,
+		deltaTime: number,
 		appSize: Coord
 	) => void;
 }

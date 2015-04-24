@@ -8,7 +8,7 @@ interface Avatar {
 
 	draw (
 		context: CanvasRenderingContext2D,
-		currentTime: number,
+		deltaTime: number,
 		avatarCenter: Coord
 	): void;
 }

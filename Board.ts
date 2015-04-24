@@ -44,7 +44,7 @@ class Board {
 		// 	if (colors[i])
 		// 		this.pieces[i] = new Piece(colors[i]);
 		// };
-		// this.makePiecesFall(new Date().getTime());
+		// this.makePiecesFall(0);
 		// options.pieceCycle[0] = new Piece({color: 0, key:true});
 		// options.pieceCycle[1] = new Piece({color: 0, key:false});
 
@@ -89,13 +89,13 @@ class Board {
 
 	applyGameLogic () {
 
-		this.makePiecesFall(new Date().getTime());
+		this.makePiecesFall(0);
 		this.unlockChains();
 		this.checkForGameOver();
 	}
 
 
-	makePiecesFall (fallAnimationStartTime) {
+	makePiecesFall (delay: number) {
 
 		/*
 
@@ -156,7 +156,7 @@ class Board {
 				var timePerPieceHeight = 100;
 				this.pieces[putPos].animationQueue.add(new Animation({
 					to: new Coord({x: x, y: yPut}),
-					startTime: fallAnimationStartTime + numConsecutive * 50,
+					delay: delay + numConsecutive * 50 - this.pieces[putPos].animationQueue.length(),
 					duration: Math.sqrt(yPut - yGet) * timePerPieceHeight,
 					interpolation: "easeInQuad"
 				}));
@@ -167,7 +167,6 @@ class Board {
 				--yPut;
 			}
 		}
-
 	}
 
 
@@ -188,20 +187,20 @@ class Board {
 					foundChains = true;
 
 					// As soon as everything has stopped falling...
-					var unlockEffectStartTime = this.maxAnimationEndTime();
+					var unlockEffectDelay = this.maxAnimationLength();
 
 					// ...Start the unlocking effect.
-					var unlockEffectDuration = this.unLockChainRecursively(i, unlockEffectStartTime);
+					var unlockEffectDuration = this.unLockChainRecursively(i, unlockEffectDelay);
 
 					maxUnlockEffectDuration = Math.max(maxUnlockEffectDuration, unlockEffectDuration);
 				}
 			}
-		};
+		}
 
 		if (foundChains) {
 
 			// Fill up the gaps left by the chains, right after the unlocking effect is finished.
-			this.makePiecesFall(this.maxAnimationEndTime() + maxUnlockEffectDuration);
+			this.makePiecesFall(this.maxAnimationLength() + maxUnlockEffectDuration);
 
 			// New chains might have formed.
 			this.unlockChains();
@@ -212,30 +211,18 @@ class Board {
 	}
 
 
-	maxAnimationEndTime () {
-
-		var maxAnimationEndTime = new Date().getTime();
+	maxAnimationLength () {
 
 		// Must also check the unlocked pieces waiting for the unlocking effect.
 		var allPieces = this.pieces.concat(this.unlockedPieces); 
 
-		for (var i = allPieces.length - 1; i >= 0; i--) {
-			
-			if (allPieces[i]) {
-
-				var animationEndTime = allPieces[i].animationQueue.getEndTime();
-				if (animationEndTime) {
-
-					maxAnimationEndTime = Math.max(maxAnimationEndTime, animationEndTime);
-				}
-			}
-		}
-
-		return maxAnimationEndTime;
+		return allPieces
+			.map(piece => piece && piece.animationQueue.length())
+			.reduce((soFar, next) => next ? Math.max(soFar, next) : soFar, 0);
 	}
 
 
-	unLockChainRecursively (position: number, unlockEffectStartTime: number) {
+	unLockChainRecursively (position: number, unlockEffectDelay: number) {
 
 		// Must search for neighbors before removing the piece matching against.
 		var matchingNeighborPositions = this.matchingNeighborsOfPosition(position);
@@ -248,22 +235,22 @@ class Board {
 		}
 
 		// Move the piece from the play field to the queue of pieces waiting for the unlocking effect.
-		unlockedPiece.unlockEffectStartTime = unlockEffectStartTime;
+		unlockedPiece.unlockEffectDelay = unlockEffectDelay;
 		this.unlockedPieces.push(unlockedPiece);
 		this.pieces[position] = undefined;
 
 		// For all matching neighbors...
-		var unlockEffectDelayTime = 25;
+		var interUnlockEffectDelay = 25;
 		var longestChainDuration = 0;
 		for (var i = matchingNeighborPositions.length - 1; i >= 0; i--) {
 
 			// Recurse.
-			var chainDuration = this.unLockChainRecursively(matchingNeighborPositions[i], unlockEffectStartTime + unlockEffectDelayTime)
+			var chainDuration = this.unLockChainRecursively(matchingNeighborPositions[i], unlockEffectDelay + interUnlockEffectDelay)
 
 			longestChainDuration = Math.max(longestChainDuration, chainDuration);
 		};
 
-		return unlockEffectDelayTime + longestChainDuration;
+		return interUnlockEffectDelay + longestChainDuration;
 	}
 
 
@@ -334,7 +321,7 @@ class Board {
 
 	startGameOverEffect () {
 
-		var gameOverEffectStartTime = this.maxAnimationEndTime();
+		var gameOverEffectDelay = this.maxAnimationLength();
 
 		// Unlock all pieces, from the center and out.
 		for (var i = 0; i < this.pieces.length; i++) {
@@ -343,7 +330,7 @@ class Board {
 
 				var unlockedPiece = this.pieces[i];
 
-				unlockedPiece.unlockEffectStartTime = gameOverEffectStartTime + Coord.distance(Board.indexToCoord(i), Coord.scale(Board.size, 0.5)) * Board.gameOverUnlockEffectDelayPerPieceWidth;
+				unlockedPiece.unlockEffectDelay = gameOverEffectDelay + Coord.distance(Board.indexToCoord(i), Coord.scale(Board.size, 0.5)) * Board.gameOverUnlockEffectDelayPerPieceWidth;
 				this.unlockedPieces.push(unlockedPiece);
 				this.pieces[i] = undefined;
 			}
@@ -353,7 +340,7 @@ class Board {
 
 	punish (avatar: Avatar) {
 
-		var punishmentAnimationStartTime = this.maxAnimationEndTime();
+		var punishmentAnimationDelay = this.maxAnimationLength();
 
 		// Make room.
 		for (var y = 0; y < Board.size.y-1; y++) {
@@ -382,7 +369,7 @@ class Board {
 					to: Board.indexToCoord(i),
 					duration: DropperQueue.dropperQueueTimePerPieceWidth,
 					interpolation: "sine",
-					startTime: punishmentAnimationStartTime
+					delay: punishmentAnimationDelay
 				}));
 			}
 		}
@@ -395,7 +382,7 @@ class Board {
 	}
 
 
-	draw (context: CanvasRenderingContext2D, currentTime: number, center: Coord, scale: number) {
+	draw (context: CanvasRenderingContext2D, deltaTime: number, center: Coord, scale: number) {
 
 		// Draw the board background.
 		context.fillStyle = "rgba(255, 255, 255, 0.1)";
@@ -433,11 +420,11 @@ class Board {
 		var doneUnlockingEffectIndices = [];
 		for (var i = this.unlockingEffects.length - 1; i >= 0; i--) {
 		
-			if (!this.unlockingEffects[i].isDone(currentTime)) {
+			if (!this.unlockingEffects[i].isDone()) {
 
 				this.unlockingEffects[i].draw(
 					context,
-					currentTime,
+					deltaTime,
 					center,
 					scale,
 					Board.size
@@ -466,17 +453,20 @@ class Board {
 
 			var piece = this.unlockedPieces[i];
 
-			if (piece.unlockEffectStartTime > currentTime) {
+			if (piece.unlockEffectDelay > 0) {
 
 				// The piece should still be visible, so draw like normal.
 				piece.draw(
 					context,
-					currentTime,
+					deltaTime,
 					center,
 					scale,
 					disturbance,
 					Board.size
 				);
+
+				// Count down.
+				piece.unlockEffectDelay -= deltaTime;
 
 			} else {
 
@@ -506,7 +496,7 @@ class Board {
 
 				piece.draw(
 					context,
-					currentTime,
+					deltaTime,
 					center,
 					scale,
 					disturbance,
@@ -519,7 +509,7 @@ class Board {
 		// Draw the dropper queue.
 		this.dropperQueue.draw(
 			context,
-			currentTime,
+			deltaTime,
 			center,
 			scale,
 			Board.size
@@ -531,7 +521,7 @@ class Board {
 
 			this.dropper.draw(
 				context,
-				currentTime,
+				deltaTime,
 				center,
 				scale,
 				Board.size

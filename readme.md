@@ -38,7 +38,6 @@ TODO
 
 The next few issues on the map:
 
-* Switch all new Date().getTime() to passing a current time and limit the delta time. As it is now, it is sometimes problematic to debug stuff where the animation won't care that you have paused the code at a breakpoint in the debugger.
 * Animation timing is tedious and tricky to get it all just right. Possibly switch to some other method.
 * Pieces in the column above an exploding piece should fall immediately, not after the whole chain is gone.
 * Try how it feels if the droppedd pieces can never land on top of each-other, but will disappear immediately when they land, making room for the piece above. That makes it possible to make the pieces shatter immediately when a chain is made, instead of waiting for everything to settle.
