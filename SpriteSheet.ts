@@ -25,7 +25,6 @@ class SpriteSheet {
 				sheetPosition: Coord,
 				sheetSize: Coord
 			}[];
-			image?: HTMLImageElement;
 		}
 	) {
 
