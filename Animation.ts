@@ -10,7 +10,6 @@ class Animation {
 
 
 	constructor (animation: {to: Coord, delay: number, duration: number, interpolation: string}) {
-console.log(animation.delay);
 		this.to            = animation.to;
 		this.delay         = animation.delay;
 		this.duration      = animation.duration;
