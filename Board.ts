@@ -385,18 +385,26 @@ class Board {
 	draw (context: CanvasRenderingContext2D, deltaTime: number, center: Coord, scale: number) {
 
 		// Draw the board background.
-		context.fillStyle = "rgba(255, 255, 255, 0.1)";
-		for (var i = 0; i < Board.size.x; i++) {
-			
-			var xCenter = (center.x + (i/Board.size.x - 0.5) * Board.size.x*Piece.size*scale + Piece.size/2) - 0.5 * (Piece.size);
 
-			context.fillRect(
-				(xCenter + 2),
-				center.y - (Board.size.y * Piece.size / 2) * scale,
-				(Piece.size - 4) * scale,
-				(Board.size.y * Piece.size) * scale
-			);
-		};
+		var slateSprites = App.getSprites();
+		for (var y=0; y<Board.size.y; ++y) {
+			for (var x=0; x<Board.size.x; ++x) {
+				
+				slateSprites[(x + y*Board.size.y) % 16].draw(
+				// slateSprites[0].draw(
+					context,
+					{
+						x: center.x + (x - Board.size.x/2) * scale * Piece.size,
+						y: center.y + (y - Board.size.y/2) * scale * Piece.size
+					},
+					{
+						x: Piece.size*scale,
+						y: Piece.size*scale
+					}
+				);
+			}
+		}
+
 
 
 		// Calculate how much to stress the player. (Piece wobbling increases as they approach the maximum height before game over.)

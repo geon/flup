@@ -11,7 +11,7 @@ class App {
 
 	lastRenderTime: number;
 
-	backgroundImage: HTMLImageElement;
+	slateSpriteSheet: SpriteSheet
 
 	keydownEventInProgress;
 
@@ -24,10 +24,6 @@ class App {
 		this.gameMode = new GameMode2pLocal();
 		
 		this.lastRenderTime = 0;
-
-		this.backgroundImage = new Image();
-
-
 
 		// Make the canvas resolution match the displayed size.
 		var self = this;
@@ -63,6 +59,52 @@ class App {
 	}
 
 
+	static sprites;
+	static spriteSheet: SpriteSheet;
+
+
+	static getSprites () {
+
+		if (!this.sprites) {
+
+			this.sprites = this.getSpriteSheet().getSprites();
+		}
+
+		return this.sprites;
+	}
+
+
+	static getSpriteSheet () {
+
+		if (!this.spriteSheet) {
+
+			this.spriteSheet = new SpriteSheet(this.getSpriteSheetSettings());
+		}
+
+		return this.spriteSheet;
+	}
+
+
+	static getSpriteSheetSettings () {
+
+		var gridSize = new Coord({x:4, y:4});
+		var spriteSettings = [];
+		for (var i=0; i<gridSize.x*gridSize.y; ++i) {
+			spriteSettings.push({
+				name: new String(i),
+				sheetPosition: new Coord({x:i%gridSize.x, y:Math.floor(i/gridSize.x)}),
+				sheetSize: new Coord({x:1, y:1})
+			});
+		}
+		
+		return {
+			imageFileName: "slates.jpg",
+			gridSize: gridSize,
+			spriteSettings: spriteSettings	
+		};
+	}
+
+
 	getWidth () {
 		
 		return this.context.canvas.width / window.devicePixelRatio;
@@ -83,13 +125,7 @@ class App {
 		promises.push(UnlockingEffect.getSpriteSheet().loadImage());
 		promises.push(AvatarOwl.getSpriteSheet().loadImage());
 		promises.push(AvatarAztecJade.getSpriteSheet().loadImage());
-
-		var promise = $.Deferred();
-		$(this.backgroundImage).load(promise.resolve);
-		$(this.backgroundImage).error(promise.reject);
-		this.backgroundImage.src = "graphics/temple.jpg";
-
-		promises.push(promise);
+		promises.push(App.getSpriteSheet().loadImage());
 
 		return $.when.apply($, promises);	
 	}
@@ -164,27 +200,14 @@ class App {
 		this.lastRenderTime = currentTime;
 
 
-		// Draw the background.
-		var srcAspect = this.backgroundImage.width / this.backgroundImage.height;
-		var dstAspect = this.getWidth()            / this.getHeight();
-		var srcCroppedWidth  = Math.min(this.backgroundImage.width,  this.backgroundImage.width  * dstAspect / srcAspect);
-		var srcCroppedHeight = Math.min(this.backgroundImage.height, this.backgroundImage.height / dstAspect * srcAspect);
-		this.context.drawImage(
-			this.backgroundImage,
-
-			// Source xywh - Centered crop to destination aspect.
-			Math.max(0, this.backgroundImage.width  - srcCroppedWidth ) / 2,
-			Math.max(0, this.backgroundImage.height - srcCroppedHeight) / 2,
-			srcCroppedWidth,
-			srcCroppedHeight,
-
-			// Destination xywh - Fill up completely.
-			0,
-			0,
-			this.getWidth(),
-			this.getHeight()
-		);
-
+		// Draw the board background.
+        this.context.fillStyle = "rgba(0, 0, 0, 1)";
+        this.context.fillRect(
+            0,
+            0,
+            this.getWidth(),
+            this.getHeight()
+        );
 
 		// Boards and avatars.
 		this.gameMode.draw(
