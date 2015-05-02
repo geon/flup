@@ -1,14 +1,17 @@
 
+/// <reference path="Piece.ts"/>
+
+
 class PieceCycle {
 
 	currentIndex: number;
 	pieces: Piece[];
 
 
-	constructor () {
+	constructor (pieces: Piece[]) {
 
 		this.currentIndex = 0;
-		this.pieces = PieceCycle.generate();
+		this.pieces = pieces;
 	}
 
 

@@ -16,11 +16,11 @@ class GameMode2pLocal implements GameMode {
 
 	constructor () {
 
-		var pieceCycle = new PieceCycle();
+		var pieceCycleTemplate = PieceCycle.generate();
 
 		this.boards = [
-			new Board({pieceCycle: pieceCycle, gameMode: this}),
-			new Board({pieceCycle: pieceCycle, gameMode: this})
+			new Board({pieceCycle: new PieceCycle(pieceCycleTemplate), gameMode: this}),
+			new Board({pieceCycle: new PieceCycle(pieceCycleTemplate), gameMode: this})
 		];
 
 		this.avatars = [
