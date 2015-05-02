@@ -22,6 +22,8 @@ class Board {
 
 	gameOver: boolean;
 
+	slateRandomExp: number;
+
 
 	constructor (options: {gameMode: GameMode, pieceCycle: PieceCycle}) {
 
@@ -34,6 +36,7 @@ class Board {
 		this.dropperQueue = new DropperQueue({pieceCycle: this.pieceCycle});
 		this.dropper = new Dropper(this.dropperQueue);
 		this.gameOver = false;
+		this.slateRandomExp = 2+Math.random();
 
 
 		// var colors = [
@@ -390,8 +393,8 @@ class Board {
 		for (var y=0; y<Board.size.y; ++y) {
 			for (var x=0; x<Board.size.x; ++x) {
 				
-				slateSprites[(x + y*Board.size.y) % 16].draw(
-				// slateSprites[0].draw(
+				var pseudoRandomByXY = Math.floor(Math.pow((5 + x + y*Board.size.y), this.slateRandomExp));
+				slateSprites[pseudoRandomByXY % 16].draw(
 					context,
 					{
 						x: center.x + (x - Board.size.x/2) * scale * Piece.size,
