@@ -87,7 +87,7 @@ class App {
 
 	static getSpriteSheetSettings () {
 
-		var gridSize = new Coord({x:4, y:4});
+		var gridSize = new Coord({x:4, y:2});
 		var spriteSettings = [];
 		for (var i=0; i<gridSize.x*gridSize.y; ++i) {
 			spriteSettings.push({

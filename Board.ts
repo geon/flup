@@ -393,8 +393,16 @@ class Board {
 		for (var y=0; y<Board.size.y; ++y) {
 			for (var x=0; x<Board.size.x; ++x) {
 				
-				var pseudoRandomByXY = Math.floor(Math.pow((5 + x + y*Board.size.y), this.slateRandomExp));
-				slateSprites[pseudoRandomByXY % 16].draw(
+				var numTiles = 8;
+				var numBaseTiles = 2;
+
+				// This is just BS. The magic munber don't mean anything.
+				var pseudoRandomByXY = Math.floor(Math.pow((113 + x + y*Board.size.y), this.slateRandomExp));
+				var basePattern = pseudoRandomByXY % numBaseTiles;
+				var details = (pseudoRandomByXY % numTiles-numBaseTiles) + numBaseTiles;
+				var useDetail = !(Math.floor(pseudoRandomByXY/13) % 10);
+
+				slateSprites[useDetail ? details : basePattern].draw(
 					context,
 					{
 						x: center.x + (x - Board.size.x/2) * scale * Piece.size,
