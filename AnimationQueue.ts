@@ -6,14 +6,14 @@ class AnimationQueue {
 
 	from: Coord;
 	animations: Animation[];
-	accumulatedDeltaTime: number;
+	timeSinceCurrentAnimationStart: number;
 
 
 	constructor (startPosition?: Coord) {
 
 		this.from = startPosition || new Coord({x:0, y:0});
 		this.animations = [];
-		this.accumulatedDeltaTime = 0;
+		this.timeSinceCurrentAnimationStart = 0;
 	}
 
 
@@ -54,44 +54,46 @@ class AnimationQueue {
 
 	getPosition (deltaTime: number) {
 
-		this.accumulatedDeltaTime += deltaTime;
-
-
-		if (!this.animations.length) {
-
-			// Don't carry over delta time to the next animation getting queued up.
-			this.accumulatedDeltaTime = 0;
-
-			return this.from;
-		}
+		this.timeSinceCurrentAnimationStart += deltaTime;
 
 
 		var currentAnimation = this.animations[0];
 
 
 		// Remove any expired animations.
-		while (currentAnimation.length() < this.accumulatedDeltaTime) {
+		while (this.animations.length && currentAnimation.length() < this.timeSinceCurrentAnimationStart) {
 
-			// Then nex animation should start where this one ended.
+			// Then next animation should start where this one ended.
 			this.from = currentAnimation.to;
 
-			this.animations.shift();
-
 			// Make the delta time carry over to the next animation.
-			this.accumulatedDeltaTime -= currentAnimation.length();
+			this.timeSinceCurrentAnimationStart -= currentAnimation.length();
+
+			// Use the next one instead.
+			this.animations.shift();
+			currentAnimation = this.animations[0];
+		}
+
+
+		if (!this.animations.length) {
+
+			// Don't carry over delta time to the next animation getting queued up.
+			this.timeSinceCurrentAnimationStart = 0;
+
+			return this.from;
 		}
 
 
 		// Interpolate.
 
 		// Might not be started yet.
-		if (this.accumulatedDeltaTime < currentAnimation.delay) {
+		if (this.timeSinceCurrentAnimationStart < currentAnimation.delay) {
 
 			return this.from;
 		}
 
 		var progress = Animation.interpolators[currentAnimation.interpolation](
-			(this.accumulatedDeltaTime - currentAnimation.delay) / currentAnimation.duration
+			(this.timeSinceCurrentAnimationStart - currentAnimation.delay) / currentAnimation.duration
 		);
 
 		return Coord.add(
