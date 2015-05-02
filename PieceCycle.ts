@@ -1,22 +1,22 @@
 
 class PieceCycle {
 
-	pieceCycleIndex: number;
-	pieceCycle: Piece[];
+	currentIndex: number;
+	pieces: Piece[];
 
 
 	constructor () {
 
-		this.pieceCycleIndex = 0;
-		this.pieceCycle = PieceCycle.generatePieceCycle();
+		this.currentIndex = 0;
+		this.pieces = PieceCycle.generate();
 	}
 
 
-	consumePieceFromCycle () {
+	pop () {
 
-		var piece = this.pieceCycle[this.pieceCycleIndex];
+		var piece = this.pieces[this.currentIndex];
 
-		this.pieceCycleIndex = (this.pieceCycleIndex + 1) % this.pieceCycle.length;
+		this.currentIndex = (this.currentIndex + 1) % this.pieces.length;
 
 		return piece;
 	}
@@ -26,7 +26,7 @@ class PieceCycle {
 	static nonKeyToKeyRatio: number = 7;
 
 
-	static generatePieceCycle () {
+	static generate () {
 
 		// Create list of all colors.
 		var baseColors = [];

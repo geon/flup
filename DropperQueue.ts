@@ -19,7 +19,7 @@ class DropperQueue {
 		this.pieces = [];
 		while (this.pieces.length < DropperQueue.dropperQueueVisibleLength) {
 
-			var piece = this.pieceCycle.consumePieceFromCycle();
+			var piece = this.pieceCycle.pop();
 
 			this.pieces.push(new Piece({
 				color: piece.color,
@@ -39,7 +39,7 @@ class DropperQueue {
 
 	pop () {
 
-		var newPiece = this.pieceCycle.consumePieceFromCycle();
+		var newPiece = this.pieceCycle.pop();
 
 		this.pieces.push(new Piece({
 			color: newPiece.color,
