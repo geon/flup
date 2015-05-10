@@ -15,10 +15,10 @@ class GameMode1p implements GameMode {
 
 	constructor () {
 
-		var pieceCycle = new PieceCycle();
+		var pieceCycle = new PieceCycle(PieceCycle.generate());
 
 		this.board = new Board({pieceCycle: pieceCycle, gameMode: this});
-		this.avatar = new AvatarOwl({character: 0});
+		this.avatar = new AvatarOwl();
 	}
 
 
