@@ -1,0 +1,24 @@
+{
+  "name": "flup",
+  "version": "0.0.1",
+  "description": "Stereotypical puzzle game.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/geon/flup.git"
+  },
+  "author": "Victor Widell <victor@topmost.se> (http://geon.github.com/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/geon/flup/issues"
+  },
+  "homepage": "https://github.com/geon/flup",
+  "devDependencies": {
+    "gulp": "^3.8.11",
+    "gulp-typescript": "^2.7.2",
+    "typescript": "1.5.0-alpha"
+  }
+}
