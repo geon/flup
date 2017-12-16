@@ -22,7 +22,7 @@ class App {
 		this.context = options.context;
 
 		this.gameMode = new GameMode2pLocal();
-		
+
 		this.lastRenderTime = 0;
 
 		// Make the canvas resolution match the displayed size.
@@ -44,15 +44,15 @@ class App {
 		makeCanvasFullWindow();
 
 
-		
+
 		this.loadSprites().then(function(){
 
 			console.log("Sprites loaded.");
-			
+
 			self.startGame();
 
 		}, function(){
-			
+
 			console.log("Could not load sprites.");
 		});
 
@@ -96,23 +96,23 @@ class App {
 				sheetSize: new Coord({x:1, y:1})
 			});
 		}
-		
+
 		return {
 			imageFileName: "slates.jpg",
 			gridSize: gridSize,
-			spriteSettings: spriteSettings	
+			spriteSettings: spriteSettings
 		};
 	}
 
 
 	getWidth () {
-		
+
 		return this.context.canvas.width / window.devicePixelRatio;
 	}
 
 
 	getHeight () {
-		
+
 		return this.context.canvas.height / window.devicePixelRatio;
 	}
 
@@ -120,14 +120,14 @@ class App {
 	loadSprites () {
 
 		var promises = [];
-		
+
 		promises.push(Piece.getSpriteSheet().loadImage());
 		promises.push(UnlockingEffect.getSpriteSheet().loadImage());
 		promises.push(AvatarOwl.getSpriteSheet().loadImage());
 		promises.push(AvatarAztecJade.getSpriteSheet().loadImage());
 		promises.push(App.getSpriteSheet().loadImage());
 
-		return $.when.apply($, promises);	
+		return $.when.apply($, promises);
 	}
 
 
@@ -176,16 +176,16 @@ class App {
 	startRenderLoop () {
 
 		var requestAnimFrame: (callback: (currentTime: number) => void) => void = (function(){
-			return window.requestAnimationFrame || 
-			(<any>window).webkitRequestAnimationFrame || 
-			(<any>window).mozRequestAnimationFrame || 
-			(<any>window).oRequestAnimationFrame || 
-			window.msRequestAnimationFrame || 
-			function(callback){ 
+			return window.requestAnimationFrame ||
+			(<any>window).webkitRequestAnimationFrame ||
+			(<any>window).mozRequestAnimationFrame ||
+			(<any>window).oRequestAnimationFrame ||
+			window.msRequestAnimationFrame ||
+			function(callback){
 				window.setTimeout(callback, 1000 / 60, new Date().getTime());
-			}; 
-		})(); 		
-		
+			};
+		})();
+
 		// Start the loop.
 		var self = this;
 		function loop (currentTime: number) { self.render(currentTime); requestAnimFrame(loop); }
