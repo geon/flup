@@ -1,7 +1,7 @@
 
 import {GameMode} from "./GameMode";
 import {GameMode2pLocal} from "./GameMode2pLocal";
-import {SpriteSheet} from "./SpriteSheet";
+import {SpriteSheet, SpriteSet} from "./SpriteSheet";
 import {Coord} from "./Coord";
 import {UnlockingEffect} from "./UnlockingEffect";
 import {Piece} from "./Piece";
@@ -19,7 +19,7 @@ export class App {
 
 	slateSpriteSheet: SpriteSheet
 
-	keydownEventInProgress;
+	keydownEventInProgress: number | undefined;
 
 
 
@@ -65,7 +65,7 @@ export class App {
 	}
 
 
-	static sprites;
+	static sprites: SpriteSet;
 	static spriteSheet: SpriteSheet;
 
 
@@ -97,7 +97,7 @@ export class App {
 		var spriteSettings = [];
 		for (var i=0; i<gridSize.x*gridSize.y; ++i) {
 			spriteSettings.push({
-				name: new String(i),
+				name: i.toString(),
 				sheetPosition: new Coord({x:i%gridSize.x, y:Math.floor(i/gridSize.x)}),
 				sheetSize: new Coord({x:1, y:1})
 			});

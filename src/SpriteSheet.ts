@@ -4,6 +4,8 @@ import {Sprite} from "./Sprite";
 /// <reference path="jquery.d.ts" />
 
 
+export type SpriteSet = {[name: string]: Sprite};
+
 export class SpriteSheet {
 
 	imageFileName: string;
@@ -50,7 +52,7 @@ export class SpriteSheet {
 
 	getSprites () {
 
-		var sprites = {};
+		var sprites: SpriteSet = {};
 
 		for (var i = this.spriteSettings.length - 1; i >= 0; i--) {
 			sprites[this.spriteSettings[i].name] = new Sprite(

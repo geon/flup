@@ -1,7 +1,8 @@
 
 import {AnimationQueue} from "./AnimationQueue";
-import {SpriteSheet} from "./SpriteSheet";
+import {SpriteSheet, SpriteSet} from "./SpriteSheet";
 import {Coord} from "./Coord";
+import {Sprite} from "./Sprite";
 
 export class Piece {
 
@@ -23,8 +24,8 @@ export class Piece {
 
 
 	static size = 32;
-	static sprites = null;
-	static spriteSheet = null;
+	static sprites: SpriteSet | null = null;
+	static spriteSheet: SpriteSheet | null = null;
 
 
 	static getSprites () {
@@ -99,14 +100,14 @@ export class Piece {
 
 		Piece.getSprites()[(this.key ? "key" : "piece")+this.color].draw(
 			context,
-			{
+			new Coord({
 				x: (boardCenter.x + (position.x/boardSize.x - 0.5) * boardSize.x*Piece.size*boardScale + Piece.size/2) - 0.5 * (Piece.size + jitterZ) + jitterX,
 				y: (boardCenter.y + (position.y/boardSize.y - 0.5) * boardSize.y*Piece.size*boardScale + Piece.size/2) - 0.5 * (Piece.size + jitterZ) + jitterY
-			},
-			{
+			}),
+			new Coord({
 				x: Piece.size*boardScale,
 				y: Piece.size*boardScale
-			}
+			})
 		);
 	}
 }

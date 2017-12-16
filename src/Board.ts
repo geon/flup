@@ -15,7 +15,7 @@ export class Board {
 
 	gameMode: GameMode;
 
-	pieces: Piece[];
+	pieces: Array<Piece | undefined>;
 	unlockedPieces: Piece[];
 	unlockingEffects: UnlockingEffect[];
 	pieceCycle: PieceCycle;
@@ -157,12 +157,13 @@ export class Board {
 				// Move the piece.
 				this.pieces[putPos] = this.pieces[getPos];
 				this.pieces[getPos] = undefined;
+				const piece = this.pieces[putPos]!;
 
 				// Animate it.
 				var timePerPieceHeight = 100;
-				this.pieces[putPos].animationQueue.add(new Animation({
+				piece.animationQueue.add(new Animation({
 					to: new Coord({x: x, y: yPut}),
-					delay: delay + numConsecutive * 50 - this.pieces[putPos].animationQueue.length(),
+					delay: delay + numConsecutive * 50 - piece.animationQueue.length(),
 					duration: Math.sqrt(yPut - yGet) * timePerPieceHeight,
 					interpolation: "easeInQuad"
 				}));
@@ -181,9 +182,10 @@ export class Board {
 		var foundChains = false;
 		var maxUnlockEffectDuration = 0;
 		for (var i = this.pieces.length - 1; i >= 0; i--) {
+			const piece = this.pieces[i] ;
 
 			// Look for keys.
-			if (this.pieces[i] && this.pieces[i].key) {
+			if (piece&& piece.key) {
 
 				var matchingNeighborPositions = this.matchingNeighborsOfPosition(i);
 
@@ -220,11 +222,15 @@ export class Board {
 	maxAnimationLength () {
 
 		// Must also check the unlocked pieces waiting for the unlocking effect.
-		var allPieces = this.pieces.concat(this.unlockedPieces);
+		var allPieces = this.pieces.concat(this.unlockedPieces)
+			.filter(x => !!x)
+			.map(x => x!);
 
 		return allPieces
 			.map(piece => piece && piece.animationQueue.length())
-			.reduce((soFar, next) => next ? Math.max(soFar, next) : soFar, 0);
+			.reduce((soFar, next) => {
+				return next ? Math.max(soFar, next) : soFar;
+			}, 0);
 	}
 
 
@@ -261,8 +267,9 @@ export class Board {
 
 
 	matchingNeighborsOfPosition (position: number) {
+		const piece = this.pieces[position];
 
-		if (!this.pieces[position]) {
+		if (!piece) {
 			return [];
 		}
 
@@ -292,12 +299,13 @@ export class Board {
 
 
 		var matchingNeighborPositions = [];
-		var color = this.pieces[position].color;
+		var color = piece.color;
 		for (var i = neighborPositions.length - 1; i >= 0; i--) {
 
 			var neighborPosition = neighborPositions[i];
+			const neighborPiece = this.pieces[neighborPosition] ;
 
-			if (this.pieces[neighborPosition] && this.pieces[neighborPosition].color == color) {
+			if (neighborPiece && neighborPiece.color == color) {
 
 				matchingNeighborPositions.push(neighborPosition);
 			}
@@ -332,9 +340,8 @@ export class Board {
 		// Unlock all pieces, from the center and out.
 		for (var i = 0; i < this.pieces.length; i++) {
 
-			if (this.pieces[i]) {
-
-				var unlockedPiece = this.pieces[i];
+			var unlockedPiece = this.pieces[i];
+			if (unlockedPiece) {
 
 				unlockedPiece.unlockEffectDelay = gameOverEffectDelay + Coord.distance(Board.indexToCoord(i), Coord.scale(Board.size, 0.5)) * Board.gameOverUnlockEffectDelayPerPieceWidth;
 				this.unlockedPieces.push(unlockedPiece);
@@ -368,10 +375,10 @@ export class Board {
 
 		// Animate.
 		for (var i = 0; i < this.pieces.length; i++) {
+			const piece = this.pieces[i];
+			if (piece) {
 
-			if (this.pieces[i]) {
-
-				this.pieces[i].animationQueue.add(new Animation({
+				piece.animationQueue.add(new Animation({
 					to: Board.indexToCoord(i),
 					duration: DropperQueue.dropperQueueTimePerPieceWidth,
 					interpolation: "sine",
@@ -407,14 +414,14 @@ export class Board {
 
 				slateSprites[useDetail ? details : basePattern].draw(
 					context,
-					{
+					new Coord({
 						x: center.x + (x - Board.size.x/2) * scale * Piece.size,
 						y: center.y + (y - Board.size.y/2) * scale * Piece.size
-					},
-					{
+					}),
+					new Coord({
 						x: Piece.size*scale,
 						y: Piece.size*scale
-					}
+					})
 				);
 			}
 		}
@@ -513,7 +520,7 @@ export class Board {
 		// Draw the board pieces.
 		for (var i = 0, length = this.pieces.length; i < length; ++i) {
 
-			var piece = this.pieces[i];
+			let piece = this.pieces[i];
 			if (piece !== undefined) {
 
 				piece.draw(

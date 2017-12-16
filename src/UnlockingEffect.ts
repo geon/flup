@@ -1,7 +1,7 @@
 
 import {Piece} from "./Piece";
 import {Coord} from "./Coord";
-import {SpriteSheet} from "./SpriteSheet";
+import {SpriteSheet, SpriteSet} from "./SpriteSheet";
 
 
 export class UnlockingEffect {
@@ -28,8 +28,8 @@ export class UnlockingEffect {
 	static size: number = 16;
 	static gravity: number = 0.001;
 	static duration: number = 3000;
-	static sprites = null;
-	static spriteSheet = null;
+	static sprites : SpriteSet | null = null;
+	static spriteSheet: SpriteSheet | null = null;
 
 
 	static getSprites = function() {
@@ -108,14 +108,14 @@ export class UnlockingEffect {
 
 			UnlockingEffect.getSprites()["color "+this.color+", variation "+i].draw(
 				context,
-				{
+				new Coord({
 					x: origin.x + this.initialVelocities[i].x * (this.accumulatedDeltaTime),
 					y: origin.y + this.initialVelocities[i].y * (this.accumulatedDeltaTime) + UnlockingEffect.gravity * this.accumulatedDeltaTime * this.accumulatedDeltaTime
-				},
-				{
+				}),
+				new Coord({
 					x: UnlockingEffect.size*boardScale,
 					y: UnlockingEffect.size*boardScale
-				}
+				})
 			);
 		};
 

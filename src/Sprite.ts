@@ -9,7 +9,7 @@ export class Sprite {
 	spriteSheet: SpriteSheet;
 
 
-	constructor (spriteSheet, sheetPosition, sheetSize) {
+	constructor (spriteSheet: SpriteSheet, sheetPosition: Coord, sheetSize: Coord) {
 
 		this.sheetPosition = sheetPosition;
 		this.sheetSize = sheetSize;

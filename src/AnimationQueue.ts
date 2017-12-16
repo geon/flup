@@ -40,7 +40,7 @@ export class AnimationQueue {
 			? this.animations
 				.map(animation => animation.length())
 				.reduce((soFar, next) => soFar + next, 0)
-			: null;
+			: 0;
 	}
 
 

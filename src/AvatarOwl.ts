@@ -1,7 +1,7 @@
 
 import {Avatar} from "./Avatar";
 import {Coord} from "./Coord";
-import {SpriteSheet} from "./SpriteSheet";
+import {SpriteSheet, SpriteSet} from "./SpriteSheet";
 import {Piece} from "./Piece";
 import {PieceCycle} from "./PieceCycle";
 import {AnimationQueue} from "./AnimationQueue";
@@ -14,8 +14,8 @@ export class AvatarOwl implements Avatar {
 
 
 	static size: number = 256;
-	static sprites;
-	static spriteSheet;
+	static sprites: SpriteSet;
+	static spriteSheet: SpriteSheet;
 
 
 	static getSprites () {
@@ -125,7 +125,7 @@ export class AvatarOwl implements Avatar {
 			{name: "wingsTransition1", time: 50}
 		],
 		currentFrameIndex: 0,
-		frameTimer: null,
+		frameTimer: undefined as (number | undefined ),
 		getCurrentFrameName: function () {
 
 			// If there is no timer to the next frame...

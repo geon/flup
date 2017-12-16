@@ -52,7 +52,8 @@ export class DropperQueue {
 			})),
 		}));
 
-		var p = this.pieces.shift();
+		// A new piece was pushed above, so unshift will never be undefined.
+		var p = this.pieces.shift()!;
 
 		for (var i = 0; i < this.pieces.length; i++) {
 

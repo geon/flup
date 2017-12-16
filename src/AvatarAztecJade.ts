@@ -1,7 +1,7 @@
 
 import {Avatar} from "./Avatar";
 import {Coord} from "./Coord";
-import {SpriteSheet} from "./SpriteSheet";
+import {SpriteSheet, SpriteSet} from "./SpriteSheet";
 import {Piece} from "./Piece";
 import {PieceCycle} from "./PieceCycle";
 import {AnimationQueue} from "./AnimationQueue";
@@ -19,8 +19,8 @@ export class AvatarAztecJade implements Avatar {
 
 
 	static size: number = 256;
-	static sprites;
-	static spriteSheet;
+	static sprites: SpriteSet;
+	static spriteSheet: SpriteSheet;
 
 
 	static getSprites () {

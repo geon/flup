@@ -32,11 +32,11 @@ export class PieceCycle {
 	static generate () {
 
 		// Create list of all colors.
-		var baseColors = [];
-		var keyColors = [];
+		var baseColors: Array<Piece> = [];
+		var keyColors: Array<Piece> = [];
 		for (var i = 0; i < this.numColors; ++i) {
-			baseColors[i] = {color: i, key: false};
-			keyColors[i] = {color: i, key: true};
+			baseColors[i] = new Piece({color: i, key: false});
+			keyColors[i] = new Piece({color: i, key: true});
 		}
 
 		// Create a list of all pieces in the proper ratios.
@@ -46,7 +46,7 @@ export class PieceCycle {
 		}
 
 		// Repeat the colors so there is a long cycle.
-		var pieces = [];
+		var pieces: Array<Piece> = [];
 		for (var i = 0; i < 32; ++i) {
 
 			// Shuffle the group of keys and colors separately, so the whole cycle gets the keys/colors evenly distributed.
@@ -60,7 +60,7 @@ export class PieceCycle {
 
 
 	// http://stackoverflow.com/questions/2450954/how-to-randomize-a-javascript-array
-	static fisherYatesArrayShuffle (myArray) {
+	static fisherYatesArrayShuffle<T> (myArray: Array<T>) {
 
 		var i = myArray.length;
 		if ( i == 0 ) return false;
