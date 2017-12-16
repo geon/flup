@@ -4,7 +4,9 @@
   "description": "Stereotypical puzzle game.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack-dev-server",
+    "tsc": "tsc"
   },
   "repository": {
     "type": "git",
@@ -17,8 +19,9 @@
   },
   "homepage": "https://github.com/geon/flup",
   "devDependencies": {
-    "gulp": "^3.8.11",
-    "gulp-typescript": "^2.7.2",
-    "typescript": "1.5.0-alpha"
+    "ts-loader": "^3.2.0",
+    "typescript": "^2.6.2",
+    "webpack": "^3.10.0",
+    "webpack-dev-server": "^2.9.7"
   }
 }

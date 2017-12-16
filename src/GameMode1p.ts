@@ -1,10 +1,10 @@
 
-/// <reference path="GameMode.ts"/>
-/// <reference path="Avatar.ts"/>
-/// <reference path="AvatarOwl.ts"/>
-/// <reference path="Coord.ts"/>
-/// <reference path="Board.ts"/>
-/// <reference path="PieceCycle.ts"/>
+import {GameMode} from "./GameMode";
+import {Avatar} from "./Avatar";
+import {AvatarOwl} from "./AvatarOwl";
+import {Coord} from "./Coord";
+import {Board} from "./Board";
+import {PieceCycle} from "./PieceCycle";
 
 
 class GameMode1p implements GameMode {

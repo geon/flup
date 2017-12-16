@@ -1,8 +1,8 @@
 
-/// <reference path="Piece.ts"/>
+import {Piece} from "./Piece";
 
 
-class PieceCycle {
+export class PieceCycle {
 
 	currentIndex: number;
 	pieces: Piece[];

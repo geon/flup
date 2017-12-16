@@ -1,8 +1,8 @@
 
-/// <reference path="Coord.ts"/>
-/// <reference path="SpriteSheet.ts"/>
+import {Coord} from "./Coord";
+import {SpriteSheet} from "./SpriteSheet";
 
-class Sprite {
+export class Sprite {
 
 	sheetPosition: Coord;
 	sheetSize: Coord;

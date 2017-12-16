@@ -1,9 +1,9 @@
 
-/// <reference path="AnimationQueue.ts"/>
-/// <reference path="SpriteSheet.ts"/>
-/// <reference path="Coord.ts"/>
+import {AnimationQueue} from "./AnimationQueue";
+import {SpriteSheet} from "./SpriteSheet";
+import {Coord} from "./Coord";
 
-class Piece {
+export class Piece {
 
 	color: number;
 	key: boolean;
@@ -75,7 +75,7 @@ class Piece {
 		return {
 			imageFileName: "pieces.png",
 			gridSize: new Coord({x:4, y:4}),
-			spriteSettings: sprites	
+			spriteSettings: sprites
 		}
 	}
 

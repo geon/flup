@@ -1,7 +1,7 @@
 
-/// <reference path="Coord.ts"/>
+import {Coord} from "./Coord";
 
-class Animation {
+export class Animation {
 
 	to: Coord;
 	delay: number;

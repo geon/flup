@@ -1,9 +1,15 @@
 
-/// <reference path="GameMode.ts"/>
-/// <reference path="GameMode2pLocal.ts"/>
+import {GameMode} from "./GameMode";
+import {GameMode2pLocal} from "./GameMode2pLocal";
+import {SpriteSheet} from "./SpriteSheet";
+import {Coord} from "./Coord";
+import {UnlockingEffect} from "./UnlockingEffect";
+import {Piece} from "./Piece";
+import {AvatarOwl} from "./AvatarOwl";
+import {AvatarAztecJade} from "./AvatarAztecJade";
 
 
-class App {
+export class App {
 
 	context: CanvasRenderingContext2D;
 

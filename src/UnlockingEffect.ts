@@ -1,9 +1,10 @@
 
-/// <reference path="Piece.ts"/>
-/// <reference path="Coord.ts"/>
+import {Piece} from "./Piece";
+import {Coord} from "./Coord";
+import {SpriteSheet} from "./SpriteSheet";
 
 
-class UnlockingEffect {
+export class UnlockingEffect {
 
 	color: number;
 	coord: Coord;
@@ -75,7 +76,7 @@ class UnlockingEffect {
 		return {
 			imageFileName: "pieces.png",
 			gridSize: new Coord({x:8, y:8}),
-			spriteSettings: sprites	
+			spriteSettings: sprites
 		}
 	}
 

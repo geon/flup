@@ -1,14 +1,17 @@
 
-/// <reference path="Coord.ts"/>
-/// <reference path="UnlockingEffect.ts"/>
-/// <reference path="GameMode.ts"/>
-/// <reference path="DropperQueue.ts"/>
-/// <reference path="Dropper.ts"/>
-/// <reference path="PieceCycle.ts"/>
-/// <reference path="Avatar.ts"/>
+import {Coord} from "./Coord";
+import {UnlockingEffect} from "./UnlockingEffect";
+import {GameMode} from "./GameMode";
+import {DropperQueue} from "./DropperQueue";
+import {Dropper} from "./Dropper";
+import {Piece} from "./Piece";
+import {PieceCycle} from "./PieceCycle";
+import {Animation} from "./Animation";
+import {Avatar} from "./Avatar";
+import {App} from "./App";
 
 
-class Board {
+export class Board {
 
 	gameMode: GameMode;
 
@@ -61,31 +64,31 @@ class Board {
 
 
 	static xyToIndex (x: number, y: number) {
-		
+
 		return x + y * Board.size.x;
 	}
 
 
 	static coordToIndex (coord: Coord) {
-		
+
 		return Board.xyToIndex(coord.x, coord.y);
 	}
 
 
 	static indexToCoord (index: number) {
-		
+
 		return new Coord({x:index % Board.size.x, y:Math.floor(index / Board.size.x)});
 	}
 
 
 	static getWidth () {
-		
+
 		return (Board.size.x + 2) * Piece.size;
 	}
 
 
 	static getHeight () {
-		
+
 		return (Board.size.y + 2) * Piece.size;
 	}
 
@@ -104,7 +107,7 @@ class Board {
 
 		This might seem like an awful lot of code for something as simple as
 		making the pieces fall.
-		
+
 		Turns out it isn't that simple...
 
 		I need to set the animation properly so it is initiated only when a
@@ -181,7 +184,7 @@ class Board {
 
 			// Look for keys.
 			if (this.pieces[i] && this.pieces[i].key) {
-		
+
 				var matchingNeighborPositions = this.matchingNeighborsOfPosition(i);
 
 				// If there is at least one pair in the chain...
@@ -217,7 +220,7 @@ class Board {
 	maxAnimationLength () {
 
 		// Must also check the unlocked pieces waiting for the unlocking effect.
-		var allPieces = this.pieces.concat(this.unlockedPieces); 
+		var allPieces = this.pieces.concat(this.unlockedPieces);
 
 		return allPieces
 			.map(piece => piece && piece.animationQueue.length())
@@ -315,7 +318,7 @@ class Board {
 				this.startGameOverEffect();
 
 				break;
-			}		
+			}
 		};
 
 		return false;
@@ -328,7 +331,7 @@ class Board {
 
 		// Unlock all pieces, from the center and out.
 		for (var i = 0; i < this.pieces.length; i++) {
-			
+
 			if (this.pieces[i]) {
 
 				var unlockedPiece = this.pieces[i];
@@ -365,7 +368,7 @@ class Board {
 
 		// Animate.
 		for (var i = 0; i < this.pieces.length; i++) {
-			
+
 			if (this.pieces[i]) {
 
 				this.pieces[i].animationQueue.add(new Animation({
@@ -392,7 +395,7 @@ class Board {
 		var slateSprites = App.getSprites();
 		for (var y=0; y<Board.size.y; ++y) {
 			for (var x=0; x<Board.size.x; ++x) {
-				
+
 				var numTiles = 8;
 				var numBaseTiles = 2;
 
@@ -421,7 +424,7 @@ class Board {
 		// Calculate how much to stress the player. (Piece wobbling increases as they approach the maximum height before game over.)
 		var height = 0;
 		for (var i = 0; i < this.pieces.length; i++) {
-		
+
 			if (this.pieces[i]) {
 
 				var position = Board.indexToCoord(i);
@@ -438,7 +441,7 @@ class Board {
 		// Draw the unlocking effects.
 		var doneUnlockingEffectIndices = [];
 		for (var i = this.unlockingEffects.length - 1; i >= 0; i--) {
-		
+
 			if (!this.unlockingEffects[i].isDone()) {
 
 				this.unlockingEffects[i].draw(
@@ -457,7 +460,7 @@ class Board {
 
 		// Remove the unlocking effects when they are done.
 		for (var i = doneUnlockingEffectIndices.length - 1; i >= 0; i--) {
-		
+
 			this.unlockingEffects.splice(doneUnlockingEffectIndices[i], 1);
 		};
 
@@ -499,7 +502,7 @@ class Board {
 
 		// Remove the unlocked pieces from the unlocking effect queue.
 		for (var i = donePieceIndices.length - 1; i >= 0; i--) {
-		
+
 			this.unlockedPieces.splice(donePieceIndices[i], 1);
 		};
 

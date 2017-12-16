@@ -1,8 +1,9 @@
 
-/// <reference path="Board.ts"/>
+import {Board} from "./Board"
+import {Coord} from "./Coord"
 
 
-interface GameMode {
+export interface GameMode {
 
 	isGameOver: () => boolean;
 	onUnlockedChains: (board: Board) => void;

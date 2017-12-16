@@ -1,11 +1,13 @@
 
-/// <reference path="Coord.ts"/>
-/// <reference path="Piece.ts"/>
-/// <reference path="Board.ts"/>
-/// <reference path="PieceCycle.ts"/>
+import {Coord} from "./Coord";
+import {Piece} from "./Piece";
+import {Board} from "./Board";
+import {PieceCycle} from "./PieceCycle";
+import {Animation} from "./Animation";
+import {AnimationQueue} from "./AnimationQueue";
 
 
-class DropperQueue {
+export class DropperQueue {
 
 	pieces: Piece[];
 

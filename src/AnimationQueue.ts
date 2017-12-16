@@ -1,8 +1,8 @@
 
-/// <reference path="Animation.ts"/>
-/// <reference path="Coord.ts"/>
+import {Animation} from "./Animation";
+import {Coord} from "./Coord";
 
-class AnimationQueue {
+export class AnimationQueue {
 
 	from: Coord;
 	animations: Animation[];

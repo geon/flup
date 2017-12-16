@@ -1,8 +1,9 @@
 
-/// <reference path="Piece.ts"/>
+import {Piece} from "./Piece"
+import {Coord} from "./Coord"
 
 
-interface Avatar {
+export interface Avatar {
 
 	getPunishRow (width: number, y: number): Piece[];
 

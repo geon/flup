@@ -1,10 +1,12 @@
 
-/// <reference path="Avatar.ts"/>
-/// <reference path="Coord.ts"/>
-/// <reference path="SpriteSheet.ts"/>
+import {Avatar} from "./Avatar";
+import {Coord} from "./Coord";
+import {SpriteSheet} from "./SpriteSheet";
+import {Piece} from "./Piece";
+import {PieceCycle} from "./PieceCycle";
+import {AnimationQueue} from "./AnimationQueue";
 
-
-class AvatarAztecJade implements Avatar {
+export class AvatarAztecJade implements Avatar {
 
 	rowNumber: number;
 	accumulatedDeltaTime: number;
@@ -71,7 +73,7 @@ class AvatarAztecJade implements Avatar {
 		return {
 			imageFileName: "aztec-jade.png",
 			gridSize: new Coord({x:2, y:2}),
-			spriteSettings: sprites	
+			spriteSettings: sprites
 		}
 	}
 

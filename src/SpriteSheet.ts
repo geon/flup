@@ -1,10 +1,10 @@
 
-/// <reference path="Coord.ts"/>
-/// <reference path="Sprite.ts"/>
+import {Coord} from "./Coord";
+import {Sprite} from "./Sprite";
 /// <reference path="jquery.d.ts" />
 
 
-class SpriteSheet {
+export class SpriteSheet {
 
 	imageFileName: string;
 	gridSize: Coord;
@@ -44,7 +44,7 @@ class SpriteSheet {
 
 		this.image.src = "graphics/"+this.imageFileName;
 
-		return promise;	
+		return promise;
 	}
 
 
@@ -60,6 +60,6 @@ class SpriteSheet {
 			);
 		};
 
-		return sprites;	
+		return sprites;
 	}
 }

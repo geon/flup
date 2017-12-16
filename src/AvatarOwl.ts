@@ -1,10 +1,12 @@
 
-/// <reference path="Avatar.ts"/>
-/// <reference path="Coord.ts"/>
-/// <reference path="SpriteSheet.ts"/>
+import {Avatar} from "./Avatar";
+import {Coord} from "./Coord";
+import {SpriteSheet} from "./SpriteSheet";
+import {Piece} from "./Piece";
+import {PieceCycle} from "./PieceCycle";
+import {AnimationQueue} from "./AnimationQueue";
 
-
-class AvatarOwl implements Avatar {
+export class AvatarOwl implements Avatar {
 
 	constructor () {
 
@@ -106,7 +108,7 @@ class AvatarOwl implements Avatar {
 		return {
 			imageFileName: "owl.png",
 			gridSize: new Coord({x:6, y:2}),
-			spriteSettings: sprites	
+			spriteSettings: sprites
 		}
 	}
 
