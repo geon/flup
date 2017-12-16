@@ -54,7 +54,7 @@ export class GameMode2pLocal implements GameMode {
 	}
 
 
-	onKeyDown (keyCode: number) {
+	onKeyDown (_keyCode: number) {
 
 		if (this.isGameOver()) {
 

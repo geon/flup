@@ -7,7 +7,7 @@ import {Board} from "./Board";
 import {PieceCycle} from "./PieceCycle";
 
 
-class GameMode1p implements GameMode {
+export class GameMode1p implements GameMode {
 
 	board: Board;
 	avatar: Avatar;
@@ -22,7 +22,7 @@ class GameMode1p implements GameMode {
 	}
 
 
-	onUnlockedChains (board: Board) {
+	onUnlockedChains (_board: Board) {
 
 		// Do nothing.
 	}
@@ -34,7 +34,7 @@ class GameMode1p implements GameMode {
 	}
 
 
-	onKeyDown (keyCode: number) {
+	onKeyDown (_keyCode: number) {
 
 		if (this.isGameOver()) {
 

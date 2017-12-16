@@ -63,7 +63,7 @@ export class PieceCycle {
 	static fisherYatesArrayShuffle<T> (myArray: Array<T>) {
 
 		var i = myArray.length;
-		if ( i == 0 ) return false;
+		if ( i == 0 ) return;
 		while ( --i ) {
 			var j = Math.floor( Math.random() * ( i + 1 ) );
 			var tempi = myArray[i];

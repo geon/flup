@@ -48,20 +48,6 @@ export class App {
 		}
 		$(window).resize(makeCanvasFullWindow);
 		makeCanvasFullWindow();
-
-
-
-		this.loadSprites().then(function(){
-
-			console.log("Sprites loaded.");
-
-			self.startGame();
-
-		}, function(){
-
-			console.log("Could not load sprites.");
-		});
-
 	}
 
 
@@ -145,7 +131,7 @@ export class App {
 
 		// I need to listen to keyup as well, so I can ignore repeated
 		// keydown events from holding the key.
-		window.addEventListener("keyup", function(event) {
+		window.addEventListener("keyup", function(_event) {
 
 			self.keydownEventInProgress = undefined;
 
@@ -174,8 +160,19 @@ export class App {
 		// 	}
 		// });
 
-		// Set up the renderer.
-		this.startRenderLoop();
+
+
+		self.loadSprites().then(function(){
+
+			console.log("Sprites loaded.");
+
+			// Set up the renderer.
+			self.startRenderLoop();
+
+		}, function(){
+
+			console.log("Could not load sprites.");
+		});
 	}
 
 

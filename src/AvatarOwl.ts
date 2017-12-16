@@ -171,7 +171,7 @@ export class AvatarOwl implements Avatar {
 	}
 
 
-	draw (context: CanvasRenderingContext2D, deltaTime: number, avatarCenter: Coord) {
+	draw (context: CanvasRenderingContext2D, _deltaTime: number, avatarCenter: Coord) {
 
 		var sprites = AvatarOwl.getSprites();
 
@@ -179,8 +179,6 @@ export class AvatarOwl implements Avatar {
 			x: AvatarOwl.size,
 			y: AvatarOwl.size
 		});
-
-		var wingFlapFrameTime = 50;
 
 		sprites[AvatarOwl.wingFlapCycle.getCurrentFrameName()].draw(
 			context,

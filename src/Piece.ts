@@ -2,7 +2,6 @@
 import {AnimationQueue} from "./AnimationQueue";
 import {SpriteSheet, SpriteSet} from "./SpriteSheet";
 import {Coord} from "./Coord";
-import {Sprite} from "./Sprite";
 
 export class Piece {
 
