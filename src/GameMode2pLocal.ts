@@ -61,7 +61,7 @@ class GameMode2pLocal implements GameMode {
 			return;
 		}
 
-		switch (event.keyCode) {
+		switch ((<KeyboardEvent>event).keyCode) {
 
 			// Player 1.
 			case 37: // Left

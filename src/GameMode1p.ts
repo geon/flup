@@ -41,7 +41,7 @@ class GameMode1p implements GameMode {
 			return;
 		}
 
-		switch (event.keyCode) {
+		switch ((<KeyboardEvent>event).keyCode) {
 
 			case 37: // Left
 				this.board.dropper.moveLeft();
