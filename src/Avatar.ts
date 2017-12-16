@@ -1,15 +1,12 @@
-
-import {Piece} from "./Piece"
-import {Coord} from "./Coord"
-
+import { Piece } from "./Piece";
+import { Coord } from "./Coord";
 
 export interface Avatar {
+	getPunishRow(width: number, y: number): Piece[];
 
-	getPunishRow (width: number, y: number): Piece[];
-
-	draw (
+	draw(
 		context: CanvasRenderingContext2D,
 		deltaTime: number,
-		avatarCenter: Coord
+		avatarCenter: Coord,
 	): void;
 }

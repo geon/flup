@@ -1,30 +1,24 @@
-
-import {GameMode} from "./GameMode";
-import {GameMode2pLocal} from "./GameMode2pLocal";
-import {SpriteSheet, SpriteSet} from "./SpriteSheet";
-import {Coord} from "./Coord";
-import {UnlockingEffect} from "./UnlockingEffect";
-import {Piece} from "./Piece";
-import {AvatarOwl} from "./AvatarOwl";
-import {AvatarAztecJade} from "./AvatarAztecJade";
-
+import { GameMode } from "./GameMode";
+import { GameMode2pLocal } from "./GameMode2pLocal";
+import { SpriteSheet, SpriteSet } from "./SpriteSheet";
+import { Coord } from "./Coord";
+import { UnlockingEffect } from "./UnlockingEffect";
+import { Piece } from "./Piece";
+import { AvatarOwl } from "./AvatarOwl";
+import { AvatarAztecJade } from "./AvatarAztecJade";
 
 export class App {
-
 	context: CanvasRenderingContext2D;
 
 	gameMode: GameMode;
 
 	lastRenderTime: number;
 
-	slateSpriteSheet: SpriteSheet
+	slateSpriteSheet: SpriteSheet;
 
-	keydownEventInProgress: number | undefined;
+	keydownEventInProgress: number | undefined;
 
-
-
-	constructor (options: {context: CanvasRenderingContext2D}) {
-
+	constructor(options: { context: CanvasRenderingContext2D }) {
 		this.context = options.context;
 
 		this.gameMode = new GameMode2pLocal();
@@ -33,14 +27,13 @@ export class App {
 
 		// Make the canvas resolution match the displayed size.
 		var self = this;
-		function makeCanvasFullWindow (){
-
+		function makeCanvasFullWindow() {
 			self.context.canvas.width = window.innerWidth * window.devicePixelRatio;
 			self.context.canvas.height = window.innerHeight * window.devicePixelRatio;
 
 			$(self.context.canvas).css({
 				width: window.innerWidth,
-				height: window.innerHeight
+				height: window.innerHeight,
 			});
 
 			// Set the scale factor to handle Retina displays. MUST BE DONE AFTER EACH SIZE CHANGE.
@@ -50,67 +43,55 @@ export class App {
 		makeCanvasFullWindow();
 	}
 
-
 	static sprites: SpriteSet;
 	static spriteSheet: SpriteSheet;
 
-
-	static getSprites () {
-
+	static getSprites() {
 		if (!this.sprites) {
-
 			this.sprites = this.getSpriteSheet().getSprites();
 		}
 
 		return this.sprites;
 	}
 
-
-	static getSpriteSheet () {
-
+	static getSpriteSheet() {
 		if (!this.spriteSheet) {
-
 			this.spriteSheet = new SpriteSheet(this.getSpriteSheetSettings());
 		}
 
 		return this.spriteSheet;
 	}
 
-
-	static getSpriteSheetSettings () {
-
-		var gridSize = new Coord({x:4, y:2});
+	static getSpriteSheetSettings() {
+		var gridSize = new Coord({ x: 4, y: 2 });
 		var spriteSettings = [];
-		for (var i=0; i<gridSize.x*gridSize.y; ++i) {
+		for (var i = 0; i < gridSize.x * gridSize.y; ++i) {
 			spriteSettings.push({
 				name: i.toString(),
-				sheetPosition: new Coord({x:i%gridSize.x, y:Math.floor(i/gridSize.x)}),
-				sheetSize: new Coord({x:1, y:1})
+				sheetPosition: new Coord({
+					x: i % gridSize.x,
+					y: Math.floor(i / gridSize.x),
+				}),
+				sheetSize: new Coord({ x: 1, y: 1 }),
 			});
 		}
 
 		return {
 			imageFileName: "slates.jpg",
 			gridSize: gridSize,
-			spriteSettings: spriteSettings
+			spriteSettings: spriteSettings,
 		};
 	}
 
-
-	getWidth () {
-
+	getWidth() {
 		return this.context.canvas.width / window.devicePixelRatio;
 	}
 
-
-	getHeight () {
-
+	getHeight() {
 		return this.context.canvas.height / window.devicePixelRatio;
 	}
 
-
-	loadSprites () {
-
+	loadSprites() {
 		var promises = [];
 
 		promises.push(Piece.getSpriteSheet().loadImage());
@@ -122,31 +103,31 @@ export class App {
 		return $.when.apply($, promises);
 	}
 
-
-	startGame () {
-
+	startGame() {
 		// Set up input.
 		var self = this;
 
-
 		// I need to listen to keyup as well, so I can ignore repeated
 		// keydown events from holding the key.
-		window.addEventListener("keyup", function(_event) {
+		window.addEventListener(
+			"keyup",
+			function(_event) {
+				self.keydownEventInProgress = undefined;
+			},
+			false,
+		);
 
-			self.keydownEventInProgress = undefined;
+		window.addEventListener(
+			"keydown",
+			function(event) {
+				if (self.keydownEventInProgress != event.keyCode) {
+					self.gameMode.onKeyDown(event.keyCode);
+				}
 
-		}, false);
-
-		window.addEventListener("keydown", function(event) {
-
-			if (self.keydownEventInProgress != event.keyCode) {
-
-				self.gameMode.onKeyDown(event.keyCode);
-			}
-
-			self.keydownEventInProgress = event.keyCode;
-
-		}, false);
+				self.keydownEventInProgress = event.keyCode;
+			},
+			false,
+		);
 
 		// Set up the server connection.
 		// var socket = io.connect("//"); // The root at the same domain and protocol.
@@ -160,71 +141,66 @@ export class App {
 		// 	}
 		// });
 
+		self.loadSprites().then(
+			function() {
+				console.log("Sprites loaded.");
 
-
-		self.loadSprites().then(function(){
-
-			console.log("Sprites loaded.");
-
-			// Set up the renderer.
-			self.startRenderLoop();
-
-		}, function(){
-
-			console.log("Could not load sprites.");
-		});
+				// Set up the renderer.
+				self.startRenderLoop();
+			},
+			function() {
+				console.log("Could not load sprites.");
+			},
+		);
 	}
 
-
-	startRenderLoop () {
-
-		var requestAnimFrame: (callback: (currentTime: number) => void) => void = (function(){
-			return window.requestAnimationFrame ||
-			(<any>window).webkitRequestAnimationFrame ||
-			(<any>window).mozRequestAnimationFrame ||
-			(<any>window).oRequestAnimationFrame ||
-			(<any>window).msRequestAnimationFrame ||
-			function(callback){
-				window.setTimeout(callback, 1000 / 60, new Date().getTime());
-			};
+	startRenderLoop() {
+		var requestAnimFrame: (
+			callback: (currentTime: number) => void,
+		) => void = (function() {
+			return (
+				window.requestAnimationFrame ||
+				(<any>window).webkitRequestAnimationFrame ||
+				(<any>window).mozRequestAnimationFrame ||
+				(<any>window).oRequestAnimationFrame ||
+				(<any>window).msRequestAnimationFrame ||
+				function(callback) {
+					window.setTimeout(callback, 1000 / 60, new Date().getTime());
+				}
+			);
 		})();
 
 		// Start the loop.
 		var self = this;
-		function loop (currentTime: number) { self.render(currentTime); requestAnimFrame(loop); }
+		function loop(currentTime: number) {
+			self.render(currentTime);
+			requestAnimFrame(loop);
+		}
 		requestAnimFrame(loop);
 	}
 
-
-	render (currentTime: number) {
-
+	render(currentTime: number) {
 		// Calculate delta time. Cap it to make debugging easier.
 		var deltaTime = Math.min(currentTime - this.lastRenderTime, 100);
 		this.lastRenderTime = currentTime;
 
-
 		// Draw the board background.
-        this.context.fillStyle = "rgba(0, 0, 0, 1)";
-        this.context.fillRect(
-            0,
-            0,
-            this.getWidth(),
-            this.getHeight()
-        );
+		this.context.fillStyle = "rgba(0, 0, 0, 1)";
+		this.context.fillRect(0, 0, this.getWidth(), this.getHeight());
 
 		// Boards and avatars.
 		this.gameMode.draw(
 			this.context,
 			deltaTime,
-			new Coord ({
-				x:this.getWidth(),
-				y:this.getHeight()
-			})
+			new Coord({
+				x: this.getWidth(),
+				y: this.getHeight(),
+			}),
 		);
 
 		// FPS counter.
-	//	this.context.fillStyle = "black";
-	//	this.context.font = "16px Palatino";
-	//	this.context.fillText("FPS: " + Math.floor(1000/deltaTime), 10, 20);
-	};
+		//	this.context.fillStyle = "black";
+		//	this.context.font = "16px Palatino";
+		//	this.context.fillText("FPS: " + Math.floor(1000/deltaTime), 10, 20);
+	}
 }

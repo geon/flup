@@ -1,47 +1,42 @@
-
-import {Coord} from "./Coord";
+import { Coord } from "./Coord";
 
 type InterplolationName = keyof typeof Animation.interpolators;
 export class Animation {
-
 	to: Coord;
 	delay: number;
 	duration: number;
 	interpolation: InterplolationName;
 
-
-	constructor (animation: {to: Coord, delay: number, duration: number, interpolation: InterplolationName}) {
-		this.to            = animation.to;
-		this.delay         = animation.delay;
-		this.duration      = animation.duration;
+	constructor(animation: {
+		to: Coord;
+		delay: number;
+		duration: number;
+		interpolation: InterplolationName;
+	}) {
+		this.to = animation.to;
+		this.delay = animation.delay;
+		this.duration = animation.duration;
 		this.interpolation = animation.interpolation;
 	}
 
-
-	length () {
-
+	length() {
 		return this.delay + this.duration;
 	}
 
-
 	static interpolators = {
-		"linear" : function (progress: number) {
-
+		linear: function(progress: number) {
 			return progress;
 		},
-		"easeInQuad" : function (progress: number) {
-
+		easeInQuad: function(progress: number) {
 			return progress * progress;
 		},
-		"sine" : function (progress: number) {
-
-			return (Math.cos((1 - progress)*Math.PI) + 1)/2;
+		sine: function(progress: number) {
+			return (Math.cos((1 - progress) * Math.PI) + 1) / 2;
 		},
-		"sine2" : function (progress: number) {
-
+		sine2: function(progress: number) {
 			return Animation.interpolators["sine"](
-				Animation.interpolators["sine"](progress)
+				Animation.interpolators["sine"](progress),
 			);
-		}
-	}
+		},
+	};
 }

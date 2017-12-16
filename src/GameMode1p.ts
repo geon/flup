@@ -1,48 +1,35 @@
-
-import {GameMode} from "./GameMode";
-import {Avatar} from "./Avatar";
-import {AvatarOwl} from "./AvatarOwl";
-import {Coord} from "./Coord";
-import {Board} from "./Board";
-import {PieceCycle} from "./PieceCycle";
-
+import { GameMode } from "./GameMode";
+import { Avatar } from "./Avatar";
+import { AvatarOwl } from "./AvatarOwl";
+import { Coord } from "./Coord";
+import { Board } from "./Board";
+import { PieceCycle } from "./PieceCycle";
 
 export class GameMode1p implements GameMode {
-
 	board: Board;
 	avatar: Avatar;
 
-
-	constructor () {
-
+	constructor() {
 		var pieceCycle = new PieceCycle(PieceCycle.generate());
 
-		this.board = new Board({pieceCycle: pieceCycle, gameMode: this});
+		this.board = new Board({ pieceCycle: pieceCycle, gameMode: this });
 		this.avatar = new AvatarOwl();
 	}
 
-
-	onUnlockedChains (_board: Board) {
-
+	onUnlockedChains(_board: Board) {
 		// Do nothing.
 	}
 
-
-	isGameOver () {
-
+	isGameOver() {
 		return this.board.gameOver;
 	}
 
-
-	onKeyDown (_keyCode: number) {
-
+	onKeyDown(_keyCode: number) {
 		if (this.isGameOver()) {
-
 			return;
 		}
 
 		switch ((<KeyboardEvent>event).keyCode) {
-
 			case 37: // Left
 				this.board.dropper.moveLeft();
 				break;
@@ -61,25 +48,23 @@ export class GameMode1p implements GameMode {
 		}
 	}
 
-	draw (
-		context: CanvasRenderingContext2D,
-		deltaTime: number,
-		appSize: Coord
-	) {
-
+	draw(context: CanvasRenderingContext2D, deltaTime: number, appSize: Coord) {
 		// The player boards.
 		this.board.draw(
 			context,
 			deltaTime,
-			new Coord({x:appSize.x/2, y:appSize.y/2}),
-			1/1
+			new Coord({ x: appSize.x / 2, y: appSize.y / 2 }),
+			1 / 1,
 		);
 
 		// Draw the player avatars.
 		this.avatar.draw(
 			context,
 			deltaTime,
-			new Coord({x:appSize.x/2+ Board.getWidth() * -1.1/2, y:appSize.y/2 + Board.getWidth()*.65})
+			new Coord({
+				x: appSize.x / 2 + Board.getWidth() * -1.1 / 2,
+				y: appSize.y / 2 + Board.getWidth() * 0.65,
+			}),
 		);
 	}
 }
