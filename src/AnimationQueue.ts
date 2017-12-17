@@ -3,7 +3,7 @@ import { Coord } from "./Coord";
 
 export class AnimationQueue {
 	from: Coord;
-	animations: Animation[];
+	animations: Array<Animation>;
 	timeSinceCurrentAnimationStart: number;
 
 	constructor(startPosition?: Coord) {

@@ -6,7 +6,7 @@ export class UnlockingEffect {
 	color: number;
 	coord: Coord;
 	accumulatedDeltaTime: number;
-	initialVelocities: Coord[];
+	initialVelocities: Array<Coord>;
 
 	constructor(piece: Piece) {
 		this.color = piece.color;

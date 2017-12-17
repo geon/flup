@@ -7,8 +7,8 @@ import { GameMode } from "./GameMode";
 import { PieceCycle } from "./PieceCycle";
 
 export class GameMode2pLocal implements GameMode {
-	boards: Board[];
-	avatars: Avatar[];
+	boards: Array<Board>;
+	avatars: Array<Avatar>;
 
 	constructor() {
 		const pieceCycleTemplate = PieceCycle.generate();

@@ -12,7 +12,8 @@
 		"variable-name": false,
 		"no-console": false,
 		"semicolon": false,
-		"no-var-keyword": true
+		"no-var-keyword": true,
+		"array-type": [true, "generic"]
 	},
 	"rulesDirectory": []
 }

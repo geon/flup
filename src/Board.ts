@@ -14,8 +14,8 @@ export class Board {
 	gameMode: GameMode;
 
 	pieces: Array<Piece | undefined>;
-	unlockedPieces: Piece[];
-	unlockingEffects: UnlockingEffect[];
+	unlockedPieces: Array<Piece>;
+	unlockingEffects: Array<UnlockingEffect>;
 	pieceCycle: PieceCycle;
 	dropperQueue: DropperQueue;
 

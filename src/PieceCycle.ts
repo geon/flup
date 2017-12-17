@@ -2,9 +2,9 @@ import { Piece } from "./Piece";
 
 export class PieceCycle {
 	currentIndex: number;
-	pieces: Piece[];
+	pieces: Array<Piece>;
 
-	constructor(pieces: Piece[]) {
+	constructor(pieces: Array<Piece>) {
 		this.currentIndex = 0;
 		this.pieces = pieces;
 	}
@@ -22,8 +22,8 @@ export class PieceCycle {
 
 	static generate() {
 		// Create list of all colors.
-		const baseColors: Piece[] = [];
-		const keyColors: Piece[] = [];
+		const baseColors: Array<Piece> = [];
+		const keyColors: Array<Piece> = [];
 		for (let i = 0; i < this.numColors; ++i) {
 			baseColors[i] = new Piece({ color: i, key: false });
 			keyColors[i] = new Piece({ color: i, key: true });
@@ -36,7 +36,7 @@ export class PieceCycle {
 		}
 
 		// Repeat the colors so there is a long cycle.
-		let pieces: Piece[] = [];
+		let pieces: Array<Piece> = [];
 		for (let i = 0; i < 32; ++i) {
 			// Shuffle the group of keys and colors separately, so the whole cycle gets the keys/colors evenly distributed.
 			this.fisherYatesArrayShuffle(properRatio);
@@ -48,7 +48,7 @@ export class PieceCycle {
 	}
 
 	// http://stackoverflow.com/questions/2450954/how-to-randomize-a-javascript-array
-	static fisherYatesArrayShuffle<T>(myArray: T[]) {
+	static fisherYatesArrayShuffle<T>(myArray: Array<T>) {
 		let i = myArray.length;
 		if (i === 0) {
 			return;

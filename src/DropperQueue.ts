@@ -6,7 +6,7 @@ import { Piece } from "./Piece";
 import { PieceCycle } from "./PieceCycle";
 
 export class DropperQueue {
-	pieces: Piece[];
+	pieces: Array<Piece>;
 
 	pieceCycle: PieceCycle;
 
