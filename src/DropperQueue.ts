@@ -32,7 +32,7 @@ export class DropperQueue {
 		}
 	}
 
-	static dropperQueueVisibleLength: number = 6;
+	static dropperQueueVisibleLength: number = 18;
 	static dropperQueueTimePerPieceWidth: number = 200;
 
 	pop() {

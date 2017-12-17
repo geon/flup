@@ -87,8 +87,7 @@ export class GameMode2pLocal implements GameMode {
 
 	draw(context: CanvasRenderingContext2D, deltaTime: number, appSize: Coord) {
 		const center = new Coord({ x: appSize.x / 2, y: appSize.y / 2 });
-		const leftOverForEachSide = (appSize.x - Board.getWidth() * 2) / 2;
-		const boardSpread = Board.getWidth() / 2 + leftOverForEachSide / 3;
+		const boardSpread = Board.getWidth() * 0.66;
 
 		// The player boards.
 		this.boards[0].draw(
@@ -110,7 +109,7 @@ export class GameMode2pLocal implements GameMode {
 			1 / 1,
 		);
 
-		const avatarSpread = Board.getWidth() / 2;
+		const avatarSpread = Board.getWidth() * 0.75;
 		const avatarDownStickiness = 1.1;
 		const avatarDownset = Board.getHeight() / 2 * avatarDownStickiness;
 
