@@ -2,8 +2,9 @@ import { Avatar } from "./Avatar";
 import { Coord } from "./Coord";
 import { PieceCycle } from "./PieceCycle";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
+import { Board } from "./Board";
 
-export class AvatarOwl implements Avatar {
+export class AvatarOwl extends Avatar {
 	static size: number = 256;
 	static sprites: SpriteSet;
 	static spriteSheet: SpriteSheet;
@@ -134,14 +135,14 @@ export class AvatarOwl implements Avatar {
 		},
 	};
 
-	getPunishColors(width: number) {
-		const colors = [];
-
-		for (let x = 0; x < width; x++) {
-			colors.push(x % PieceCycle.numColors);
+	*generatePunishColors() {
+		for (;;) {
+			const colors = [];
+			for (let x = 0; x < Board.size.x; x++) {
+				colors.push(x % PieceCycle.numColors);
+			}
+			yield colors;
 		}
-
-		return colors;
 	}
 
 	draw(

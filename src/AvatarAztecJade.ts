@@ -2,13 +2,13 @@ import { Avatar } from "./Avatar";
 import { Coord } from "./Coord";
 import { PieceCycle } from "./PieceCycle";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
+import { Board } from "./Board";
 
-export class AvatarAztecJade implements Avatar {
-	rowNumber: number;
+export class AvatarAztecJade extends Avatar {
 	accumulatedDeltaTime: number;
 
 	constructor() {
-		this.rowNumber = 0;
+		super();
 		this.accumulatedDeltaTime = 0;
 	}
 
@@ -65,16 +65,17 @@ export class AvatarAztecJade implements Avatar {
 		};
 	}
 
-	getPunishColors(width: number) {
-		const colors = [];
+	*generatePunishColors() {
+		let rowNumber = 0;
+		for (;;) {
+			++rowNumber;
 
-		for (let x = 0; x < width; x++) {
-			colors.push((x + this.rowNumber) % PieceCycle.numColors);
+			const colors = [];
+			for (let x = 0; x < Board.size.x; x++) {
+				colors.push((x + rowNumber) % PieceCycle.numColors);
+			}
+			yield colors;
 		}
-
-		++this.rowNumber;
-
-		return colors;
 	}
 
 	draw(

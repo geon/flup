@@ -1,9 +1,19 @@
 import { Coord } from "./Coord";
 
-export interface Avatar {
-	getPunishColors(width: number): Array<number>;
+export abstract class Avatar {
+	colorGenerator: IterableIterator<Array<number>>;
 
-	draw(
+	constructor() {
+		this.colorGenerator = this.generatePunishColors();
+	}
+
+	getPunishColors() {
+		return this.colorGenerator.next().value;
+	}
+
+	abstract generatePunishColors(): IterableIterator<Array<number>>;
+
+	abstract draw(
 		context: CanvasRenderingContext2D,
 		deltaTime: number,
 		avatarCenter: Coord,

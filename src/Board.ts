@@ -336,7 +336,7 @@ export class Board {
 		}
 
 		// Add pieces.
-		const row = avatar.getPunishColors(Board.size.x);
+		const row = avatar.getPunishColors();
 
 		for (let x = 0; x < row.length; x++) {
 			const piece = new Piece({
