@@ -1,8 +1,8 @@
 import { Avatar } from "./Avatar";
+import { Board } from "./Board";
 import { Coord } from "./Coord";
 import { PieceCycle } from "./PieceCycle";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
-import { Board } from "./Board";
 
 export class AvatarOwl extends Avatar {
 	static size: number = 256;

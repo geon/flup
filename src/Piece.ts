@@ -1,7 +1,7 @@
 import { AnimationQueue } from "./AnimationQueue";
 import { Coord } from "./Coord";
-import { SpriteSet, SpriteSheet } from "./SpriteSheet";
 import { PieceCycle } from "./PieceCycle";
+import { SpriteSet, SpriteSheet } from "./SpriteSheet";
 
 export class Piece {
 	color: number;
