@@ -72,8 +72,7 @@ export class DropperQueue {
 					to: new Coord({ x: Board.size.x, y: i }),
 					duration: DropperQueue.dropperQueueTimePerPieceWidth,
 					interpolation: "sine",
-					delay: 0,
-					// delay: this.pieces[0].animationQueue.length() || 0
+					delay: i * 5,
 				}),
 			);
 		}
