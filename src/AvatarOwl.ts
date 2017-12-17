@@ -9,6 +9,10 @@ export class AvatarOwl extends Avatar {
 	static sprites: SpriteSet;
 	static spriteSheet: SpriteSheet;
 
+	getSize() {
+		return AvatarOwl.size;
+	}
+
 	static getSprites() {
 		if (!AvatarOwl.sprites) {
 			AvatarOwl.sprites = AvatarOwl.getSpriteSheet().getSprites();

@@ -11,6 +11,8 @@ export abstract class Avatar {
 		return this.colorGenerator.next().value;
 	}
 
+	abstract getSize(): number;
+
 	abstract generatePunishColors(): IterableIterator<Array<number>>;
 
 	abstract draw(

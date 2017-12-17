@@ -16,6 +16,10 @@ export class AvatarAztecJade extends Avatar {
 	static sprites: SpriteSet;
 	static spriteSheet: SpriteSheet;
 
+	getSize() {
+		return AvatarAztecJade.size;
+	}
+
 	static getSprites() {
 		if (!AvatarAztecJade.sprites) {
 			AvatarAztecJade.sprites = AvatarAztecJade.getSpriteSheet().getSprites();

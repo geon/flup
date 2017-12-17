@@ -86,14 +86,17 @@ export class GameMode2pLocal implements GameMode {
 	}
 
 	draw(context: CanvasRenderingContext2D, deltaTime: number, appSize: Coord) {
+		const center = new Coord({ x: appSize.x / 2, y: appSize.y / 2 });
+		const leftOverForEachSide = (appSize.x - Board.getWidth() * 2) / 2;
+		const boardSpread = Board.getWidth() / 2 + leftOverForEachSide / 3;
+
 		// The player boards.
 		this.boards[0].draw(
 			context,
 			deltaTime,
 			new Coord({
-				x:
-					(appSize.x - Board.getWidth() * 2) * 1 / 3 + Board.getWidth() * 1 / 2,
-				y: appSize.y / 2,
+				x: center.x - boardSpread,
+				y: center.y,
 			}),
 			1 / 1,
 		);
@@ -101,32 +104,31 @@ export class GameMode2pLocal implements GameMode {
 			context,
 			deltaTime,
 			new Coord({
-				x:
-					(appSize.x - Board.getWidth() * 2) * 2 / 3 + Board.getWidth() * 3 / 2,
-				y: appSize.y / 2,
+				x: center.x + boardSpread,
+				y: center.y,
 			}),
 			1 / 1,
 		);
+
+		const avatarSpread = Board.getWidth() / 2;
+		const avatarDownStickiness = 1.1;
+		const avatarDownset = Board.getHeight() / 2 * avatarDownStickiness;
 
 		// Draw the player avatars.
 		this.avatars[0].draw(
 			context,
 			deltaTime,
 			new Coord({
-				x:
-					(appSize.x - Board.getWidth() * 2) * 1 / 3 +
-					Board.getWidth() * -0.1 / 2,
-				y: appSize.y / 2 + Board.getWidth() * 0.65,
+				x: center.x - boardSpread - avatarSpread,
+				y: center.y + avatarDownset - this.avatars[0].getSize() / 2,
 			}),
 		);
 		this.avatars[1].draw(
 			context,
 			deltaTime,
 			new Coord({
-				x:
-					(appSize.x - Board.getWidth() * 2) * 2 / 3 +
-					Board.getWidth() * 4.1 / 2,
-				y: appSize.y / 2 + Board.getWidth() * 0.65,
+				x: center.x + boardSpread + avatarSpread,
+				y: center.y + avatarDownset - this.avatars[1].getSize() / 2,
 			}),
 		);
 	}
