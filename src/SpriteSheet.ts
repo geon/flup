@@ -45,11 +45,11 @@ export class SpriteSheet {
 	getSprites() {
 		const sprites: SpriteSet = {};
 
-		for (let i = this.spriteSettings.length - 1; i >= 0; i--) {
-			sprites[this.spriteSettings[i].name] = new Sprite(
+		for (const spriteSetting of this.spriteSettings) {
+			sprites[spriteSetting.name] = new Sprite(
 				this,
-				this.spriteSettings[i].sheetPosition,
-				this.spriteSettings[i].sheetSize,
+				spriteSetting.sheetPosition,
+				spriteSetting.sheetSize,
 			);
 		}
 
