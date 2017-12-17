@@ -6,4 +6,8 @@ const app = new App({
 	)[0] as HTMLCanvasElement).getContext("2d")!,
 });
 
-app.startGame();
+try {
+	app.startGame();
+} catch (error) {
+	console.error("Could not start game.", error);
+}

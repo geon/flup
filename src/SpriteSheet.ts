@@ -35,7 +35,8 @@ export class SpriteSheet {
 	loadImage() {
 		return new Promise<void>((resolve, reject) => {
 			this.image.onload = () => resolve();
-			this.image.onerror = () => reject();
+			this.image.onerror = (error: ErrorEvent) =>
+				reject(new Error("Could not load sprites. " + error.message));
 
 			this.image.src = "graphics/" + this.imageFileName;
 		});

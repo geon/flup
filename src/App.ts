@@ -26,17 +26,16 @@ export class App {
 		this.lastRenderTime = 0;
 
 		// Make the canvas resolution match the displayed size.
-		const self = this;
-		function makeCanvasFullWindow() {
-			self.context.canvas.width = window.innerWidth * window.devicePixelRatio;
-			self.context.canvas.height = window.innerHeight * window.devicePixelRatio;
+		const makeCanvasFullWindow = () => {
+			this.context.canvas.width = window.innerWidth * window.devicePixelRatio;
+			this.context.canvas.height = window.innerHeight * window.devicePixelRatio;
 
-			self.context.canvas.style.width = window.innerWidth + "px";
-			self.context.canvas.style.height = window.innerHeight + "px";
+			this.context.canvas.style.width = window.innerWidth + "px";
+			this.context.canvas.style.height = window.innerHeight + "px";
 
 			// Set the scale factor to handle Retina displays. MUST BE DONE AFTER EACH SIZE CHANGE.
-			self.context.scale(window.devicePixelRatio, window.devicePixelRatio);
-		}
+			this.context.scale(window.devicePixelRatio, window.devicePixelRatio);
+		};
 		window.onresize = makeCanvasFullWindow;
 		makeCanvasFullWindow();
 	}
@@ -101,16 +100,15 @@ export class App {
 		return Promise.all(promises);
 	}
 
-	startGame() {
+	async startGame() {
 		// Set up input.
-		const self = this;
 
 		// I need to listen to keyup as well, so I can ignore repeated
 		// keydown events from holding the key.
 		window.addEventListener(
 			"keyup",
 			_event => {
-				self.keydownEventInProgress = undefined;
+				this.keydownEventInProgress = undefined;
 			},
 			false,
 		);
@@ -118,11 +116,11 @@ export class App {
 		window.addEventListener(
 			"keydown",
 			event => {
-				if (self.keydownEventInProgress !== event.keyCode) {
-					self.gameMode.onKeyDown(event.keyCode);
+				if (this.keydownEventInProgress !== event.keyCode) {
+					this.gameMode.onKeyDown(event.keyCode);
 				}
 
-				self.keydownEventInProgress = event.keyCode;
+				this.keydownEventInProgress = event.keyCode;
 			},
 			false,
 		);
@@ -139,15 +137,10 @@ export class App {
 		// 	}
 		// });
 
-		self.loadSprites().then(
-			() => {
-				// Set up the renderer.
-				self.startRenderLoop();
-			},
-			() => {
-				console.error("Could not load sprites.");
-			},
-		);
+		await this.loadSprites();
+
+		// Set up the renderer.
+		this.startRenderLoop();
 	}
 
 	startRenderLoop() {
@@ -167,11 +160,10 @@ export class App {
 		})();
 
 		// Start the loop.
-		const self = this;
-		function loop(currentTime: number) {
-			self.render(currentTime);
+		const loop = (currentTime: number) => {
+			this.render(currentTime);
 			requestAnimFrame(loop);
-		}
+		};
 		requestAnimFrame(loop);
 	}
 
