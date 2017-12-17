@@ -1,8 +1,7 @@
 import { Coord } from "./Coord";
-import { Piece } from "./Piece";
 
 export interface Avatar {
-	getPunishRow(width: number, y: number): Piece[];
+	getPunishColors(width: number): Array<number>;
 
 	draw(
 		context: CanvasRenderingContext2D,

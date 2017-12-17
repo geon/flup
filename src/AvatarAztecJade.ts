@@ -1,7 +1,5 @@
-import { AnimationQueue } from "./AnimationQueue";
 import { Avatar } from "./Avatar";
 import { Coord } from "./Coord";
-import { Piece } from "./Piece";
 import { PieceCycle } from "./PieceCycle";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
 
@@ -67,27 +65,16 @@ export class AvatarAztecJade implements Avatar {
 		};
 	}
 
-	getPunishRow(width: number, y: number) {
-		const pieces: Piece[] = [];
+	getPunishColors(width: number) {
+		const colors = [];
 
 		for (let x = 0; x < width; x++) {
-			pieces.push(
-				new Piece({
-					color: (x + this.rowNumber) % PieceCycle.numColors,
-					key: false,
-					animationQueue: new AnimationQueue(
-						new Coord({
-							x,
-							y,
-						}),
-					),
-				}),
-			);
+			colors.push((x + this.rowNumber) % PieceCycle.numColors);
 		}
 
 		++this.rowNumber;
 
-		return pieces;
+		return colors;
 	}
 
 	draw(

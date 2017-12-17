@@ -1,4 +1,5 @@
 import { Animation } from "./Animation";
+import { AnimationQueue } from "./AnimationQueue";
 import { App } from "./App";
 import { Avatar } from "./Avatar";
 import { Coord } from "./Coord";
@@ -335,12 +336,22 @@ export class Board {
 		}
 
 		// Add pieces.
-		const row = avatar.getPunishRow(
-			Board.size.x,
-			Board.size.y, // Start the animation just outside the Board.
-		);
+		const row = avatar.getPunishColors(Board.size.x);
+
 		for (let x = 0; x < row.length; x++) {
-			this.pieces[Board.xyToIndex(x, Board.size.y - 1)] = row[x];
+			const piece = new Piece({
+				color: row[x],
+				key: false,
+				animationQueue: new AnimationQueue(
+					new Coord({
+						x,
+						// Start the animation just outside the Board.
+						y: Board.size.y,
+					}),
+				),
+			});
+
+			this.pieces[Board.xyToIndex(x, Board.size.y - 1)] = piece;
 		}
 
 		// Animate.
