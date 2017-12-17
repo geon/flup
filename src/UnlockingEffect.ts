@@ -16,14 +16,16 @@ export class UnlockingEffect {
 		this.initialVelocities = [];
 		for (let i = 0; i < 8; i++) {
 			this.initialVelocities[i] = new Coord({
-				x: Math.random() * 2 - 1,
-				y: Math.random() * 2 - 1,
-			}).scaled(0.5);
+				// Spread a little less sideways.
+				x: (Math.random() * 2 - 1) * 0.75,
+				// Spray up a bit more than down.
+				y: Math.random() * 2 - 1 - 0.2,
+			}).scaled(0.35);
 		}
 	}
 
 	static size: number = 16;
-	static gravity: number = 0.001;
+	static gravity: number = 0.0005;
 	static duration: number = 3000;
 	static sprites: SpriteSet | undefined;
 	static spriteSheet: SpriteSheet | undefined;
