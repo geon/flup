@@ -33,13 +33,12 @@ export class SpriteSheet {
 	}
 
 	loadImage() {
-		const promise = $.Deferred();
-		$(this.image).load(promise.resolve);
-		$(this.image).error(promise.reject);
+		return new Promise<void>((resolve, reject) => {
+			this.image.onload = () => resolve();
+			this.image.onerror = () => reject();
 
-		this.image.src = "graphics/" + this.imageFileName;
-
-		return promise;
+			this.image.src = "graphics/" + this.imageFileName;
+		});
 	}
 
 	getSprites() {

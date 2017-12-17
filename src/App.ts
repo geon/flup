@@ -31,15 +31,13 @@ export class App {
 			self.context.canvas.width = window.innerWidth * window.devicePixelRatio;
 			self.context.canvas.height = window.innerHeight * window.devicePixelRatio;
 
-			$(self.context.canvas).css({
-				width: window.innerWidth,
-				height: window.innerHeight,
-			});
+			self.context.canvas.style.width = window.innerWidth + "px";
+			self.context.canvas.style.height = window.innerHeight + "px";
 
 			// Set the scale factor to handle Retina displays. MUST BE DONE AFTER EACH SIZE CHANGE.
 			self.context.scale(window.devicePixelRatio, window.devicePixelRatio);
 		}
-		$(window).resize(makeCanvasFullWindow);
+		window.onresize = makeCanvasFullWindow;
 		makeCanvasFullWindow();
 	}
 
@@ -100,7 +98,7 @@ export class App {
 		promises.push(AvatarAztecJade.getSpriteSheet().loadImage());
 		promises.push(App.getSpriteSheet().loadImage());
 
-		return $.when.apply($, promises);
+		return Promise.all(promises);
 	}
 
 	startGame() {
