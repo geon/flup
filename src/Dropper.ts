@@ -119,8 +119,9 @@ export class Dropper {
 
 		const timePerPieceWidths = 50;
 
-		this.pieceA = this.dropperQueue.pop();
-		this.pieceB = this.dropperQueue.pop();
+		const pieces = this.dropperQueue.pop();
+		this.pieceA = pieces.a;
+		this.pieceB = pieces.b;
 
 		// A needs to wait just beside the queue until B is ready.
 		this.pieceA.animationQueue.add(

@@ -36,23 +36,35 @@ export class DropperQueue {
 	static dropperQueueTimePerPieceWidth: number = 200;
 
 	pop() {
-		const newPiece = this.pieceCycle.pop();
+		this.pushSingle(DropperQueue.dropperQueueVisibleLength);
+		this.pushSingle(DropperQueue.dropperQueueVisibleLength + 1);
+
+		// 2 new pieces were pushed above, so unshift will never be undefined.
+		const a = this.popSingle()!;
+		const b = this.popSingle()!;
+
+		return { a, b };
+	}
+
+	private pushSingle(startYPos: number) {
+		const piece = this.pieceCycle.pop();
 
 		this.pieces.push(
 			new Piece({
-				color: newPiece.color,
-				key: newPiece.key,
+				color: piece.color,
+				key: piece.key,
 				animationQueue: new AnimationQueue(
 					new Coord({
 						x: Board.size.x,
-						y: DropperQueue.dropperQueueVisibleLength,
+						y: startYPos,
 					}),
 				),
 			}),
 		);
+	}
 
-		// A new piece was pushed above, so unshift will never be undefined.
-		const p = this.pieces.shift()!;
+	private popSingle() {
+		const piece = this.pieces.shift();
 
 		for (let i = 0; i < this.pieces.length; i++) {
 			this.pieces[i].animationQueue.add(
@@ -66,7 +78,7 @@ export class DropperQueue {
 			);
 		}
 
-		return p;
+		return piece;
 	}
 
 	draw(
