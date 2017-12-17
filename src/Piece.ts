@@ -23,8 +23,8 @@ export class Piece {
 	}
 
 	static size = 32;
-	static sprites: SpriteSet | null = null;
-	static spriteSheet: SpriteSheet | null = null;
+	static sprites: SpriteSet | undefined;
+	static spriteSheet: SpriteSheet | undefined;
 
 	static getSprites() {
 		if (!Piece.sprites) {

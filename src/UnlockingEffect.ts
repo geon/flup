@@ -25,8 +25,8 @@ export class UnlockingEffect {
 	static size: number = 16;
 	static gravity: number = 0.001;
 	static duration: number = 3000;
-	static sprites: SpriteSet | null = null;
-	static spriteSheet: SpriteSheet | null = null;
+	static sprites: SpriteSet | undefined;
+	static spriteSheet: SpriteSheet | undefined;
 
 	static getSprites = () => {
 		if (!UnlockingEffect.sprites) {
