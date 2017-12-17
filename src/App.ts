@@ -1,11 +1,11 @@
+import { AvatarAztecJade } from "./AvatarAztecJade";
+import { AvatarOwl } from "./AvatarOwl";
+import { Coord } from "./Coord";
 import { GameMode } from "./GameMode";
 import { GameMode2pLocal } from "./GameMode2pLocal";
-import { SpriteSheet, SpriteSet } from "./SpriteSheet";
-import { Coord } from "./Coord";
-import { UnlockingEffect } from "./UnlockingEffect";
 import { Piece } from "./Piece";
-import { AvatarOwl } from "./AvatarOwl";
-import { AvatarAztecJade } from "./AvatarAztecJade";
+import { SpriteSet, SpriteSheet } from "./SpriteSheet";
+import { UnlockingEffect } from "./UnlockingEffect";
 
 export class App {
 	context: CanvasRenderingContext2D;
@@ -26,7 +26,7 @@ export class App {
 		this.lastRenderTime = 0;
 
 		// Make the canvas resolution match the displayed size.
-		var self = this;
+		const self = this;
 		function makeCanvasFullWindow() {
 			self.context.canvas.width = window.innerWidth * window.devicePixelRatio;
 			self.context.canvas.height = window.innerHeight * window.devicePixelRatio;
@@ -63,9 +63,9 @@ export class App {
 	}
 
 	static getSpriteSheetSettings() {
-		var gridSize = new Coord({ x: 4, y: 2 });
-		var spriteSettings = [];
-		for (var i = 0; i < gridSize.x * gridSize.y; ++i) {
+		const gridSize = new Coord({ x: 4, y: 2 });
+		const spriteSettings = [];
+		for (let i = 0; i < gridSize.x * gridSize.y; ++i) {
 			spriteSettings.push({
 				name: i.toString(),
 				sheetPosition: new Coord({
@@ -78,8 +78,8 @@ export class App {
 
 		return {
 			imageFileName: "slates.jpg",
-			gridSize: gridSize,
-			spriteSettings: spriteSettings,
+			gridSize,
+			spriteSettings,
 		};
 	}
 
@@ -92,7 +92,7 @@ export class App {
 	}
 
 	loadSprites() {
-		var promises = [];
+		const promises = [];
 
 		promises.push(Piece.getSpriteSheet().loadImage());
 		promises.push(UnlockingEffect.getSpriteSheet().loadImage());
@@ -105,13 +105,13 @@ export class App {
 
 	startGame() {
 		// Set up input.
-		var self = this;
+		const self = this;
 
 		// I need to listen to keyup as well, so I can ignore repeated
 		// keydown events from holding the key.
 		window.addEventListener(
 			"keyup",
-			function(_event) {
+			_event => {
 				self.keydownEventInProgress = undefined;
 			},
 			false,
@@ -119,8 +119,8 @@ export class App {
 
 		window.addEventListener(
 			"keydown",
-			function(event) {
-				if (self.keydownEventInProgress != event.keyCode) {
+			event => {
+				if (self.keydownEventInProgress !== event.keyCode) {
 					self.gameMode.onKeyDown(event.keyCode);
 				}
 
@@ -142,36 +142,34 @@ export class App {
 		// });
 
 		self.loadSprites().then(
-			function() {
-				console.log("Sprites loaded.");
-
+			() => {
 				// Set up the renderer.
 				self.startRenderLoop();
 			},
-			function() {
-				console.log("Could not load sprites.");
+			() => {
+				console.error("Could not load sprites.");
 			},
 		);
 	}
 
 	startRenderLoop() {
-		var requestAnimFrame: (
+		const requestAnimFrame: (
 			callback: (currentTime: number) => void,
-		) => void = (function() {
+		) => void = (() => {
 			return (
 				window.requestAnimationFrame ||
-				(<any>window).webkitRequestAnimationFrame ||
-				(<any>window).mozRequestAnimationFrame ||
-				(<any>window).oRequestAnimationFrame ||
-				(<any>window).msRequestAnimationFrame ||
-				function(callback) {
+				(window as any).webkitRequestAnimationFrame ||
+				(window as any).mozRequestAnimationFrame ||
+				(window as any).oRequestAnimationFrame ||
+				(window as any).msRequestAnimationFrame ||
+				(callback => {
 					window.setTimeout(callback, 1000 / 60, new Date().getTime());
-				}
+				})
 			);
 		})();
 
 		// Start the loop.
-		var self = this;
+		const self = this;
 		function loop(currentTime: number) {
 			self.render(currentTime);
 			requestAnimFrame(loop);
@@ -181,7 +179,7 @@ export class App {
 
 	render(currentTime: number) {
 		// Calculate delta time. Cap it to make debugging easier.
-		var deltaTime = Math.min(currentTime - this.lastRenderTime, 100);
+		const deltaTime = Math.min(currentTime - this.lastRenderTime, 100);
 		this.lastRenderTime = currentTime;
 
 		// Draw the board background.
@@ -199,8 +197,8 @@ export class App {
 		);
 
 		// FPS counter.
-		//	this.context.fillStyle = "black";
-		//	this.context.font = "16px Palatino";
-		//	this.context.fillText("FPS: " + Math.floor(1000/deltaTime), 10, 20);
+		// this.context.fillStyle = "black";
+		// this.context.font = "16px Palatino";
+		// this.context.fillText("FPS: " + Math.floor(1000/deltaTime), 10, 20);
 	}
 }

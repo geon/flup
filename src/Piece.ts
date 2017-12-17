@@ -1,6 +1,6 @@
 import { AnimationQueue } from "./AnimationQueue";
-import { SpriteSheet, SpriteSet } from "./SpriteSheet";
 import { Coord } from "./Coord";
+import { SpriteSet, SpriteSheet } from "./SpriteSheet";
 
 export class Piece {
 	color: number;
@@ -42,13 +42,13 @@ export class Piece {
 	}
 
 	static getSpriteSheetSettings() {
-		var sprites: {
+		const sprites: Array<{
 			name: string;
 			sheetPosition: Coord;
 			sheetSize: Coord;
-		}[] = [];
+		}> = [];
 
-		for (var i = 0; i < 4; ++i) {
+		for (let i = 0; i < 4; ++i) {
 			sprites.push({
 				name: "piece" + i,
 				sheetPosition: new Coord({ x: 0, y: i }),
@@ -79,9 +79,9 @@ export class Piece {
 	) {
 		this.accumulatedDeltaTime += deltaTime;
 
-		var position = this.animationQueue.getPosition(deltaTime);
+		const position = this.animationQueue.getPosition(deltaTime);
 
-		var jitterX =
+		const jitterX =
 			disturbance *
 			(Piece.size *
 				boardScale *
@@ -89,7 +89,7 @@ export class Piece {
 				Math.sin(
 					this.accumulatedDeltaTime / 1000 * 27 + position.x + position.y * 3,
 				));
-		var jitterY =
+		const jitterY =
 			disturbance *
 			(Piece.size *
 				boardScale *
@@ -97,7 +97,7 @@ export class Piece {
 				Math.sin(
 					this.accumulatedDeltaTime / 1000 * 21 + position.y + position.x * 2,
 				));
-		var jitterZ =
+		const jitterZ =
 			disturbance *
 			(Piece.size *
 				boardScale *

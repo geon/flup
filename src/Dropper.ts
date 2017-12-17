@@ -1,8 +1,8 @@
+import { Animation } from "./Animation";
+import { Board } from "./Board";
 import { Coord } from "./Coord";
 import { DropperQueue } from "./DropperQueue";
-import { Board } from "./Board";
 import { Piece } from "./Piece";
-import { Animation } from "./Animation";
 
 export class Dropper {
 	dropperQueue: DropperQueue;
@@ -54,10 +54,10 @@ export class Dropper {
 	}
 
 	drop(board: Board) {
-		var coords = this.getCoordinates();
+		const coords = this.getCoordinates();
 
-		var aPos = Board.coordToIndex(coords.a);
-		var bPos = Board.coordToIndex(coords.b);
+		const aPos = Board.coordToIndex(coords.a);
+		const bPos = Board.coordToIndex(coords.b);
 
 		// Make sure the board space is not used, and is not outside the Board.
 		if (
@@ -93,31 +93,31 @@ export class Dropper {
 
 		return {
 			a: new Coord({
-				x: this.position + (this.orientation == 2 ? 1 : 0),
-				y: this.orientation == 3 ? 1 : 0,
+				x: this.position + (this.orientation === 2 ? 1 : 0),
+				y: this.orientation === 3 ? 1 : 0,
 			}),
 			b: new Coord({
-				x: this.position + (this.orientation == 0 ? 1 : 0),
-				y: this.orientation == 1 ? 1 : 0,
+				x: this.position + (this.orientation === 0 ? 1 : 0),
+				y: this.orientation === 1 ? 1 : 0,
 			}),
 		};
 	}
 
 	private charge() {
 		// Set the orientation back to horiz. or vert., but not backwards or upside-down.
-		//	this.orientation %= 2;
+		// this.orientation %= 2;
 
-		if (this.orientation == 2) {
+		if (this.orientation === 2) {
 			this.orientation = 0;
 		}
 
-		if (this.orientation == 1) {
+		if (this.orientation === 1) {
 			this.orientation = 3;
 		}
 
-		var coords = this.getCoordinates();
+		const coords = this.getCoordinates();
 
-		var timePerPieceWidths = 50;
+		const timePerPieceWidths = 50;
 
 		this.pieceA = this.dropperQueue.pop();
 		this.pieceB = this.dropperQueue.pop();
@@ -178,9 +178,9 @@ export class Dropper {
 	}
 
 	private animate() {
-		var coords = this.getCoordinates();
+		const coords = this.getCoordinates();
 
-		var timePerPieceWidths = 50;
+		const timePerPieceWidths = 50;
 
 		this.pieceA.animationQueue.add(
 			new Animation({

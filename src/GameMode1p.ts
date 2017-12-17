@@ -1,8 +1,8 @@
-import { GameMode } from "./GameMode";
 import { Avatar } from "./Avatar";
 import { AvatarOwl } from "./AvatarOwl";
-import { Coord } from "./Coord";
 import { Board } from "./Board";
+import { Coord } from "./Coord";
+import { GameMode } from "./GameMode";
 import { PieceCycle } from "./PieceCycle";
 
 export class GameMode1p implements GameMode {
@@ -10,9 +10,9 @@ export class GameMode1p implements GameMode {
 	avatar: Avatar;
 
 	constructor() {
-		var pieceCycle = new PieceCycle(PieceCycle.generate());
+		const pieceCycle = new PieceCycle(PieceCycle.generate());
 
-		this.board = new Board({ pieceCycle: pieceCycle, gameMode: this });
+		this.board = new Board({ pieceCycle, gameMode: this });
 		this.avatar = new AvatarOwl();
 	}
 
@@ -29,7 +29,7 @@ export class GameMode1p implements GameMode {
 			return;
 		}
 
-		switch ((<KeyboardEvent>event).keyCode) {
+		switch ((event as KeyboardEvent).keyCode) {
 			case 37: // Left
 				this.board.dropper.moveLeft();
 				break;

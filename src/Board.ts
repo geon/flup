@@ -1,13 +1,13 @@
+import { Animation } from "./Animation";
+import { App } from "./App";
+import { Avatar } from "./Avatar";
 import { Coord } from "./Coord";
-import { UnlockingEffect } from "./UnlockingEffect";
-import { GameMode } from "./GameMode";
-import { DropperQueue } from "./DropperQueue";
 import { Dropper } from "./Dropper";
+import { DropperQueue } from "./DropperQueue";
+import { GameMode } from "./GameMode";
 import { Piece } from "./Piece";
 import { PieceCycle } from "./PieceCycle";
-import { Animation } from "./Animation";
-import { Avatar } from "./Avatar";
-import { App } from "./App";
+import { UnlockingEffect } from "./UnlockingEffect";
 
 export class Board {
 	gameMode: GameMode;
@@ -101,18 +101,18 @@ export class Board {
 		*/
 
 		// For each collumn.
-		for (var x = 0; x < Board.size.x; ++x) {
+		for (let x = 0; x < Board.size.x; ++x) {
 			// Start at the bottom.
-			var yPut = Board.size.y - 1;
+			let yPut = Board.size.y - 1;
 
 			// Search for a space that can be filled from above.
 			while (yPut && this.pieces[Board.xyToIndex(x, yPut)]) {
 				--yPut;
 			}
 
-			var yGet = yPut - 1;
+			let yGet = yPut - 1;
 
-			var numConsecutive = 0;
+			let numConsecutive = 0;
 
 			// For the whole collumn...
 			collumnLoop: while (yGet >= 0) {
@@ -127,8 +127,8 @@ export class Board {
 					}
 				}
 
-				var getPos = Board.xyToIndex(x, yGet);
-				var putPos = Board.xyToIndex(x, yPut);
+				const getPos = Board.xyToIndex(x, yGet);
+				const putPos = Board.xyToIndex(x, yPut);
 
 				// Move the piece.
 				this.pieces[putPos] = this.pieces[getPos];
@@ -136,10 +136,10 @@ export class Board {
 				const piece = this.pieces[putPos]!;
 
 				// Animate it.
-				var timePerPieceHeight = 100;
+				const timePerPieceHeight = 100;
 				piece.animationQueue.add(
 					new Animation({
-						to: new Coord({ x: x, y: yPut }),
+						to: new Coord({ x, y: yPut }),
 						delay: delay + numConsecutive * 50 - piece.animationQueue.length(),
 						duration: Math.sqrt(yPut - yGet) * timePerPieceHeight,
 						interpolation: "easeInQuad",
@@ -155,24 +155,24 @@ export class Board {
 	}
 
 	unlockChains() {
-		var foundChains = false;
-		var maxUnlockEffectDuration = 0;
-		for (var i = this.pieces.length - 1; i >= 0; i--) {
+		let foundChains = false;
+		let maxUnlockEffectDuration = 0;
+		for (let i = this.pieces.length - 1; i >= 0; i--) {
 			const piece = this.pieces[i];
 
 			// Look for keys.
 			if (piece && piece.key) {
-				var matchingNeighborPositions = this.matchingNeighborsOfPosition(i);
+				const matchingNeighborPositions = this.matchingNeighborsOfPosition(i);
 
 				// If there is at least one pair in the chain...
 				if (matchingNeighborPositions.length) {
 					foundChains = true;
 
 					// As soon as everything has stopped falling...
-					var unlockEffectDelay = this.maxAnimationLength();
+					const unlockEffectDelay = this.maxAnimationLength();
 
 					// ...Start the unlocking effect.
-					var unlockEffectDuration = this.unLockChainRecursively(
+					const unlockEffectDuration = this.unLockChainRecursively(
 						i,
 						unlockEffectDelay,
 					);
@@ -199,7 +199,7 @@ export class Board {
 
 	maxAnimationLength() {
 		// Must also check the unlocked pieces waiting for the unlocking effect.
-		var allPieces = this.pieces
+		const allPieces = this.pieces
 			.concat(this.unlockedPieces)
 			.filter(x => !!x)
 			.map(x => x!);
@@ -213,26 +213,29 @@ export class Board {
 
 	unLockChainRecursively(position: number, unlockEffectDelay: number) {
 		// Must search for neighbors before removing the piece matching against.
-		var matchingNeighborPositions = this.matchingNeighborsOfPosition(position);
+		const matchingNeighborPositions = this.matchingNeighborsOfPosition(
+			position,
+		);
 
-		var unlockedPiece = this.pieces[position];
+		const unlockedPiece = this.pieces[position];
 
 		// Another branch of the chain might have reached here before.
 		if (!unlockedPiece) {
 			return 0;
 		}
 
-		// Move the piece from the play field to the queue of pieces waiting for the unlocking effect.
+		// Move the piece from the play field to the queue of
+		// pieces waiting for the unlocking effect.
 		unlockedPiece.unlockEffectDelay = unlockEffectDelay;
 		this.unlockedPieces.push(unlockedPiece);
 		this.pieces[position] = undefined;
 
 		// For all matching neighbors...
-		var interUnlockEffectDelay = 25;
-		var longestChainDuration = 0;
-		for (var i = matchingNeighborPositions.length - 1; i >= 0; i--) {
+		const interUnlockEffectDelay = 25;
+		let longestChainDuration = 0;
+		for (let i = matchingNeighborPositions.length - 1; i >= 0; i--) {
 			// Recurse.
-			var chainDuration = this.unLockChainRecursively(
+			const chainDuration = this.unLockChainRecursively(
 				matchingNeighborPositions[i],
 				unlockEffectDelay + interUnlockEffectDelay,
 			);
@@ -250,9 +253,9 @@ export class Board {
 			return [];
 		}
 
-		var neighborPositions = [];
+		const neighborPositions = [];
 
-		var coord = Board.indexToCoord(position);
+		const coord = Board.indexToCoord(position);
 
 		// Right
 		if (coord.x < Board.size.x - 1) {
@@ -274,13 +277,13 @@ export class Board {
 			neighborPositions.push(position - Board.size.x);
 		}
 
-		var matchingNeighborPositions = [];
-		var color = piece.color;
-		for (var i = neighborPositions.length - 1; i >= 0; i--) {
-			var neighborPosition = neighborPositions[i];
+		const matchingNeighborPositions = [];
+		const color = piece.color;
+		for (let i = neighborPositions.length - 1; i >= 0; i--) {
+			const neighborPosition = neighborPositions[i];
 			const neighborPiece = this.pieces[neighborPosition];
 
-			if (neighborPiece && neighborPiece.color == color) {
+			if (neighborPiece && neighborPiece.color === color) {
 				matchingNeighborPositions.push(neighborPosition);
 			}
 		}
@@ -289,7 +292,7 @@ export class Board {
 	}
 
 	checkForGameOver() {
-		for (var i = 0; i < Board.size.x * 2; i++) {
+		for (let i = 0; i < Board.size.x * 2; i++) {
 			if (this.pieces[i]) {
 				this.gameOver = true;
 
@@ -303,11 +306,11 @@ export class Board {
 	}
 
 	startGameOverEffect() {
-		var gameOverEffectDelay = this.maxAnimationLength();
+		const gameOverEffectDelay = this.maxAnimationLength();
 
 		// Unlock all pieces, from the center and out.
-		for (var i = 0; i < this.pieces.length; i++) {
-			var unlockedPiece = this.pieces[i];
+		for (let i = 0; i < this.pieces.length; i++) {
+			const unlockedPiece = this.pieces[i];
 			if (unlockedPiece) {
 				unlockedPiece.unlockEffectDelay =
 					gameOverEffectDelay +
@@ -320,11 +323,11 @@ export class Board {
 	}
 
 	punish(avatar: Avatar) {
-		var punishmentAnimationDelay = this.maxAnimationLength();
+		const punishmentAnimationDelay = this.maxAnimationLength();
 
 		// Make room.
-		for (var y = 0; y < Board.size.y - 1; y++) {
-			for (var x = 0; x < Board.size.x; x++) {
+		for (let y = 0; y < Board.size.y - 1; y++) {
+			for (let x = 0; x < Board.size.x; x++) {
 				this.pieces[Board.xyToIndex(x, y)] = this.pieces[
 					Board.xyToIndex(x, y + 1)
 				];
@@ -332,16 +335,16 @@ export class Board {
 		}
 
 		// Add pieces.
-		var row = avatar.getPunishRow(
+		const row = avatar.getPunishRow(
 			Board.size.x,
 			Board.size.y, // Start the animation just outside the Board.
 		);
-		for (var x = 0; x < row.length; x++) {
+		for (let x = 0; x < row.length; x++) {
 			this.pieces[Board.xyToIndex(x, Board.size.y - 1)] = row[x];
 		}
 
 		// Animate.
-		for (var i = 0; i < this.pieces.length; i++) {
+		for (let i = 0; i < this.pieces.length; i++) {
 			const piece = this.pieces[i];
 			if (piece) {
 				piece.animationQueue.add(
@@ -370,19 +373,20 @@ export class Board {
 	) {
 		// Draw the board background.
 
-		var slateSprites = App.getSprites();
-		for (var y = 0; y < Board.size.y; ++y) {
-			for (var x = 0; x < Board.size.x; ++x) {
-				var numTiles = 8;
-				var numBaseTiles = 2;
+		const slateSprites = App.getSprites();
+		for (let y = 0; y < Board.size.y; ++y) {
+			for (let x = 0; x < Board.size.x; ++x) {
+				const numTiles = 8;
+				const numBaseTiles = 2;
 
 				// This is just BS. The magic munber don't mean anything.
-				var pseudoRandomByXY = Math.floor(
+				const pseudoRandomByXY = Math.floor(
 					Math.pow(113 + x + y * Board.size.y, this.slateRandomExp),
 				);
-				var basePattern = pseudoRandomByXY % numBaseTiles;
-				var details = pseudoRandomByXY % numTiles - numBaseTiles + numBaseTiles;
-				var useDetail = !(Math.floor(pseudoRandomByXY / 13) % 10);
+				const basePattern = pseudoRandomByXY % numBaseTiles;
+				const details =
+					pseudoRandomByXY % numTiles - numBaseTiles + numBaseTiles;
+				const useDetail = !(Math.floor(pseudoRandomByXY / 13) % 10);
 
 				slateSprites[useDetail ? details : basePattern].draw(
 					context,
@@ -398,23 +402,24 @@ export class Board {
 			}
 		}
 
-		// Calculate how much to stress the player. (Piece wobbling increases as they approach the maximum height before game over.)
-		var height = 0;
-		for (var i = 0; i < this.pieces.length; i++) {
+		// Calculate how much to stress the player. (Piece wobbling increases as
+		// they approach the maximum height before game over.)
+		let height = 0;
+		for (let i = 0; i < this.pieces.length; i++) {
 			if (this.pieces[i]) {
-				var position = Board.indexToCoord(i);
+				const position = Board.indexToCoord(i);
 				height = Board.size.y - 1 - position.y;
 				break;
 			}
 		}
-		var ratio = height / (Board.size.y - 2 - 1);
-		var cutOffPoint = 0.65;
-		var disturbance =
+		const ratio = height / (Board.size.y - 2 - 1);
+		const cutOffPoint = 0.65;
+		const disturbance =
 			ratio < cutOffPoint ? 0 : (ratio - cutOffPoint) / (1 - cutOffPoint);
 
 		// Draw the unlocking effects.
-		var doneUnlockingEffectIndices = [];
-		for (var i = this.unlockingEffects.length - 1; i >= 0; i--) {
+		const doneUnlockingEffectIndices = [];
+		for (let i = this.unlockingEffects.length - 1; i >= 0; i--) {
 			if (!this.unlockingEffects[i].isDone()) {
 				this.unlockingEffects[i].draw(
 					context,
@@ -429,14 +434,14 @@ export class Board {
 		}
 
 		// Remove the unlocking effects when they are done.
-		for (var i = doneUnlockingEffectIndices.length - 1; i >= 0; i--) {
+		for (let i = doneUnlockingEffectIndices.length - 1; i >= 0; i--) {
 			this.unlockingEffects.splice(doneUnlockingEffectIndices[i], 1);
 		}
 
 		// Draw the unlocked pieces, queued for unlocking effects.
-		var donePieceIndices = [];
-		for (var i = 0, length = this.unlockedPieces.length; i < length; ++i) {
-			var piece = this.unlockedPieces[i];
+		const donePieceIndices = [];
+		for (let i = 0, length = this.unlockedPieces.length; i < length; ++i) {
+			const piece = this.unlockedPieces[i];
 
 			if (piece.unlockEffectDelay > 0) {
 				// The piece should still be visible, so draw like normal.
@@ -454,13 +459,13 @@ export class Board {
 		}
 
 		// Remove the unlocked pieces from the unlocking effect queue.
-		for (var i = donePieceIndices.length - 1; i >= 0; i--) {
+		for (let i = donePieceIndices.length - 1; i >= 0; i--) {
 			this.unlockedPieces.splice(donePieceIndices[i], 1);
 		}
 
 		// Draw the board pieces.
-		for (var i = 0, length = this.pieces.length; i < length; ++i) {
-			let piece = this.pieces[i];
+		for (let i = 0, length = this.pieces.length; i < length; ++i) {
+			const piece = this.pieces[i];
 			if (piece !== undefined) {
 				piece.draw(context, deltaTime, center, scale, disturbance, Board.size);
 			}

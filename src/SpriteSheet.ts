@@ -2,26 +2,28 @@ import { Coord } from "./Coord";
 import { Sprite } from "./Sprite";
 /// <reference path="jquery.d.ts" />
 
-export type SpriteSet = { [name: string]: Sprite };
+export interface SpriteSet {
+	[name: string]: Sprite;
+}
 
 export class SpriteSheet {
 	imageFileName: string;
 	gridSize: Coord;
-	spriteSettings: {
+	spriteSettings: Array<{
 		name: string;
 		sheetPosition: Coord;
 		sheetSize: Coord;
-	}[];
+	}>;
 	image: HTMLImageElement;
 
 	constructor(spriteSheet: {
 		imageFileName: string;
 		gridSize: Coord;
-		spriteSettings: {
+		spriteSettings: Array<{
 			name: string;
 			sheetPosition: Coord;
 			sheetSize: Coord;
-		}[];
+		}>;
 	}) {
 		this.imageFileName = spriteSheet.imageFileName;
 		this.gridSize = spriteSheet.gridSize;
@@ -31,7 +33,7 @@ export class SpriteSheet {
 	}
 
 	loadImage() {
-		var promise = $.Deferred();
+		const promise = $.Deferred();
 		$(this.image).load(promise.resolve);
 		$(this.image).error(promise.reject);
 
@@ -41,9 +43,9 @@ export class SpriteSheet {
 	}
 
 	getSprites() {
-		var sprites: SpriteSet = {};
+		const sprites: SpriteSet = {};
 
-		for (var i = this.spriteSettings.length - 1; i >= 0; i--) {
+		for (let i = this.spriteSettings.length - 1; i >= 0; i--) {
 			sprites[this.spriteSettings[i].name] = new Sprite(
 				this,
 				this.spriteSettings[i].sheetPosition,

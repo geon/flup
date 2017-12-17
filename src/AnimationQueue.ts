@@ -33,7 +33,7 @@ export class AnimationQueue {
 	}
 
 	getLastTo() {
-		var lastAnimation = this.getLast();
+		const lastAnimation = this.getLast();
 
 		return lastAnimation ? lastAnimation.to : this.from;
 	}
@@ -41,7 +41,7 @@ export class AnimationQueue {
 	getPosition(deltaTime: number) {
 		this.timeSinceCurrentAnimationStart += deltaTime;
 
-		var currentAnimation = this.animations[0];
+		let currentAnimation = this.animations[0];
 
 		// Remove any expired animations.
 		while (
@@ -73,7 +73,7 @@ export class AnimationQueue {
 			return this.from;
 		}
 
-		var progress = Animation.interpolators[currentAnimation.interpolation](
+		const progress = Animation.interpolators[currentAnimation.interpolation](
 			(this.timeSinceCurrentAnimationStart - currentAnimation.delay) /
 				currentAnimation.duration,
 		);

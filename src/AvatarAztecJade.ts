@@ -1,9 +1,9 @@
+import { AnimationQueue } from "./AnimationQueue";
 import { Avatar } from "./Avatar";
 import { Coord } from "./Coord";
-import { SpriteSheet, SpriteSet } from "./SpriteSheet";
 import { Piece } from "./Piece";
 import { PieceCycle } from "./PieceCycle";
-import { AnimationQueue } from "./AnimationQueue";
+import { SpriteSet, SpriteSheet } from "./SpriteSheet";
 
 export class AvatarAztecJade implements Avatar {
 	rowNumber: number;
@@ -37,7 +37,7 @@ export class AvatarAztecJade implements Avatar {
 	}
 
 	static getSpriteSheetSettings() {
-		var sprites = [
+		const sprites = [
 			{
 				name: "gold",
 				sheetPosition: new Coord({ x: 0, y: 0 }),
@@ -68,17 +68,17 @@ export class AvatarAztecJade implements Avatar {
 	}
 
 	getPunishRow(width: number, y: number) {
-		var pieces: Piece[] = [];
+		const pieces: Piece[] = [];
 
-		for (var x = 0; x < width; x++) {
+		for (let x = 0; x < width; x++) {
 			pieces.push(
 				new Piece({
 					color: (x + this.rowNumber) % PieceCycle.numColors,
 					key: false,
 					animationQueue: new AnimationQueue(
 						new Coord({
-							x: x,
-							y: y,
+							x,
+							y,
 						}),
 					),
 				}),
@@ -97,23 +97,23 @@ export class AvatarAztecJade implements Avatar {
 	) {
 		this.accumulatedDeltaTime += deltaTime;
 
-		var sprites = AvatarAztecJade.getSprites();
+		const sprites = AvatarAztecJade.getSprites();
 
-		var size = new Coord({
+		const size = new Coord({
 			x: AvatarAztecJade.size,
 			y: AvatarAztecJade.size,
 		});
 
-		var diskSizeFactor =
+		const diskSizeFactor =
 			(1 + Math.sin(this.accumulatedDeltaTime / 1000 * 3)) / 2;
 
-		sprites["gold"].draw(
+		sprites.gold.draw(
 			context,
 			Coord.subtract(avatarCenter, Coord.scale(size, 0.5 * diskSizeFactor)),
 			Coord.scale(size, diskSizeFactor),
 		);
 
-		sprites["idol"].draw(
+		sprites.idol.draw(
 			context,
 			Coord.subtract(avatarCenter, Coord.scale(size, 0.5)),
 			size,

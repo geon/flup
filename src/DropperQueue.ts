@@ -1,9 +1,9 @@
-import { Coord } from "./Coord";
-import { Piece } from "./Piece";
-import { Board } from "./Board";
-import { PieceCycle } from "./PieceCycle";
 import { Animation } from "./Animation";
 import { AnimationQueue } from "./AnimationQueue";
+import { Board } from "./Board";
+import { Coord } from "./Coord";
+import { Piece } from "./Piece";
+import { PieceCycle } from "./PieceCycle";
 
 export class DropperQueue {
 	pieces: Piece[];
@@ -15,7 +15,7 @@ export class DropperQueue {
 
 		this.pieces = [];
 		while (this.pieces.length < DropperQueue.dropperQueueVisibleLength) {
-			var piece = this.pieceCycle.pop();
+			const piece = this.pieceCycle.pop();
 
 			this.pieces.push(
 				new Piece({
@@ -36,7 +36,7 @@ export class DropperQueue {
 	static dropperQueueTimePerPieceWidth: number = 200;
 
 	pop() {
-		var newPiece = this.pieceCycle.pop();
+		const newPiece = this.pieceCycle.pop();
 
 		this.pieces.push(
 			new Piece({
@@ -52,9 +52,9 @@ export class DropperQueue {
 		);
 
 		// A new piece was pushed above, so unshift will never be undefined.
-		var p = this.pieces.shift()!;
+		const p = this.pieces.shift()!;
 
-		for (var i = 0; i < this.pieces.length; i++) {
+		for (let i = 0; i < this.pieces.length; i++) {
 			this.pieces[i].animationQueue.add(
 				new Animation({
 					to: new Coord({ x: Board.size.x, y: i }),
@@ -77,8 +77,8 @@ export class DropperQueue {
 		boardSize: Coord,
 	) {
 		// Draw the dropper queue.
-		for (var i = 0; i < this.pieces.length; i++) {
-			this.pieces[i].draw(context, deltaTime, center, scale, 0, boardSize);
+		for (const piece of this.pieces) {
+			piece.draw(context, deltaTime, center, scale, 0, boardSize);
 		}
 	}
 }

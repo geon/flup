@@ -24,18 +24,18 @@ export class Animation {
 	}
 
 	static interpolators = {
-		linear: function(progress: number) {
+		linear(progress: number) {
 			return progress;
 		},
-		easeInQuad: function(progress: number) {
+		easeInQuad(progress: number) {
 			return progress * progress;
 		},
-		sine: function(progress: number) {
+		sine(progress: number) {
 			return (Math.cos((1 - progress) * Math.PI) + 1) / 2;
 		},
-		sine2: function(progress: number) {
-			return Animation.interpolators["sine"](
-				Animation.interpolators["sine"](progress),
+		sine2(progress: number) {
+			return Animation.interpolators.sine(
+				Animation.interpolators.sine(progress),
 			);
 		},
 	};

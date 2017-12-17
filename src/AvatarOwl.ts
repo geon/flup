@@ -1,13 +1,11 @@
+import { AnimationQueue } from "./AnimationQueue";
 import { Avatar } from "./Avatar";
 import { Coord } from "./Coord";
-import { SpriteSheet, SpriteSet } from "./SpriteSheet";
 import { Piece } from "./Piece";
 import { PieceCycle } from "./PieceCycle";
-import { AnimationQueue } from "./AnimationQueue";
+import { SpriteSet, SpriteSheet } from "./SpriteSheet";
 
 export class AvatarOwl implements Avatar {
-	constructor() {}
-
 	static size: number = 256;
 	static sprites: SpriteSet;
 	static spriteSheet: SpriteSheet;
@@ -31,7 +29,7 @@ export class AvatarOwl implements Avatar {
 	}
 
 	static getSpriteSheetSettings() {
-		var sprites = [
+		const sprites = [
 			{
 				name: "head",
 				sheetPosition: new Coord({ x: 0, y: 0 }),
@@ -114,11 +112,11 @@ export class AvatarOwl implements Avatar {
 		],
 		currentFrameIndex: 0,
 		frameTimer: undefined as number | undefined,
-		getCurrentFrameName: function() {
+		getCurrentFrameName() {
 			// If there is no timer to the next frame...
 			if (!AvatarOwl.wingFlapCycle.frameTimer) {
 				// ...create one.
-				AvatarOwl.wingFlapCycle.frameTimer = setTimeout(function() {
+				AvatarOwl.wingFlapCycle.frameTimer = setTimeout(() => {
 					// Next frame.
 					++AvatarOwl.wingFlapCycle.currentFrameIndex;
 					AvatarOwl.wingFlapCycle.currentFrameIndex %=
@@ -128,8 +126,7 @@ export class AvatarOwl implements Avatar {
 					AvatarOwl.wingFlapCycle.frameTimer = undefined;
 
 					// Wait this long before switching frame.
-				}, AvatarOwl
-					.wingFlapCycle.frames[AvatarOwl.wingFlapCycle.currentFrameIndex].time);
+				}, AvatarOwl.wingFlapCycle.frames[AvatarOwl.wingFlapCycle.currentFrameIndex].time);
 			}
 
 			// The current frame name.
@@ -140,17 +137,17 @@ export class AvatarOwl implements Avatar {
 	};
 
 	getPunishRow(width: number, y: number) {
-		var pieces: Piece[] = [];
+		const pieces: Piece[] = [];
 
-		for (var x = 0; x < width; x++) {
+		for (let x = 0; x < width; x++) {
 			pieces.push(
 				new Piece({
 					color: x % PieceCycle.numColors,
 					key: false,
 					animationQueue: new AnimationQueue(
 						new Coord({
-							x: x,
-							y: y,
+							x,
+							y,
 						}),
 					),
 				}),
@@ -165,9 +162,9 @@ export class AvatarOwl implements Avatar {
 		_deltaTime: number,
 		avatarCenter: Coord,
 	) {
-		var sprites = AvatarOwl.getSprites();
+		const sprites = AvatarOwl.getSprites();
 
-		var size = new Coord({
+		const size = new Coord({
 			x: AvatarOwl.size,
 			y: AvatarOwl.size,
 		});
@@ -178,13 +175,13 @@ export class AvatarOwl implements Avatar {
 			size,
 		);
 
-		sprites["body"].draw(
+		sprites.body.draw(
 			context,
 			Coord.subtract(avatarCenter, Coord.scale(size, 0.5)),
 			size,
 		);
 
-		sprites["head"].draw(
+		sprites.head.draw(
 			context,
 			Coord.subtract(avatarCenter, Coord.scale(size, 0.5)),
 			size,

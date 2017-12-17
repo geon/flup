@@ -1,6 +1,6 @@
-import { Piece } from "./Piece";
 import { Coord } from "./Coord";
-import { SpriteSheet, SpriteSet } from "./SpriteSheet";
+import { Piece } from "./Piece";
+import { SpriteSet, SpriteSheet } from "./SpriteSheet";
 
 export class UnlockingEffect {
 	color: number;
@@ -14,7 +14,7 @@ export class UnlockingEffect {
 		this.accumulatedDeltaTime = 0;
 
 		this.initialVelocities = [];
-		for (var i = 0; i < 8; i++) {
+		for (let i = 0; i < 8; i++) {
 			this.initialVelocities[i] = new Coord({
 				x: Math.random() * 2 - 1,
 				y: Math.random() * 2 - 1,
@@ -28,7 +28,7 @@ export class UnlockingEffect {
 	static sprites: SpriteSet | null = null;
 	static spriteSheet: SpriteSheet | null = null;
 
-	static getSprites = function() {
+	static getSprites = () => {
 		if (!UnlockingEffect.sprites) {
 			UnlockingEffect.sprites = UnlockingEffect.getSpriteSheet().getSprites();
 		}
@@ -36,7 +36,7 @@ export class UnlockingEffect {
 		return UnlockingEffect.sprites;
 	};
 
-	static getSpriteSheet = function() {
+	static getSpriteSheet = () => {
 		if (!UnlockingEffect.spriteSheet) {
 			UnlockingEffect.spriteSheet = new SpriteSheet(
 				UnlockingEffect.getSpriteSheetSettings(),
@@ -46,15 +46,15 @@ export class UnlockingEffect {
 		return UnlockingEffect.spriteSheet;
 	};
 
-	static getSpriteSheetSettings = function() {
-		var sprites: {
+	static getSpriteSheetSettings = () => {
+		const sprites: Array<{
 			name: string;
 			sheetPosition: Coord;
 			sheetSize: Coord;
-		}[] = [];
+		}> = [];
 
-		for (var i = 0; i < 4; ++i) {
-			for (var j = 0; j < 8; ++j) {
+		for (let i = 0; i < 4; ++i) {
+			for (let j = 0; j < 8; ++j) {
 				sprites.push({
 					name: "color " + i + ", variation " + j,
 					sheetPosition: new Coord({
@@ -86,7 +86,7 @@ export class UnlockingEffect {
 	) {
 		this.accumulatedDeltaTime += deltaTime;
 
-		var origin = new Coord({
+		const origin = new Coord({
 			x:
 				boardCenter.x +
 				(this.coord.x / boardSize.x - 0.5) *
@@ -105,7 +105,7 @@ export class UnlockingEffect {
 				0.5 * UnlockingEffect.size,
 		});
 
-		for (var i = 0; i < this.initialVelocities.length; i++) {
+		for (let i = 0; i < this.initialVelocities.length; i++) {
 			UnlockingEffect.getSprites()[
 				"color " + this.color + ", variation " + i
 			].draw(

@@ -1,9 +1,9 @@
-import { GameMode } from "./GameMode";
 import { Avatar } from "./Avatar";
-import { AvatarOwl } from "./AvatarOwl";
 import { AvatarAztecJade } from "./AvatarAztecJade";
-import { Coord } from "./Coord";
+import { AvatarOwl } from "./AvatarOwl";
 import { Board } from "./Board";
+import { Coord } from "./Coord";
+import { GameMode } from "./GameMode";
 import { PieceCycle } from "./PieceCycle";
 
 export class GameMode2pLocal implements GameMode {
@@ -11,7 +11,7 @@ export class GameMode2pLocal implements GameMode {
 	avatars: Avatar[];
 
 	constructor() {
-		var pieceCycleTemplate = PieceCycle.generate();
+		const pieceCycleTemplate = PieceCycle.generate();
 
 		this.boards = [
 			new Board({
@@ -32,8 +32,8 @@ export class GameMode2pLocal implements GameMode {
 	}
 
 	punishOpponents(board: Board) {
-		for (var i = 0; i < this.boards.length; i++) {
-			if (this.boards[i] != board) {
+		for (let i = 0; i < this.boards.length; i++) {
+			if (this.boards[i] !== board) {
 				this.boards[i].punish(this.avatars[i]);
 			}
 		}
@@ -48,7 +48,7 @@ export class GameMode2pLocal implements GameMode {
 			return;
 		}
 
-		switch ((<KeyboardEvent>event).keyCode) {
+		switch ((event as KeyboardEvent).keyCode) {
 			// Player 1.
 			case 37: // Left
 				this.boards[1].dropper.moveLeft();
