@@ -72,7 +72,7 @@ export class AvatarAztecJade extends Avatar {
 
 			const colors = [];
 			for (let x = 0; x < Board.size.x; x++) {
-				colors.push((x + rowNumber) % PieceCycle.numColors);
+				colors.push(Math.floor((rowNumber + x) / 2) % PieceCycle.numColors);
 			}
 			yield colors;
 		}
