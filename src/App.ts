@@ -89,15 +89,13 @@ export class App {
 	}
 
 	loadSprites() {
-		const promises = [];
-
-		promises.push(Piece.getSpriteSheet().loadImage());
-		promises.push(UnlockingEffect.getSpriteSheet().loadImage());
-		promises.push(AvatarOwl.getSpriteSheet().loadImage());
-		promises.push(AvatarAztecJade.getSpriteSheet().loadImage());
-		promises.push(App.getSpriteSheet().loadImage());
-
-		return Promise.all(promises);
+		return Promise.all([
+			Piece.getSpriteSheet().loadImage(),
+			UnlockingEffect.getSpriteSheet().loadImage(),
+			AvatarOwl.getSpriteSheet().loadImage(),
+			AvatarAztecJade.getSpriteSheet().loadImage(),
+			App.getSpriteSheet().loadImage(),
+		]);
 	}
 
 	async startGame() {
