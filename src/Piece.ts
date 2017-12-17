@@ -1,6 +1,7 @@
 import { AnimationQueue } from "./AnimationQueue";
 import { Coord } from "./Coord";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
+import { PieceCycle } from "./PieceCycle";
 
 export class Piece {
 	color: number;
@@ -48,7 +49,7 @@ export class Piece {
 			sheetSize: Coord;
 		}> = [];
 
-		for (let i = 0; i < 4; ++i) {
+		for (let i = 0; i < PieceCycle.numColors; ++i) {
 			sprites.push({
 				name: "piece" + i,
 				sheetPosition: new Coord({ x: 0, y: i }),
