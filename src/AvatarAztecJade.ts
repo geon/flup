@@ -97,7 +97,7 @@ export class AvatarAztecJade extends Avatar {
 		});
 
 		const diskSizeFactor =
-			(1 + Math.sin(this.accumulatedDeltaTime / 1000 * 3)) / 2;
+			1 - (1 + Math.sin(this.accumulatedDeltaTime / 1000 * 3)) / 2 * 0.1;
 
 		sprites.gold.draw(
 			context,
