@@ -5,6 +5,13 @@ import { PieceCycle } from "./PieceCycle";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
 
 export class AvatarOwl extends Avatar {
+	accumulatedDeltaTime: number;
+
+	constructor() {
+		super();
+		this.accumulatedDeltaTime = 0;
+	}
+
 	static size: number = 256;
 	static sprites: SpriteSet;
 	static spriteSheet: SpriteSheet;
@@ -151,9 +158,12 @@ export class AvatarOwl extends Avatar {
 
 	draw(
 		context: CanvasRenderingContext2D,
-		_deltaTime: number,
+		deltaTime: number,
 		avatarCenter: Coord,
 	) {
+
+		this.accumulatedDeltaTime += deltaTime;
+
 		const sprites = AvatarOwl.getSprites();
 
 		const size = new Coord({
@@ -173,9 +183,12 @@ export class AvatarOwl extends Avatar {
 			size,
 		);
 
+		const bobFactor =
+			 Math.sin(this.accumulatedDeltaTime / 200);
+
 		sprites.head.draw(
 			context,
-			Coord.subtract(avatarCenter, Coord.scale(size, 0.5)),
+			Coord.add(new Coord({x:0, y: bobFactor * 2}), Coord.subtract(avatarCenter, Coord.scale(size, 0.5))),
 			size,
 		);
 	}
