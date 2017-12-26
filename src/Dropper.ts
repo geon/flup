@@ -120,25 +120,37 @@ export class Dropper {
 		const timePerPieceWidths = 50;
 
 		const pieces = this.dropperQueue.pop();
-		this.pieceA = pieces.a;
-		this.pieceB = pieces.b;
+		if (this.dropperQueue.dropperSide == "left") {
+			this.pieceA = pieces.b;
+			this.pieceB = pieces.a;
+		} else {
+			this.pieceA = pieces.a;
+			this.pieceB = pieces.b;
+		}
 
 		// A needs to wait just beside the queue until B is ready.
 		this.pieceA.animationQueue.add(
 			new Animation({
-				to: new Coord({ x: Board.size.x - 1, y: 0 }),
+				to: new Coord({
+					x: this.dropperQueue.dropperSide == "left" ? 0 : Board.size.x - 1,
+					y: 0,
+				}),
 				duration: DropperQueue.dropperQueueTimePerPieceWidth,
 				interpolation: "sine",
 				delay: 0,
 			}),
 		);
 
+		const duration =
+			this.dropperQueue.dropperSide == "left"
+				? (coords.b.x - Board.size.x) * timePerPieceWidths
+				: (Board.size.x - coords.b.x) * timePerPieceWidths;
 		if (this.orientation && this.position < Board.size.x - 1) {
 			// Make A go via B.
 			this.pieceA.animationQueue.add(
 				new Animation({
 					to: coords.b,
-					duration: (Board.size.x - coords.b.x) * timePerPieceWidths,
+					duration,
 					interpolation: "sine",
 					delay: 0,
 				}),
@@ -148,7 +160,7 @@ export class Dropper {
 			this.pieceB.animationQueue.add(
 				new Animation({
 					to: new Coord({ x: coords.b.x + 1, y: 0 }),
-					duration: (Board.size.x - coords.b.x) * timePerPieceWidths,
+					duration,
 					interpolation: "sine",
 					delay: 0,
 				}),

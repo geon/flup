@@ -9,9 +9,14 @@ export class DropperQueue {
 	pieces: Array<Piece>;
 
 	pieceCycle: PieceCycle;
+	dropperSide: "left" | "right";
 
-	constructor(options: { pieceCycle: PieceCycle }) {
+	constructor(
+		options: { pieceCycle: PieceCycle },
+		dropperSide: "left" | "right",
+	) {
 		this.pieceCycle = options.pieceCycle;
+		this.dropperSide = dropperSide;
 
 		this.pieces = [];
 		while (this.pieces.length < DropperQueue.dropperQueueVisibleLength) {
@@ -23,7 +28,7 @@ export class DropperQueue {
 					key: piece.key,
 					animationQueue: new AnimationQueue(
 						new Coord({
-							x: Board.size.x,
+							x: this.dropperSide == "left" ? -1 : Board.size.x,
 							y: this.pieces.length,
 						}),
 					),
@@ -55,7 +60,7 @@ export class DropperQueue {
 				key: piece.key,
 				animationQueue: new AnimationQueue(
 					new Coord({
-						x: Board.size.x,
+						x: this.dropperSide == "left" ? -1 : Board.size.x,
 						y: startYPos,
 					}),
 				),
@@ -69,7 +74,10 @@ export class DropperQueue {
 		for (let i = 0; i < this.pieces.length; i++) {
 			this.pieces[i].animationQueue.add(
 				new Animation({
-					to: new Coord({ x: Board.size.x, y: i }),
+					to: new Coord({
+						x: this.dropperSide == "left" ? -1 : Board.size.x,
+						y: i,
+					}),
 					duration: DropperQueue.dropperQueueTimePerPieceWidth,
 					interpolation: "sine",
 					delay: i * 5,

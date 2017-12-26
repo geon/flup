@@ -20,19 +20,24 @@ export class Board {
 	dropperQueue: DropperQueue;
 
 	dropper: Dropper;
-
 	gameOver: boolean;
-
 	slateRandomExp: number;
 
-	constructor(options: { gameMode: GameMode; pieceCycle: PieceCycle }) {
+	constructor(options: {
+		gameMode: GameMode;
+		pieceCycle: PieceCycle;
+		dropperSide: "left" | "right";
+	}) {
 		this.gameMode = options.gameMode;
 
 		this.pieces = [];
 		this.unlockedPieces = [];
 		this.unlockingEffects = [];
 		this.pieceCycle = options.pieceCycle;
-		this.dropperQueue = new DropperQueue({ pieceCycle: this.pieceCycle });
+		this.dropperQueue = new DropperQueue(
+			{ pieceCycle: this.pieceCycle },
+			options.dropperSide,
+		);
 		this.dropper = new Dropper(this.dropperQueue);
 		this.gameOver = false;
 		this.slateRandomExp = 2 + Math.random();

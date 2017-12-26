@@ -17,10 +17,12 @@ export class GameMode2pLocal implements GameMode {
 			new Board({
 				pieceCycle: new PieceCycle(pieceCycleTemplate),
 				gameMode: this,
+				dropperSide: "right",
 			}),
 			new Board({
 				pieceCycle: new PieceCycle(pieceCycleTemplate),
 				gameMode: this,
+				dropperSide: "left",
 			}),
 		];
 

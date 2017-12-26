@@ -12,7 +12,7 @@ export class GameMode1p implements GameMode {
 	constructor() {
 		const pieceCycle = new PieceCycle(PieceCycle.generate());
 
-		this.board = new Board({ pieceCycle, gameMode: this });
+		this.board = new Board({ pieceCycle, gameMode: this, dropperSide: "left" });
 		this.avatar = new AvatarOwl();
 	}
 
