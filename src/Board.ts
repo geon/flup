@@ -1,5 +1,4 @@
 import { Animation } from "./Animation";
-import { AnimationQueue } from "./AnimationQueue";
 import { App } from "./App";
 import { Avatar } from "./Avatar";
 import { Coord } from "./Coord";
@@ -348,13 +347,11 @@ export class Board {
 			const piece = new Piece({
 				color: row[x],
 				key: false,
-				animationQueue: new AnimationQueue(
-					new Coord({
-						x,
-						// Start the animation just outside the Board.
-						y: Board.size.y,
-					}),
-				),
+				position: new Coord({
+					x,
+					// Start the animation just outside the Board.
+					y: Board.size.y,
+				}),
 			});
 
 			this.pieces[Board.xyToIndex(x, Board.size.y - 1)] = piece;

@@ -1,13 +1,16 @@
 import { Animation } from "./Animation";
 import { Coord } from "./Coord";
+import { Piece } from "./Piece";
 
 export class AnimationQueue {
+	piece: Piece;
 	from: Coord;
 	animations: Array<Animation>;
 	timeSinceCurrentAnimationStart: number;
 
-	constructor(startPosition?: Coord) {
-		this.from = startPosition || new Coord({ x: 0, y: 0 });
+	constructor(piece: Piece) {
+		this.piece = piece;
+		this.from = this.piece.position;
 		this.animations = [];
 		this.timeSinceCurrentAnimationStart = 0;
 	}
@@ -40,8 +43,8 @@ export class AnimationQueue {
 		return lastAnimation ? lastAnimation.to : this.from;
 	}
 
-	// TODO: Remove. Make the piece store it's display position, and manipulate that instead.
-	getPosition(deltaTime: number) {
+	// TODO: Remove. Replace with generators.
+	setPosition(deltaTime: number) {
 		this.timeSinceCurrentAnimationStart += deltaTime;
 
 		let currentAnimation = this.animations[0];
@@ -66,14 +69,16 @@ export class AnimationQueue {
 			// Don't carry over delta time to the next animation getting queued up.
 			this.timeSinceCurrentAnimationStart = 0;
 
-			return this.from;
+			this.piece.position = this.from;
+			return;
 		}
 
 		// Interpolate.
 
 		// Might not be started yet.
 		if (this.timeSinceCurrentAnimationStart < currentAnimation.delay) {
-			return this.from;
+			this.piece.position = this.from;
+			return;
 		}
 
 		const progress = Animation.interpolators[currentAnimation.interpolation](
@@ -81,7 +86,7 @@ export class AnimationQueue {
 				currentAnimation.duration,
 		);
 
-		return Coord.add(
+		this.piece.position = Coord.add(
 			this.from.scaled(1 - progress),
 			currentAnimation.to.scaled(progress),
 		);

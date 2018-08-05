@@ -1,5 +1,4 @@
 import { Animation } from "./Animation";
-import { AnimationQueue } from "./AnimationQueue";
 import { Board } from "./Board";
 import { Coord } from "./Coord";
 import { Piece } from "./Piece";
@@ -26,12 +25,10 @@ export class DropperQueue {
 				new Piece({
 					color: piece.color,
 					key: piece.key,
-					animationQueue: new AnimationQueue(
-						new Coord({
-							x: this.dropperSide == "left" ? -1 : Board.size.x,
-							y: this.pieces.length,
-						}),
-					),
+					position: new Coord({
+						x: this.dropperSide == "left" ? -1 : Board.size.x,
+						y: this.pieces.length,
+					}),
 				}),
 			);
 		}
@@ -58,12 +55,10 @@ export class DropperQueue {
 			new Piece({
 				color: piece.color,
 				key: piece.key,
-				animationQueue: new AnimationQueue(
-					new Coord({
-						x: this.dropperSide == "left" ? -1 : Board.size.x,
-						y: startYPos,
-					}),
-				),
+				position: new Coord({
+					x: this.dropperSide == "left" ? -1 : Board.size.x,
+					y: startYPos,
+				}),
 			}),
 		);
 	}

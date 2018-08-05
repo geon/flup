@@ -1,4 +1,5 @@
 import { Piece } from "./Piece";
+import { Coord } from "./Coord";
 
 export class PieceCycle {
 	currentIndex: number;
@@ -25,8 +26,16 @@ export class PieceCycle {
 		const baseColors: Array<Piece> = [];
 		const keyColors: Array<Piece> = [];
 		for (let i = 0; i < this.numColors; ++i) {
-			baseColors[i] = new Piece({ color: i, key: false });
-			keyColors[i] = new Piece({ color: i, key: true });
+			baseColors[i] = new Piece({
+				color: i,
+				key: false,
+				position: new Coord({ x: 0, y: 0 }),
+			});
+			keyColors[i] = new Piece({
+				color: i,
+				key: true,
+				position: new Coord({ x: 0, y: 0 }),
+			});
 		}
 
 		// Create a list of all pieces in the proper ratios.

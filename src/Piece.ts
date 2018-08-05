@@ -6,18 +6,16 @@ import { SpriteSet, SpriteSheet } from "./SpriteSheet";
 export class Piece {
 	color: number;
 	key: boolean;
+	position: Coord;
 	animationQueue: AnimationQueue;
 	unlockEffectDelay: number;
 	accumulatedDeltaTime: number;
 
-	constructor(options: {
-		color: number;
-		key: boolean;
-		animationQueue?: AnimationQueue;
-	}) {
+	constructor(options: { color: number; key: boolean; position: Coord }) {
 		this.color = options.color;
 		this.key = options.key;
-		this.animationQueue = options.animationQueue || new AnimationQueue();
+		this.position = options.position;
+		this.animationQueue = new AnimationQueue(this);
 		this.unlockEffectDelay = 0;
 		this.accumulatedDeltaTime = 0;
 	}
@@ -80,7 +78,7 @@ export class Piece {
 	) {
 		this.accumulatedDeltaTime += deltaTime;
 
-		const position = this.animationQueue.getPosition(deltaTime);
+		this.animationQueue.setPosition(deltaTime);
 
 		const jitterX =
 			disturbance *
@@ -88,7 +86,9 @@ export class Piece {
 				boardScale *
 				0.05 *
 				Math.sin(
-					this.accumulatedDeltaTime / 1000 * 27 + position.x + position.y * 3,
+					this.accumulatedDeltaTime / 1000 * 27 +
+						this.position.x +
+						this.position.y * 3,
 				));
 		const jitterY =
 			disturbance *
@@ -96,7 +96,9 @@ export class Piece {
 				boardScale *
 				0.05 *
 				Math.sin(
-					this.accumulatedDeltaTime / 1000 * 21 + position.y + position.x * 2,
+					this.accumulatedDeltaTime / 1000 * 21 +
+						this.position.y +
+						this.position.x * 2,
 				));
 		const jitterZ =
 			disturbance *
@@ -104,7 +106,9 @@ export class Piece {
 				boardScale *
 				0.1 *
 				Math.sin(
-					this.accumulatedDeltaTime / 1000 * 13 + position.y + position.x * 5,
+					this.accumulatedDeltaTime / 1000 * 13 +
+						this.position.y +
+						this.position.x * 5,
 				));
 
 		Piece.getSprites()[(this.key ? "key" : "piece") + this.color].draw(
@@ -112,7 +116,7 @@ export class Piece {
 			new Coord({
 				x:
 					boardCenter.x +
-					(position.x / boardSize.x - 0.5) *
+					(this.position.x / boardSize.x - 0.5) *
 						boardSize.x *
 						Piece.size *
 						boardScale +
@@ -121,7 +125,7 @@ export class Piece {
 					jitterX,
 				y:
 					boardCenter.y +
-					(position.y / boardSize.y - 0.5) *
+					(this.position.y / boardSize.y - 0.5) *
 						boardSize.y *
 						Piece.size *
 						boardScale +
