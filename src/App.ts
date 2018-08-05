@@ -14,7 +14,7 @@ export class App {
 
 	lastRenderTime: number;
 
-	slateSpriteSheet: SpriteSheet;
+	// slateSpriteSheet: SpriteSheet;
 
 	keydownEventInProgress: number | undefined;
 
