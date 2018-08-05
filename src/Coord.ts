@@ -43,4 +43,8 @@ export class Coord {
 			y: coord.y * factor,
 		});
 	}
+
+	static interpolate(from: Coord, to: Coord, factor: number) {
+		return Coord.add(Coord.scale(from, 1 - factor), Coord.scale(to, factor));
+	}
 }

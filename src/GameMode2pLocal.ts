@@ -9,6 +9,7 @@ import { PieceCycle } from "./PieceCycle";
 export class GameMode2pLocal implements GameMode {
 	boards: Array<Board>;
 	avatars: Array<Avatar>;
+	frameCoroutine: IterableIterator<void>;
 
 	constructor() {
 		const pieceCycleTemplate = PieceCycle.generate();
@@ -27,6 +28,8 @@ export class GameMode2pLocal implements GameMode {
 		];
 
 		this.avatars = [new AvatarOwl(), new AvatarAztecJade()];
+
+		this.frameCoroutine = this.makeFrameCoroutine();
 	}
 
 	onUnlockedChains(board: Board) {
@@ -84,6 +87,17 @@ export class GameMode2pLocal implements GameMode {
 			case "S".charCodeAt(0): // Down
 				this.boards[0].dropper.drop(this.boards[0]);
 				break;
+		}
+	}
+
+	*makeFrameCoroutine(): IterableIterator<void> {
+		// Run board coroutines concurrently.
+		for (;;) {
+			const deltaTime: number = yield;
+
+			this.boards
+				.map(board => board.frameCoroutine)
+				.forEach(coroutine => coroutine.next(deltaTime));
 		}
 	}
 

@@ -14,8 +14,6 @@ export class App {
 
 	lastRenderTime: number;
 
-	// slateSpriteSheet: SpriteSheet;
-
 	keydownEventInProgress: number | undefined;
 
 	constructor(options: { context: CanvasRenderingContext2D }) {
@@ -138,38 +136,42 @@ export class App {
 		await this.loadSprites();
 
 		// Set up the renderer.
-		this.startRenderLoop();
+		await this.startRenderLoop();
 	}
 
-	startRenderLoop() {
-		const requestAnimFrame: (
-			callback: (currentTime: number) => void,
-		) => void = (() => {
-			return (
-				window.requestAnimationFrame ||
-				(window as any).webkitRequestAnimationFrame ||
-				(window as any).mozRequestAnimationFrame ||
-				(window as any).oRequestAnimationFrame ||
-				(window as any).msRequestAnimationFrame ||
-				(callback => {
-					window.setTimeout(callback, 1000 / 60, new Date().getTime());
-				})
-			);
-		})();
+	async startRenderLoop() {
+		const requestAnimFrame = () =>
+			new Promise<number>(resolve => {
+				(window.requestAnimationFrame ||
+					(window as any).webkitRequestAnimationFrame ||
+					(window as any).mozRequestAnimationFrame ||
+					(window as any).oRequestAnimationFrame ||
+					(window as any).msRequestAnimationFrame ||
+					(callback => {
+						window.setTimeout(callback, 1000 / 60, new Date().getTime());
+					}))(resolve);
+			});
 
 		// Start the loop.
-		const loop = (currentTime: number) => {
-			this.render(currentTime);
-			requestAnimFrame(loop);
-		};
-		requestAnimFrame(loop);
+		for (;;) {
+			const currentTime = await requestAnimFrame();
+
+			// Calculate delta time. Cap it to make debugging easier.
+			const deltaTime = Math.min(currentTime - this.lastRenderTime, 100);
+			this.lastRenderTime = currentTime;
+
+			const done = this.gameMode.frameCoroutine.next(deltaTime).done;
+			this.render(deltaTime);
+
+			// Restart the game after game over.
+			if (done) {
+				// TODO
+				console.log("Game Over");
+			}
+		}
 	}
 
-	render(currentTime: number) {
-		// Calculate delta time. Cap it to make debugging easier.
-		const deltaTime = Math.min(currentTime - this.lastRenderTime, 100);
-		this.lastRenderTime = currentTime;
-
+	render(deltaTime: number) {
 		// Draw the board background.
 		this.context.fillStyle = "rgba(0, 0, 0, 1)";
 		this.context.fillRect(0, 0, this.getWidth(), this.getHeight());

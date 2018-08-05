@@ -10,7 +10,8 @@ export class UnlockingEffect {
 
 	constructor(piece: Piece) {
 		this.color = piece.color;
-		this.coord = piece.animationQueue.getLastTo();
+		// TODO: Fix syncing.
+		this.coord = piece.position; //piece.animationQueue.getLastTo();
 		this.accumulatedDeltaTime = 0;
 
 		this.initialVelocities = [];

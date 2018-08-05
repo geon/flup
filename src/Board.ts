@@ -1,4 +1,4 @@
-import { Animation } from "./Animation";
+import { easings } from "./Animation";
 import { App } from "./App";
 import { Avatar } from "./Avatar";
 import { Coord } from "./Coord";
@@ -11,6 +11,7 @@ import { UnlockingEffect } from "./UnlockingEffect";
 
 export class Board {
 	gameMode: GameMode;
+	frameCoroutine: IterableIterator<void>;
 
 	pieces: Array<Piece | undefined>;
 	unlockedPieces: Array<Piece>;
@@ -28,6 +29,7 @@ export class Board {
 		dropperSide: "left" | "right";
 	}) {
 		this.gameMode = options.gameMode;
+		this.frameCoroutine = this.makeFrameCoroutine();
 
 		this.pieces = [];
 		this.unlockedPieces = [];
@@ -142,14 +144,12 @@ export class Board {
 
 				// Animate it.
 				const timePerPieceHeight = 100;
-				piece.animationQueue.add(
-					new Animation({
-						to: new Coord({ x, y: yPut }),
-						delay: delay + numConsecutive * 50 - piece.animationQueue.length(),
-						duration: Math.sqrt(yPut - yGet) * timePerPieceHeight,
-						interpolation: "easeInQuad",
-					}),
-				);
+				piece.move({
+					to: new Coord({ x, y: yPut }),
+					delay: delay + numConsecutive * 50, //- piece.animationQueue.length(),
+					duration: Math.sqrt(yPut - yGet) * timePerPieceHeight,
+					easing: easings.easeInQuad,
+				});
 				++numConsecutive;
 
 				// Raise the put/put-positions.
@@ -204,17 +204,18 @@ export class Board {
 
 	// TODO: Remove. Use explicit animation syncin with parallel and queue instead.
 	maxAnimationLength() {
-		// Must also check the unlocked pieces waiting for the unlocking effect.
-		const allPieces = this.pieces
-			.concat(this.unlockedPieces)
-			.filter(x => !!x)
-			.map(x => x!);
+		return 2000;
+		// // Must also check the unlocked pieces waiting for the unlocking effect.
+		// const allPieces = this.pieces
+		// 	.concat(this.unlockedPieces)
+		// 	.filter(x => !!x)
+		// 	.map(x => x!);
 
-		return allPieces
-			.map(piece => piece && piece.animationQueue.length())
-			.reduce((soFar, next) => {
-				return next ? Math.max(soFar, next) : soFar;
-			}, 0);
+		// return allPieces
+		// 	.map(piece => piece && piece.animationQueue.length())
+		// 	.reduce((soFar, next) => {
+		// 		return next ? Math.max(soFar, next) : soFar;
+		// 	}, 0);
 	}
 
 	unLockChainRecursively(position: number, unlockEffectDelay: number) {
@@ -361,14 +362,12 @@ export class Board {
 		for (let i = 0; i < this.pieces.length; i++) {
 			const piece = this.pieces[i];
 			if (piece) {
-				piece.animationQueue.add(
-					new Animation({
-						to: Board.indexToCoord(i),
-						duration: DropperQueue.dropperQueueTimePerPieceWidth,
-						interpolation: "sine",
-						delay: punishmentAnimationDelay,
-					}),
-				);
+				piece.move({
+					to: Board.indexToCoord(i),
+					duration: DropperQueue.dropperQueueTimePerPieceWidth,
+					easing: easings.sine,
+					delay: punishmentAnimationDelay,
+				});
 			}
 		}
 
@@ -377,6 +376,24 @@ export class Board {
 
 		// The pieces might have risen too high.
 		this.checkForGameOver();
+	}
+
+	*makeFrameCoroutine(): IterableIterator<void> {
+		// Run pieces coroutines concurrently.
+		for (;;) {
+			const deltaTime: number = yield;
+
+			[
+				...this.pieces,
+				...this.unlockedPieces,
+				...this.dropperQueue.pieces,
+				this.dropper.pieceA,
+				this.dropper.pieceB,
+			]
+				.filter((piece): piece is Piece => !!piece)
+				.map(piece => piece.frameCoroutine)
+				.forEach(coroutine => coroutine.next(deltaTime));
+		}
 	}
 
 	draw(

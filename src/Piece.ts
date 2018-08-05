@@ -1,13 +1,14 @@
-import { AnimationQueue } from "./AnimationQueue";
 import { Coord } from "./Coord";
 import { PieceCycle } from "./PieceCycle";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
+import { animateInterpolation, queue, waitMs } from "./Animation";
 
 export class Piece {
 	color: number;
 	key: boolean;
 	position: Coord;
-	animationQueue: AnimationQueue;
+	frameCoroutine: IterableIterator<void>;
+	animationCoroutine?: IterableIterator<void>;
 	unlockEffectDelay: number;
 	accumulatedDeltaTime: number;
 
@@ -15,9 +16,9 @@ export class Piece {
 		this.color = options.color;
 		this.key = options.key;
 		this.position = options.position;
-		this.animationQueue = new AnimationQueue(this);
 		this.unlockEffectDelay = 0;
 		this.accumulatedDeltaTime = 0;
+		this.frameCoroutine = this.makeFrameCoroutine();
 	}
 
 	static size = 32;
@@ -68,6 +69,51 @@ export class Piece {
 		};
 	}
 
+	*makeFrameCoroutine(): IterableIterator<void> {
+		// I would just `yield*`, but `animationCoroutine` may be replaced at any frame.
+		for (;;) {
+			const deltaTime: number = yield;
+
+			if (this.animationCoroutine) {
+				const done = this.animationCoroutine.next(deltaTime).done;
+				if (done) {
+					this.animationCoroutine = undefined;
+				}
+			}
+		}
+	}
+
+	queueUpAnimation(newPart: IterableIterator<void>) {
+		this.animationCoroutine = this.animationCoroutine
+			? queue([this.animationCoroutine, newPart])
+			: newPart;
+	}
+
+	*makeMoveCoroutine(
+		position: Coord,
+		duration: number,
+		easing: (t: number) => number,
+	): IterableIterator<void> {
+		const from = this.position;
+		const to = position;
+
+		yield* animateInterpolation(duration, timeFactor => {
+			this.position = Coord.interpolate(from, to, easing(timeFactor));
+		});
+	}
+
+	move(options: {
+		to: Coord;
+		duration: number;
+		easing: (t: number) => number;
+		delay: number;
+	}) {
+		this.queueUpAnimation(waitMs(options.delay));
+		this.queueUpAnimation(
+			this.makeMoveCoroutine(options.to, options.duration, options.easing),
+		);
+	}
+
 	draw(
 		context: CanvasRenderingContext2D,
 		deltaTime: number,
@@ -77,8 +123,6 @@ export class Piece {
 		boardSize: Coord,
 	) {
 		this.accumulatedDeltaTime += deltaTime;
-
-		this.animationQueue.setPosition(deltaTime);
 
 		const jitterX =
 			disturbance *

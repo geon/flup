@@ -1,4 +1,4 @@
-import { Animation } from "./Animation";
+import { easings } from "./Animation";
 import { Board } from "./Board";
 import { Coord } from "./Coord";
 import { Piece } from "./Piece";
@@ -67,17 +67,15 @@ export class DropperQueue {
 		const piece = this.pieces.shift();
 
 		for (let i = 0; i < this.pieces.length; i++) {
-			this.pieces[i].animationQueue.add(
-				new Animation({
-					to: new Coord({
-						x: this.dropperSide == "left" ? -1 : Board.size.x,
-						y: i,
-					}),
-					duration: DropperQueue.dropperQueueTimePerPieceWidth,
-					interpolation: "sine",
-					delay: i * 5,
+			this.pieces[i].move({
+				to: new Coord({
+					x: this.dropperSide == "left" ? -1 : Board.size.x,
+					y: i,
 				}),
-			);
+				duration: DropperQueue.dropperQueueTimePerPieceWidth,
+				easing: easings.sine,
+				delay: i * 5,
+			});
 		}
 
 		return piece;

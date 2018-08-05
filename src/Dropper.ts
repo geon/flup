@@ -1,8 +1,8 @@
-import { Animation } from "./Animation";
 import { Board } from "./Board";
 import { Coord } from "./Coord";
 import { DropperQueue } from "./DropperQueue";
 import { Piece } from "./Piece";
+import { easings } from "./Animation";
 
 export class Dropper {
 	dropperQueue: DropperQueue;
@@ -18,6 +18,10 @@ export class Dropper {
 
 		this.position = Math.floor((Board.size.x - 1) / 2);
 		this.orientation = 0;
+
+		const { a, b } = this.dropperQueue.pop();
+		this.pieceA = a;
+		this.pieceB = b;
 
 		this.charge();
 	}
@@ -129,17 +133,15 @@ export class Dropper {
 		}
 
 		// A needs to wait just beside the queue until B is ready.
-		this.pieceA.animationQueue.add(
-			new Animation({
-				to: new Coord({
-					x: this.dropperQueue.dropperSide == "left" ? 0 : Board.size.x - 1,
-					y: 0,
-				}),
-				duration: DropperQueue.dropperQueueTimePerPieceWidth,
-				interpolation: "sine",
-				delay: 0,
+		this.pieceA.move({
+			to: new Coord({
+				x: this.dropperQueue.dropperSide == "left" ? 0 : Board.size.x - 1,
+				y: 0,
 			}),
-		);
+			duration: DropperQueue.dropperQueueTimePerPieceWidth,
+			easing: easings.sine,
+			delay: 0,
+		});
 
 		const duration =
 			this.dropperQueue.dropperSide == "left"
@@ -147,47 +149,38 @@ export class Dropper {
 				: (Board.size.x - coords.b.x) * timePerPieceWidths;
 		if (this.orientation && this.position < Board.size.x - 1) {
 			// Make A go via B.
-			this.pieceA.animationQueue.add(
-				new Animation({
-					to: coords.b,
-					duration,
-					interpolation: "sine",
-					delay: 0,
-				}),
-			);
+			this.pieceA.move({
+				to: coords.b,
+				duration,
+				easing: easings.sine,
+				delay: 0,
+			});
 
 			// Make B stop next to A.
-			this.pieceB.animationQueue.add(
-				new Animation({
-					to: new Coord({ x: coords.b.x + 1, y: 0 }),
-					duration,
-					interpolation: "sine",
-					delay: 0,
-				}),
-			);
+			this.pieceB.move({
+				to: new Coord({ x: coords.b.x + 1, y: 0 }),
+				duration,
+				easing: easings.sine,
+				delay: 0,
+			});
 		}
 
 		// Move to final positions.
-		this.pieceA.animationQueue.add(
-			new Animation({
-				to: coords.a,
-				duration:
-					Coord.distance(this.pieceA.animationQueue.getLastTo(), coords.a) *
-					timePerPieceWidths,
-				interpolation: "sine",
-				delay: 0,
-			}),
-		);
-		this.pieceB.animationQueue.add(
-			new Animation({
-				to: coords.b,
-				duration:
-					Coord.distance(this.pieceB.animationQueue.getLastTo(), coords.b) *
-					timePerPieceWidths,
-				interpolation: "sine",
-				delay: 0,
-			}),
-		);
+		this.pieceA.move({
+			to: coords.a,
+			// TODO: Fix syncing.
+			duration: 1000, // Coord.distance(this.pieceA.animationQueue.getLastTo(), coords.a) * timePerPieceWidths,
+			easing: easings.sine,
+			delay: 0,
+		});
+
+		this.pieceB.move({
+			to: coords.b,
+			// TODO: Fix syncing.
+			duration: 1000, // Coord.distance(this.pieceB.animationQueue.getLastTo(), coords.b) * timePerPieceWidths,
+			easing: easings.sine,
+			delay: 0,
+		});
 	}
 
 	private animate() {
@@ -195,22 +188,18 @@ export class Dropper {
 
 		const timePerPieceWidths = 50;
 
-		this.pieceA.animationQueue.add(
-			new Animation({
-				to: coords.a,
-				duration: timePerPieceWidths,
-				interpolation: "sine",
-				delay: 0,
-			}),
-		);
-		this.pieceB.animationQueue.add(
-			new Animation({
-				to: coords.b,
-				duration: timePerPieceWidths,
-				interpolation: "sine",
-				delay: 0,
-			}),
-		);
+		this.pieceA.move({
+			to: coords.a,
+			duration: timePerPieceWidths,
+			easing: easings.sine,
+			delay: 0,
+		});
+		this.pieceB.move({
+			to: coords.b,
+			duration: timePerPieceWidths,
+			easing: easings.sine,
+			delay: 0,
+		});
 	}
 
 	draw(

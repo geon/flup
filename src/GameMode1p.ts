@@ -8,12 +8,15 @@ import { PieceCycle } from "./PieceCycle";
 export class GameMode1p implements GameMode {
 	board: Board;
 	avatar: Avatar;
+	frameCoroutine: IterableIterator<void>;
 
 	constructor() {
 		const pieceCycle = new PieceCycle(PieceCycle.generate());
 
 		this.board = new Board({ pieceCycle, gameMode: this, dropperSide: "left" });
 		this.avatar = new AvatarOwl();
+
+		this.frameCoroutine = this.board.frameCoroutine;
 	}
 
 	onUnlockedChains(_board: Board) {
