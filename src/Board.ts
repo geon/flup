@@ -203,6 +203,7 @@ export class Board {
 		}
 	}
 
+	// TODO: Remove. Use explicit animation syncin with parallel and queue instead.
 	maxAnimationLength() {
 		// Must also check the unlocked pieces waiting for the unlocking effect.
 		const allPieces = this.pieces

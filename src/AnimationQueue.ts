@@ -24,6 +24,7 @@ export class AnimationQueue {
 		return this.animations[this.animations.length - 1];
 	}
 
+	// TODO: Remove. It is used for syncing animatuons. Use explicit primitives like parallel and queue instead.
 	length() {
 		return this.animations.length
 			? this.animations
@@ -32,12 +33,14 @@ export class AnimationQueue {
 			: 0;
 	}
 
+	// TODO: Remove. Make the last animation step take a speed instead of duration.
 	getLastTo() {
 		const lastAnimation = this.getLast();
 
 		return lastAnimation ? lastAnimation.to : this.from;
 	}
 
+	// TODO: Remove. Make the piece store it's display position, and manipulate that instead.
 	getPosition(deltaTime: number) {
 		this.timeSinceCurrentAnimationStart += deltaTime;
 
