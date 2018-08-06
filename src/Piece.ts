@@ -89,13 +89,16 @@ export class Piece {
 			: newPart;
 	}
 
-	*makeMoveCoroutine(
-		position: Coord,
-		duration: number,
-		easing: (t: number) => number,
-	): IterableIterator<void> {
+	*makeMoveCoroutine({
+		to,
+		duration,
+		easing,
+	}: {
+		to: Coord;
+		duration: number;
+		easing: (t: number) => number;
+	}): IterableIterator<void> {
 		const from = this.position;
-		const to = position;
 
 		yield* animateInterpolation(duration, timeFactor => {
 			this.position = Coord.interpolate(from, to, easing(timeFactor));
@@ -109,9 +112,7 @@ export class Piece {
 		delay: number;
 	}) {
 		this.queueUpAnimation(waitMs(options.delay));
-		this.queueUpAnimation(
-			this.makeMoveCoroutine(options.to, options.duration, options.easing),
-		);
+		this.queueUpAnimation(this.makeMoveCoroutine(options));
 	}
 
 	draw(
