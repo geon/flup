@@ -1,4 +1,4 @@
-import { easings } from "./Animation";
+import { easings, waitMs, queue, parallel } from "./Animation";
 import { App } from "./App";
 import { Avatar } from "./Avatar";
 import { Coord } from "./Coord";
@@ -100,14 +100,21 @@ export class Board {
 				const moves = this.makePiecesFall();
 
 				const timePerPieceHeight = 100;
-				for (const move of moves) {
-					move.piece.move({
-						to: new Coord({ x: move.from.x, y: move.from.y + move.distance }),
-						delay: move.numConsecutive * 50, //- piece.animationQueue.length(),
-						duration: Math.sqrt(move.distance) * timePerPieceHeight,
-						easing: easings.easeInQuad,
-					});
-				}
+				yield* parallel(
+					moves.map(move =>
+						queue([
+							waitMs(move.numConsecutive * 50),
+							move.piece.makeMoveCoroutine({
+								to: new Coord({
+									x: move.from.x,
+									y: move.from.y + move.distance,
+								}),
+								duration: Math.sqrt(move.distance) * timePerPieceHeight,
+								easing: easings.easeInQuad,
+							}),
+						]),
+					),
+				);
 
 				foundChains = this.unlockChains();
 				if (foundChains) {
