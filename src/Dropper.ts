@@ -79,8 +79,6 @@ export class Dropper {
 		board.pieces[aPos] = this.pieceA;
 		board.pieces[bPos] = this.pieceB;
 
-		board.applyGameLogic();
-
 		if (!board.gameOver) {
 			this.charge();
 		}

@@ -83,10 +83,26 @@ export class Board {
 		return (Board.size.y + 2) * Piece.size;
 	}
 
-	applyGameLogic() {
-		this.makePiecesFall(0);
-		this.unlockChains();
-		this.checkForGameOver();
+	*makeGameLogicCoroutine(): IterableIterator<void> {
+		for (;;) {
+			yield;
+
+			let foundChains = true;
+
+			while (foundChains) {
+				this.makePiecesFall(0);
+				foundChains = this.unlockChains();
+				if (foundChains) {
+					// The player scored, so punish opponents.
+					this.gameMode.onUnlockedChains(this);
+				}
+			}
+
+			const gameOver = this.checkForGameOver();
+			if (gameOver) {
+				break;
+			}
+		}
 	}
 
 	makePiecesFall(delay: number) {
@@ -190,16 +206,7 @@ export class Board {
 			}
 		}
 
-		if (foundChains) {
-			// Fill up the gaps left by the chains, right after the unlocking effect is finished.
-			this.makePiecesFall(this.maxAnimationLength() + maxUnlockEffectDuration);
-
-			// New chains might have formed.
-			this.unlockChains();
-
-			// The player scored, so punish opponents.
-			this.gameMode.onUnlockedChains(this);
-		}
+		return foundChains;
 	}
 
 	// TODO: Remove. Use explicit animation syncin with parallel and queue instead.
@@ -370,14 +377,19 @@ export class Board {
 				});
 			}
 		}
-
-		this.applyGameLogic();
 	}
 
 	*makeFrameCoroutine(): IterableIterator<void> {
+		const gameLogicCoroutine = this.makeGameLogicCoroutine();
+
 		// Run pieces coroutines concurrently.
 		for (;;) {
 			const deltaTime: number = yield;
+
+			const done = gameLogicCoroutine.next(deltaTime).done;
+			if (done) {
+				break;
+			}
 
 			[
 				...this.pieces,
