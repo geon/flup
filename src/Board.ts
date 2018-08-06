@@ -9,6 +9,13 @@ import { Piece } from "./Piece";
 import { PieceCycle } from "./PieceCycle";
 import { UnlockingEffect } from "./UnlockingEffect";
 
+interface FallMove {
+	piece: Piece;
+	from: Coord;
+	distance: number;
+	numConsecutive: number;
+}
+
 export class Board {
 	gameMode: GameMode;
 	frameCoroutine: IterableIterator<void>;
@@ -90,7 +97,18 @@ export class Board {
 			let foundChains = true;
 
 			while (foundChains) {
-				this.makePiecesFall(0);
+				const moves = this.makePiecesFall();
+
+				const timePerPieceHeight = 100;
+				for (const move of moves) {
+					move.piece.move({
+						to: new Coord({ x: move.from.x, y: move.from.y + move.distance }),
+						delay: move.numConsecutive * 50, //- piece.animationQueue.length(),
+						duration: Math.sqrt(move.distance) * timePerPieceHeight,
+						easing: easings.easeInQuad,
+					});
+				}
+
 				foundChains = this.unlockChains();
 				if (foundChains) {
 					// The player scored, so punish opponents.
@@ -105,7 +123,7 @@ export class Board {
 		}
 	}
 
-	makePiecesFall(delay: number) {
+	makePiecesFall(): ReadonlyArray<FallMove> {
 		/*
 
 		This might seem like an awful lot of code for something as simple as
@@ -122,6 +140,8 @@ export class Board {
 		If you have a better solution, I'm happy to see it.
 
 		*/
+
+		const moves: Array<FallMove> = [];
 
 		// For each collumn.
 		for (let x = 0; x < Board.size.x; ++x) {
@@ -158,13 +178,12 @@ export class Board {
 				this.pieces[getPos] = undefined;
 				const piece = this.pieces[putPos]!;
 
-				// Animate it.
-				const timePerPieceHeight = 100;
-				piece.move({
-					to: new Coord({ x, y: yPut }),
-					delay: delay + numConsecutive * 50, //- piece.animationQueue.length(),
-					duration: Math.sqrt(yPut - yGet) * timePerPieceHeight,
-					easing: easings.easeInQuad,
+				// Record moves.
+				moves.push({
+					piece,
+					from: Board.indexToCoord(getPos),
+					distance: yPut - yGet,
+					numConsecutive,
 				});
 				++numConsecutive;
 
@@ -173,6 +192,8 @@ export class Board {
 				--yPut;
 			}
 		}
+
+		return moves;
 	}
 
 	unlockChains() {
