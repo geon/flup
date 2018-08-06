@@ -371,11 +371,7 @@ export class Board {
 			}
 		}
 
-		// New chains might thave formed.
-		this.unlockChains();
-
-		// The pieces might have risen too high.
-		this.checkForGameOver();
+		this.applyGameLogic();
 	}
 
 	*makeFrameCoroutine(): IterableIterator<void> {
