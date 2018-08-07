@@ -161,6 +161,7 @@ export class App {
 			this.lastRenderTime = currentTime;
 
 			const done = this.gameMode.frameCoroutine.next(deltaTime).done;
+			// TODO: Remove deltatime from rendering.
 			this.render(deltaTime);
 
 			// Restart the game after game over.
