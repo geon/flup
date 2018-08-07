@@ -1,6 +1,7 @@
 import { Coord } from "./Coord";
 import { Piece } from "./Piece";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
+import { waitMs } from "./Animation";
 
 export class UnlockingEffect {
 	color: number;
@@ -76,8 +77,8 @@ export class UnlockingEffect {
 		};
 	};
 
-	isDone() {
-		return this.accumulatedDeltaTime > UnlockingEffect.duration;
+	*makeFrameCoroutine() {
+		yield* waitMs(UnlockingEffect.duration);
 	}
 
 	draw(

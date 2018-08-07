@@ -1,4 +1,4 @@
-import { easings, waitMs, queue, parallel } from "./Animation";
+import { easings, waitMs, queue, parallel, makeIterable } from "./Animation";
 import { App } from "./App";
 import { Avatar } from "./Avatar";
 import { Coord } from "./Coord";
@@ -21,7 +21,6 @@ export class Board {
 	frameCoroutine: IterableIterator<void>;
 
 	pieces: Array<Piece | undefined>;
-	unlockedPieces: Array<Piece>;
 	unlockingEffects: Array<UnlockingEffect>;
 	pieceCycle: PieceCycle;
 	dropperQueue: DropperQueue;
@@ -39,7 +38,6 @@ export class Board {
 		this.frameCoroutine = this.makeFrameCoroutine();
 
 		this.pieces = [];
-		this.unlockedPieces = [];
 		this.unlockingEffects = [];
 		this.pieceCycle = options.pieceCycle;
 		this.dropperQueue = new DropperQueue(
@@ -116,7 +114,26 @@ export class Board {
 					),
 				);
 
-				foundChains = this.unlockChains();
+				const unlockedPieces = this.unlockChains();
+				foundChains = !!unlockedPieces.length;
+
+				yield* parallel(
+					unlockedPieces.map((piece, i) => {
+						const unlockingEffect = new UnlockingEffect(piece);
+						this.unlockingEffects.push(unlockingEffect);
+						const unlockingEffectCoroutine = unlockingEffect.makeFrameCoroutine();
+						return queue([
+							waitMs(i * 50),
+							unlockingEffectCoroutine,
+							makeIterable(() => {
+								// Remove the unlockingEffect.
+								const index = this.unlockingEffects.indexOf(unlockingEffect);
+								this.unlockingEffects.splice(index, 1);
+							}),
+						]);
+					}),
+				);
+
 				if (foundChains) {
 					// The player scored, so punish opponents.
 					this.gameMode.onUnlockedChains(this);
@@ -125,6 +142,8 @@ export class Board {
 
 			const gameOver = this.checkForGameOver();
 			if (gameOver) {
+				yield* this.startGameOverEffect();
+
 				break;
 			}
 		}
@@ -203,38 +222,19 @@ export class Board {
 		return moves;
 	}
 
-	unlockChains() {
-		let foundChains = false;
-		let maxUnlockEffectDuration = 0;
-		for (let i = this.pieces.length - 1; i >= 0; i--) {
-			const piece = this.pieces[i];
-
-			// Look for keys.
-			if (piece && piece.key) {
-				const matchingNeighborPositions = this.matchingNeighborsOfPosition(i);
-
-				// If there is at least one pair in the chain...
-				if (matchingNeighborPositions.length) {
-					foundChains = true;
-
-					// As soon as everything has stopped falling...
-					const unlockEffectDelay = this.maxAnimationLength();
-
-					// ...Start the unlocking effect.
-					const unlockEffectDuration = this.unLockChainRecursively(
-						i,
-						unlockEffectDelay,
-					);
-
-					maxUnlockEffectDuration = Math.max(
-						maxUnlockEffectDuration,
-						unlockEffectDuration,
-					);
-				}
-			}
-		}
-
-		return foundChains;
+	unlockChains(): Array<Piece> {
+		return this.pieces
+			.map((_piece, position) => position)
+			.filter(position => {
+				const piece = this.pieces[position];
+				return (
+					piece &&
+					piece.key &&
+					this.matchingNeighborsOfPosition(position).length
+				);
+			})
+			.map(position => this.unLockChainRecursively(position))
+			.reduce((soFar, current) => [...soFar, ...current], [] as Array<Piece>);
 	}
 
 	// TODO: Remove. Use explicit animation syncin with parallel and queue instead.
@@ -253,39 +253,32 @@ export class Board {
 		// 	}, 0);
 	}
 
-	unLockChainRecursively(position: number, unlockEffectDelay: number) {
+	unLockChainRecursively(position: number): Array<Piece> {
 		// Must search for neighbors before removing the piece matching against.
 		const matchingNeighborPositions = this.matchingNeighborsOfPosition(
 			position,
 		);
 
 		const unlockedPiece = this.pieces[position];
+		this.pieces[position] = undefined;
 
 		// Another branch of the chain might have reached here before.
 		if (!unlockedPiece) {
-			return 0;
+			return [];
 		}
 
-		// Move the piece from the play field to the queue of
-		// pieces waiting for the unlocking effect.
-		unlockedPiece.unlockEffectDelay = unlockEffectDelay;
-		this.unlockedPieces.push(unlockedPiece);
-		this.pieces[position] = undefined;
+		// For all matching neighbors, recurse.
+		const unlockedChainsFromNeighbors = matchingNeighborPositions.map(
+			neighborPosition => this.unLockChainRecursively(neighborPosition),
+		);
 
-		// For all matching neighbors...
-		const interUnlockEffectDelay = 25;
-		let longestChainDuration = 0;
-		for (let i = matchingNeighborPositions.length - 1; i >= 0; i--) {
-			// Recurse.
-			const chainDuration = this.unLockChainRecursively(
-				matchingNeighborPositions[i],
-				unlockEffectDelay + interUnlockEffectDelay,
-			);
-
-			longestChainDuration = Math.max(longestChainDuration, chainDuration);
-		}
-
-		return interUnlockEffectDelay + longestChainDuration;
+		return [
+			unlockedPiece,
+			...unlockedChainsFromNeighbors.reduce(
+				(soFar, current) => [...soFar, ...current],
+				[] as Array<Piece>,
+			),
+		];
 	}
 
 	matchingNeighborsOfPosition(position: number) {
@@ -337,31 +330,41 @@ export class Board {
 		for (let i = 0; i < Board.size.x * 2; i++) {
 			if (this.pieces[i]) {
 				this.gameOver = true;
-
-				this.startGameOverEffect();
-
+				return true;
 				break;
 			}
 		}
-
 		return false;
 	}
 
-	startGameOverEffect() {
-		const gameOverEffectDelay = this.maxAnimationLength();
-
-		// Unlock all pieces, from the center and out.
-		for (let i = 0; i < this.pieces.length; i++) {
-			const unlockedPiece = this.pieces[i];
-			if (unlockedPiece) {
-				unlockedPiece.unlockEffectDelay =
-					gameOverEffectDelay +
-					Coord.distance(Board.indexToCoord(i), Coord.scale(Board.size, 0.5)) *
-						Board.gameOverUnlockEffectDelayPerPieceWidth;
-				this.unlockedPieces.push(unlockedPiece);
-				this.pieces[i] = undefined;
-			}
-		}
+	*startGameOverEffect() {
+		yield* parallel(
+			this.pieces
+				.map((piece, position) => ({ piece: piece!, position }))
+				.filter(({ piece }) => !!piece)
+				.map(({ piece, position }) => {
+					const unlockingEffect = new UnlockingEffect(piece);
+					this.unlockingEffects.push(unlockingEffect);
+					const unlockingEffectCoroutine = unlockingEffect.makeFrameCoroutine();
+					return queue([
+						// Unlock all pieces, from the center and out.
+						waitMs(
+							Coord.distance(piece.position, Coord.scale(Board.size, 0.5)) *
+								Board.gameOverUnlockEffectDelayPerPieceWidth,
+						),
+						makeIterable(() => {
+							// Remove the piece.
+							this.pieces.splice(position, 1);
+						}),
+						unlockingEffectCoroutine,
+						makeIterable(() => {
+							// Remove the unlockingEffect.
+							const index = this.unlockingEffects.indexOf(unlockingEffect);
+							this.unlockingEffects.splice(index, 1);
+						}),
+					]);
+				}),
+		);
 	}
 
 	punish(avatar: Avatar) {
@@ -421,7 +424,6 @@ export class Board {
 
 			[
 				...this.pieces,
-				...this.unlockedPieces,
 				...this.dropperQueue.pieces,
 				this.dropper.pieceA,
 				this.dropper.pieceB,
@@ -485,49 +487,8 @@ export class Board {
 			ratio < cutOffPoint ? 0 : (ratio - cutOffPoint) / (1 - cutOffPoint);
 
 		// Draw the unlocking effects.
-		const doneUnlockingEffectIndices = [];
-		for (let i = this.unlockingEffects.length - 1; i >= 0; i--) {
-			if (!this.unlockingEffects[i].isDone()) {
-				this.unlockingEffects[i].draw(
-					context,
-					deltaTime,
-					center,
-					scale,
-					Board.size,
-				);
-			} else {
-				doneUnlockingEffectIndices.push(i);
-			}
-		}
-
-		// Remove the unlocking effects when they are done.
-		for (let i = doneUnlockingEffectIndices.length - 1; i >= 0; i--) {
-			this.unlockingEffects.splice(doneUnlockingEffectIndices[i], 1);
-		}
-
-		// Draw the unlocked pieces, queued for unlocking effects.
-		const donePieceIndices = [];
-		for (let i = 0, length = this.unlockedPieces.length; i < length; ++i) {
-			const piece = this.unlockedPieces[i];
-
-			if (piece.unlockEffectDelay > 0) {
-				// The piece should still be visible, so draw like normal.
-				piece.draw(context, deltaTime, center, scale, disturbance, Board.size);
-
-				// Count down.
-				piece.unlockEffectDelay -= deltaTime;
-			} else {
-				// Remove it from the unlocking queue.
-				donePieceIndices.push(i);
-
-				// Start the unlocking effects.
-				this.unlockingEffects.push(new UnlockingEffect(piece));
-			}
-		}
-
-		// Remove the unlocked pieces from the unlocking effect queue.
-		for (let i = donePieceIndices.length - 1; i >= 0; i--) {
-			this.unlockedPieces.splice(donePieceIndices[i], 1);
+		for (const unlockingEffect of this.unlockingEffects) {
+			unlockingEffect.draw(context, deltaTime, center, scale, Board.size);
 		}
 
 		// Draw the board pieces.

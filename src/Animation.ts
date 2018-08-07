@@ -48,6 +48,10 @@ export function* queue(
 	}
 }
 
+export function* makeIterable(callback: () => void): IterableIterator<void> {
+	callback();
+}
+
 export const easings = {
 	linear(progress: number) {
 		return progress;
