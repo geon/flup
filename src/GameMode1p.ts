@@ -36,19 +36,19 @@ export class GameMode1p implements GameMode {
 
 		switch ((event as KeyboardEvent).keyCode) {
 			case 37: // Left
-				this.board.dropper.moveLeft();
+				this.board.moveLeft();
 				break;
 
 			case 39: // Right
-				this.board.dropper.moveRight();
+				this.board.moveRight();
 				break;
 
 			case 38: // Up
-				this.board.dropper.rotate();
+				this.board.rotate();
 				break;
 
 			case 40: // Down
-				this.board.dropper.drop(this.board);
+				this.board.drop();
 				break;
 		}
 	}

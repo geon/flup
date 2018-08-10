@@ -166,6 +166,33 @@ export class Board {
 		}
 	}
 
+	moveLeft() {
+		this.dropper.moveLeft();
+	}
+
+	moveRight() {
+		this.dropper.moveRight();
+	}
+
+	rotate() {
+		this.dropper.rotate();
+	}
+
+	drop() {
+		const drops = this.dropper.getDrops();
+
+		// Make sure the board space is not used.
+		if (drops.some(drop => !!this.pieces[Board.coordToIndex(drop.coord)])) {
+		}
+
+		for (const drop of drops) {
+			// Add the pieces.
+			this.pieces[Board.coordToIndex(drop.coord)] = drop.piece;
+		}
+
+		this.dropper.charge();
+	}
+
 	makePiecesFall(): ReadonlyArray<FallMove> {
 		/*
 

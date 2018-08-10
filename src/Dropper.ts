@@ -57,24 +57,13 @@ export class Dropper {
 		}
 	}
 
-	drop(board: Board) {
+	getDrops() {
 		const coords = this.getCoordinates();
 
-		const aPos = Board.coordToIndex(coords.a);
-		const bPos = Board.coordToIndex(coords.b);
-
-		// Make sure the board space is not used.
-		if (board.pieces[aPos] || board.pieces[bPos]) {
-			return false;
-		}
-
-		// Add the pieces.
-		board.pieces[aPos] = this.pieceA;
-		board.pieces[bPos] = this.pieceB;
-
-		this.charge();
-
-		return true;
+		return [
+			{ coord: coords.a, piece: this.pieceA },
+			{ coord: coords.b, piece: this.pieceB },
+		];
 	}
 
 	private getCoordinates() {
@@ -96,7 +85,7 @@ export class Dropper {
 		};
 	}
 
-	private charge() {
+	charge() {
 		// Set the orientation back to horiz. or vert., but not backwards or upside-down.
 		// this.orientation %= 2;
 

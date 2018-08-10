@@ -58,36 +58,36 @@ export class GameMode2pLocal implements GameMode {
 		switch ((event as KeyboardEvent).keyCode) {
 			// Player 1.
 			case 37: // Left
-				this.boards[1].dropper.moveLeft();
+				this.boards[1].moveLeft();
 				break;
 
 			case 39: // Right
-				this.boards[1].dropper.moveRight();
+				this.boards[1].moveRight();
 				break;
 
 			case 38: // Up
-				this.boards[1].dropper.rotate();
+				this.boards[1].rotate();
 				break;
 
 			case 40: // Down
-				this.boards[1].dropper.drop(this.boards[1]);
+				this.boards[1].drop();
 				break;
 
 			// Player 2.
 			case "A".charCodeAt(0): // Left
-				this.boards[0].dropper.moveLeft();
+				this.boards[0].moveLeft();
 				break;
 
 			case "D".charCodeAt(0): // Right
-				this.boards[0].dropper.moveRight();
+				this.boards[0].moveRight();
 				break;
 
 			case "W".charCodeAt(0): // Up
-				this.boards[0].dropper.rotate();
+				this.boards[0].rotate();
 				break;
 
 			case "S".charCodeAt(0): // Down
-				this.boards[0].dropper.drop(this.boards[0]);
+				this.boards[0].drop();
 				break;
 		}
 	}
