@@ -5,6 +5,7 @@ import { Coord } from "./Coord";
 import { Dropper } from "./Dropper";
 import { DropperQueue } from "./DropperQueue";
 import { GameMode } from "./GameMode";
+import { Piece } from "./Piece";
 import { PieceSprite } from "./PieceSprite";
 import { PieceCycle } from "./PieceCycle";
 import { UnlockingEffect } from "./UnlockingEffect";
@@ -20,7 +21,9 @@ export class Board {
 	gameMode: GameMode;
 	frameCoroutine: IterableIterator<void>;
 
-	pieces: Array<PieceSprite | undefined>;
+	pieces: Array<Piece | undefined>;
+	piecesSprites: Set<PieceSprite>;
+
 	unlockingEffects: Array<UnlockingEffect>;
 	pieceCycle: PieceCycle;
 	dropperQueue: DropperQueue;
@@ -37,10 +40,12 @@ export class Board {
 		this.frameCoroutine = this.makeFrameCoroutine();
 
 		this.pieces = [];
+		this.piecesSprites = new Set();
+
 		this.unlockingEffects = [];
 		this.pieceCycle = options.pieceCycle;
 		this.dropperQueue = new DropperQueue(
-			{ pieceCycle: this.pieceCycle },
+			{ pieceCycle: this.pieceCycle, board: this },
 			options.dropperSide,
 		);
 		this.dropper = new Dropper(this.dropperQueue);
@@ -52,11 +57,18 @@ export class Board {
 		// ];
 		// for (var i = colors.length - 1; i >= 0; i--) {
 		// 	if (colors[i])
-		// 		this.pieces[i] = new Piece(colors[i]);
+		// 		this.pieces[i] = this.makePiece(colors[i]);
 		// };
 		// this.makePiecesFall(0);
-		// options.pieceCycle[0] = new Piece({color: 0, key:true});
-		// options.pieceCycle[1] = new Piece({color: 0, key:false});
+		// options.pieceCycle[0] = this.makePiece({color: 0, key:true});
+		// options.pieceCycle[1] = this.makePiece({color: 0, key:false});
+	}
+
+	makePiece(options: { color: number; key: boolean; position: Coord }) {
+		const sprite = new PieceSprite(options);
+		this.piecesSprites.add(sprite);
+		const piece: Piece = { color: options.color, key: options.key, sprite };
+		return piece;
 	}
 
 	static size: Coord = new Coord({ x: 8, y: 18 });
@@ -117,11 +129,18 @@ export class Board {
 
 				yield* parallel(
 					unlockedPieces.map((piece, i) => {
-						const unlockingEffect = new UnlockingEffect(piece);
+						const unlockingEffect = new UnlockingEffect(
+							piece.color,
+							piece.sprite.position,
+						);
 						this.unlockingEffects.push(unlockingEffect);
 						const unlockingEffectCoroutine = unlockingEffect.makeFrameCoroutine();
 						return queue([
 							waitMs(i * 50),
+							makeIterable(() => {
+								// Remove the graphical representation.
+								this.piecesSprites.delete(piece.sprite);
+							}),
 							unlockingEffectCoroutine,
 							makeIterable(() => {
 								// Remove the unlockingEffect.
@@ -204,7 +223,7 @@ export class Board {
 
 				// Record moves.
 				moves.push({
-					piece,
+					piece: piece.sprite,
 					from: Board.indexToCoord(getPos),
 					distance: yPut - yGet,
 					numConsecutive,
@@ -220,7 +239,7 @@ export class Board {
 		return moves;
 	}
 
-	unlockChains(): Array<PieceSprite> {
+	unlockChains(): Array<Piece> {
 		return this.pieces
 			.map((_piece, position) => position)
 			.filter(position => {
@@ -232,12 +251,10 @@ export class Board {
 				);
 			})
 			.map(position => this.unLockChainRecursively(position))
-			.reduce((soFar, current) => [...soFar, ...current], [] as Array<
-				PieceSprite
-			>);
+			.reduce((soFar, current) => [...soFar, ...current], [] as Array<Piece>);
 	}
 
-	unLockChainRecursively(position: number): Array<PieceSprite> {
+	unLockChainRecursively(position: number): Array<Piece> {
 		// Must search for neighbors before removing the piece matching against.
 		const matchingNeighborPositions = this.matchingNeighborsOfPosition(
 			position,
@@ -260,7 +277,7 @@ export class Board {
 			unlockedPiece,
 			...unlockedChainsFromNeighbors.reduce(
 				(soFar, current) => [...soFar, ...current],
-				[] as Array<PieceSprite>,
+				[] as Array<Piece>,
 			),
 		];
 	}
@@ -317,31 +334,33 @@ export class Board {
 
 	*startGameOverEffect() {
 		yield* parallel(
-			this.pieces
-				.map((piece, position) => ({ piece: piece!, position }))
-				.filter(({ piece }) => !!piece)
-				.map(({ piece, position }) => {
-					const unlockingEffect = new UnlockingEffect(piece);
-					this.unlockingEffects.push(unlockingEffect);
-					const unlockingEffectCoroutine = unlockingEffect.makeFrameCoroutine();
-					return queue([
-						// Unlock all pieces, from the center and out.
-						waitMs(
-							Coord.distance(piece.position, Coord.scale(Board.size, 0.5)) *
-								Board.gameOverUnlockEffectDelayPerPieceWidth,
-						),
-						makeIterable(() => {
-							// Remove the piece.
-							this.pieces.splice(position, 1);
-						}),
-						unlockingEffectCoroutine,
-						makeIterable(() => {
-							// Remove the unlockingEffect.
-							const index = this.unlockingEffects.indexOf(unlockingEffect);
-							this.unlockingEffects.splice(index, 1);
-						}),
-					]);
-				}),
+			this.pieces.filter((piece): piece is Piece => !!piece).map(piece => {
+				const unlockingEffect = new UnlockingEffect(
+					piece.color,
+					piece.sprite.position,
+				);
+				this.unlockingEffects.push(unlockingEffect);
+				const unlockingEffectCoroutine = unlockingEffect.makeFrameCoroutine();
+				return queue([
+					// Unlock all pieces, from the center and out.
+					waitMs(
+						Coord.distance(
+							piece.sprite.position,
+							Coord.scale(Board.size, 0.5),
+						) * Board.gameOverUnlockEffectDelayPerPieceWidth,
+					),
+					makeIterable(() => {
+						// Remove the graphical representation.
+						this.piecesSprites.delete(piece.sprite);
+					}),
+					unlockingEffectCoroutine,
+					makeIterable(() => {
+						// Remove the unlockingEffect.
+						const index = this.unlockingEffects.indexOf(unlockingEffect);
+						this.unlockingEffects.splice(index, 1);
+					}),
+				]);
+			}),
 		);
 	}
 
@@ -359,7 +378,7 @@ export class Board {
 		const row = avatar.getPunishColors();
 
 		for (let x = 0; x < row.length; x++) {
-			const piece = new PieceSprite({
+			const piece = this.makePiece({
 				color: row[x],
 				key: false,
 				position: new Coord({
@@ -376,7 +395,7 @@ export class Board {
 		for (let i = 0; i < this.pieces.length; i++) {
 			const piece = this.pieces[i];
 			if (piece) {
-				piece.move({
+				piece.sprite.move({
 					to: Board.indexToCoord(i),
 					duration: DropperQueue.dropperQueueTimePerPieceWidth,
 					easing: easings.sine,
@@ -398,15 +417,9 @@ export class Board {
 				break;
 			}
 
-			[
-				...this.pieces,
-				...this.dropperQueue.pieces,
-				this.dropper.pieceA,
-				this.dropper.pieceB,
-			]
-				.filter((piece): piece is PieceSprite => !!piece)
-				.map(piece => piece.frameCoroutine)
-				.forEach(coroutine => coroutine.next(deltaTime));
+			for (const sprite of this.piecesSprites) {
+				sprite.frameCoroutine.next(deltaTime);
+			}
 		}
 	}
 
@@ -467,18 +480,9 @@ export class Board {
 			unlockingEffect.draw(context, deltaTime, center, scale, Board.size);
 		}
 
-		// Draw the board pieces.
-		for (let i = 0, length = this.pieces.length; i < length; ++i) {
-			const piece = this.pieces[i];
-			if (piece !== undefined) {
-				piece.draw(context, deltaTime, center, scale, disturbance, Board.size);
-			}
+		// Draw all pieces.
+		for (const sprite of this.piecesSprites) {
+			sprite.draw(context, deltaTime, center, scale, disturbance, Board.size);
 		}
-
-		// Draw the dropper queue.
-		this.dropperQueue.draw(context, deltaTime, center, scale, Board.size);
-
-		// Draw the dropper pieces.
-		this.dropper.draw(context, deltaTime, center, scale, Board.size);
 	}
 }

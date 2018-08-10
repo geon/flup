@@ -1,14 +1,14 @@
 import { Board } from "./Board";
 import { Coord } from "./Coord";
 import { DropperQueue } from "./DropperQueue";
-import { PieceSprite } from "./PieceSprite";
+import { Piece } from "./Piece";
 import { easings } from "./Animation";
 
 export class Dropper {
 	dropperQueue: DropperQueue;
 
-	pieceA: PieceSprite;
-	pieceB: PieceSprite;
+	pieceA: Piece;
+	pieceB: Piece;
 
 	position: number;
 	orientation: number;
@@ -129,7 +129,7 @@ export class Dropper {
 		}
 
 		// A needs to wait just beside the queue until B is ready.
-		this.pieceA.move({
+		this.pieceA.sprite.move({
 			to: new Coord({
 				x: this.dropperQueue.dropperSide == "left" ? 0 : Board.size.x - 1,
 				y: 0,
@@ -145,7 +145,7 @@ export class Dropper {
 				: (Board.size.x - coords.b.x) * timePerPieceWidths;
 		if (this.orientation && this.position < Board.size.x - 1) {
 			// Make A go via B.
-			this.pieceA.move({
+			this.pieceA.sprite.move({
 				to: coords.b,
 				duration,
 				easing: easings.sine,
@@ -153,7 +153,7 @@ export class Dropper {
 			});
 
 			// Make B stop next to A.
-			this.pieceB.move({
+			this.pieceB.sprite.move({
 				to: new Coord({ x: coords.b.x + 1, y: 0 }),
 				duration,
 				easing: easings.sine,
@@ -162,7 +162,7 @@ export class Dropper {
 		}
 
 		// Move to final positions.
-		this.pieceA.move({
+		this.pieceA.sprite.move({
 			to: coords.a,
 			// TODO: Fix syncing.
 			duration: 1000, // Coord.distance(this.pieceA.animationQueue.getLastTo(), coords.a) * timePerPieceWidths,
@@ -170,7 +170,7 @@ export class Dropper {
 			delay: 0,
 		});
 
-		this.pieceB.move({
+		this.pieceB.sprite.move({
 			to: coords.b,
 			// TODO: Fix syncing.
 			duration: 1000, // Coord.distance(this.pieceB.animationQueue.getLastTo(), coords.b) * timePerPieceWidths,
@@ -184,29 +184,17 @@ export class Dropper {
 
 		const timePerPieceWidths = 50;
 
-		this.pieceA.move({
+		this.pieceA.sprite.move({
 			to: coords.a,
 			duration: timePerPieceWidths,
 			easing: easings.sine,
 			delay: 0,
 		});
-		this.pieceB.move({
+		this.pieceB.sprite.move({
 			to: coords.b,
 			duration: timePerPieceWidths,
 			easing: easings.sine,
 			delay: 0,
 		});
-	}
-
-	draw(
-		context: CanvasRenderingContext2D,
-		deltaTime: number,
-		center: Coord,
-		scale: number,
-		boardSize: Coord,
-	) {
-		// Draw the dropper pieces.
-		this.pieceA.draw(context, deltaTime, center, scale, 0, boardSize);
-		this.pieceB.draw(context, deltaTime, center, scale, 0, boardSize);
 	}
 }

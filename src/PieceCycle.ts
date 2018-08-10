@@ -1,10 +1,10 @@
-import { Piece } from "./Piece";
+import { InvisiblePiece } from "./Piece";
 
 export class PieceCycle {
 	currentIndex: number;
-	pieces: Array<Piece>;
+	pieces: Array<InvisiblePiece>;
 
-	constructor(pieces: Array<Piece>) {
+	constructor(pieces: Array<InvisiblePiece>) {
 		this.currentIndex = 0;
 		this.pieces = pieces;
 	}
@@ -22,8 +22,8 @@ export class PieceCycle {
 
 	static generate() {
 		// Create list of all colors.
-		const baseColors: Array<Piece> = [];
-		const keyColors: Array<Piece> = [];
+		const baseColors: Array<InvisiblePiece> = [];
+		const keyColors: Array<InvisiblePiece> = [];
 		for (let i = 0; i < this.numColors; ++i) {
 			baseColors[i] = {
 				color: i,
@@ -42,7 +42,7 @@ export class PieceCycle {
 		}
 
 		// Repeat the colors so there is a long cycle.
-		let pieces: Array<Piece> = [];
+		let pieces: Array<InvisiblePiece> = [];
 		for (let i = 0; i < 32; ++i) {
 			// Shuffle the group of keys and colors separately, so the whole cycle gets the keys/colors evenly distributed.
 			this.fisherYatesArrayShuffle(properRatio);

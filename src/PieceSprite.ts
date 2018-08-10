@@ -4,19 +4,15 @@ import { SpriteSet, SpriteSheet } from "./SpriteSheet";
 import { animateInterpolation, queue, waitMs } from "./Animation";
 
 export class PieceSprite {
-	color: number;
-	key: boolean;
+	spriteName: string;
 	position: Coord;
 	frameCoroutine: IterableIterator<void>;
 	animationCoroutine?: IterableIterator<void>;
-	unlockEffectDelay: number;
 	accumulatedDeltaTime: number;
 
 	constructor(options: { color: number; key: boolean; position: Coord }) {
-		this.color = options.color;
-		this.key = options.key;
+		this.spriteName = (options.key ? "key" : "piece") + options.color;
 		this.position = options.position;
-		this.unlockEffectDelay = 0;
 		this.accumulatedDeltaTime = 0;
 		this.frameCoroutine = this.makeFrameCoroutine();
 	}
@@ -158,7 +154,7 @@ export class PieceSprite {
 						this.position.x * 5,
 				));
 
-		PieceSprite.getSprites()[(this.key ? "key" : "piece") + this.color].draw(
+		PieceSprite.getSprites()[this.spriteName].draw(
 			context,
 			new Coord({
 				x:

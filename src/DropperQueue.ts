@@ -1,19 +1,21 @@
 import { easings } from "./Animation";
 import { Board } from "./Board";
 import { Coord } from "./Coord";
-import { PieceSprite } from "./PieceSprite";
 import { PieceCycle } from "./PieceCycle";
+import { Piece } from "./Piece";
 
 export class DropperQueue {
-	pieces: Array<PieceSprite>;
+	board: Board;
+	pieces: Array<Piece>;
 
 	pieceCycle: PieceCycle;
 	dropperSide: "left" | "right";
 
 	constructor(
-		options: { pieceCycle: PieceCycle },
+		options: { board: Board; pieceCycle: PieceCycle },
 		dropperSide: "left" | "right",
 	) {
+		this.board = options.board;
 		this.pieceCycle = options.pieceCycle;
 		this.dropperSide = dropperSide;
 
@@ -22,7 +24,7 @@ export class DropperQueue {
 			const piece = this.pieceCycle.pop();
 
 			this.pieces.push(
-				new PieceSprite({
+				this.board.makePiece({
 					color: piece.color,
 					key: piece.key,
 					position: new Coord({
@@ -52,7 +54,7 @@ export class DropperQueue {
 		const piece = this.pieceCycle.pop();
 
 		this.pieces.push(
-			new PieceSprite({
+			this.board.makePiece({
 				color: piece.color,
 				key: piece.key,
 				position: new Coord({
@@ -67,7 +69,7 @@ export class DropperQueue {
 		const piece = this.pieces.shift();
 
 		for (let i = 0; i < this.pieces.length; i++) {
-			this.pieces[i].move({
+			this.pieces[i].sprite.move({
 				to: new Coord({
 					x: this.dropperSide == "left" ? -1 : Board.size.x,
 					y: i,
@@ -79,18 +81,5 @@ export class DropperQueue {
 		}
 
 		return piece;
-	}
-
-	draw(
-		context: CanvasRenderingContext2D,
-		deltaTime: number,
-		center: Coord,
-		scale: number,
-		boardSize: Coord,
-	) {
-		// Draw the dropper queue.
-		for (const piece of this.pieces) {
-			piece.draw(context, deltaTime, center, scale, 0, boardSize);
-		}
 	}
 }

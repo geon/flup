@@ -9,10 +9,9 @@ export class UnlockingEffect {
 	accumulatedDeltaTime: number;
 	initialVelocities: Array<Coord>;
 
-	constructor(piece: PieceSprite) {
-		this.color = piece.color;
-		// TODO: Fix syncing.
-		this.coord = piece.position; //piece.animationQueue.getLastTo();
+	constructor(color: number, position: Coord) {
+		this.color = color;
+		this.coord = position;
 		this.accumulatedDeltaTime = 0;
 
 		this.initialVelocities = [];
