@@ -1,7 +1,7 @@
 import { easings } from "./Animation";
 import { Board } from "./Board";
 import { Coord } from "./Coord";
-import { PieceSprite } from "./Piece";
+import { PieceSprite } from "./PieceSprite";
 import { PieceCycle } from "./PieceCycle";
 
 export class DropperQueue {

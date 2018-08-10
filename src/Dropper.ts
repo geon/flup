@@ -1,7 +1,7 @@
 import { Board } from "./Board";
 import { Coord } from "./Coord";
 import { DropperQueue } from "./DropperQueue";
-import { PieceSprite } from "./Piece";
+import { PieceSprite } from "./PieceSprite";
 import { easings } from "./Animation";
 
 export class Dropper {

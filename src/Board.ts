@@ -5,7 +5,7 @@ import { Coord } from "./Coord";
 import { Dropper } from "./Dropper";
 import { DropperQueue } from "./DropperQueue";
 import { GameMode } from "./GameMode";
-import { PieceSprite } from "./Piece";
+import { PieceSprite } from "./PieceSprite";
 import { PieceCycle } from "./PieceCycle";
 import { UnlockingEffect } from "./UnlockingEffect";
 

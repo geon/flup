@@ -1,5 +1,5 @@
 import { Coord } from "./Coord";
-import { PieceSprite } from "./Piece";
+import { PieceSprite } from "./PieceSprite";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
 import { waitMs } from "./Animation";
 

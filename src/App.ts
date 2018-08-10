@@ -3,7 +3,7 @@ import { AvatarOwl } from "./AvatarOwl";
 import { Coord } from "./Coord";
 import { GameMode } from "./GameMode";
 import { GameMode2pLocal } from "./GameMode2pLocal";
-import { PieceSprite } from "./Piece";
+import { PieceSprite } from "./PieceSprite";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
 import { UnlockingEffect } from "./UnlockingEffect";
 
