@@ -235,22 +235,6 @@ export class Board {
 			.reduce((soFar, current) => [...soFar, ...current], [] as Array<Piece>);
 	}
 
-	// TODO: Remove. Use explicit animation syncin with parallel and queue instead.
-	maxAnimationLength() {
-		return 2000;
-		// // Must also check the unlocked pieces waiting for the unlocking effect.
-		// const allPieces = this.pieces
-		// 	.concat(this.unlockedPieces)
-		// 	.filter(x => !!x)
-		// 	.map(x => x!);
-
-		// return allPieces
-		// 	.map(piece => piece && piece.animationQueue.length())
-		// 	.reduce((soFar, next) => {
-		// 		return next ? Math.max(soFar, next) : soFar;
-		// 	}, 0);
-	}
-
 	unLockChainRecursively(position: number): Array<Piece> {
 		// Must search for neighbors before removing the piece matching against.
 		const matchingNeighborPositions = this.matchingNeighborsOfPosition(
@@ -360,8 +344,6 @@ export class Board {
 	}
 
 	punish(avatar: Avatar) {
-		const punishmentAnimationDelay = this.maxAnimationLength();
-
 		// Make room.
 		for (let y = 0; y < Board.size.y - 1; y++) {
 			for (let x = 0; x < Board.size.x; x++) {
@@ -396,7 +378,7 @@ export class Board {
 					to: Board.indexToCoord(i),
 					duration: DropperQueue.dropperQueueTimePerPieceWidth,
 					easing: easings.sine,
-					delay: punishmentAnimationDelay,
+					delay: 0,
 				});
 			}
 		}
