@@ -3,7 +3,7 @@ import { AvatarOwl } from "./AvatarOwl";
 import { Coord } from "./Coord";
 import { GameMode } from "./GameMode";
 import { GameMode2pLocal } from "./GameMode2pLocal";
-import { Piece } from "./Piece";
+import { PieceSprite } from "./Piece";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
 import { UnlockingEffect } from "./UnlockingEffect";
 
@@ -88,7 +88,7 @@ export class App {
 
 	loadSprites() {
 		return Promise.all([
-			Piece.getSpriteSheet().loadImage(),
+			PieceSprite.getSpriteSheet().loadImage(),
 			UnlockingEffect.getSpriteSheet().loadImage(),
 			AvatarOwl.getSpriteSheet().loadImage(),
 			AvatarAztecJade.getSpriteSheet().loadImage(),

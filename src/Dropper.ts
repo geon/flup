@@ -1,14 +1,14 @@
 import { Board } from "./Board";
 import { Coord } from "./Coord";
 import { DropperQueue } from "./DropperQueue";
-import { Piece } from "./Piece";
+import { PieceSprite } from "./Piece";
 import { easings } from "./Animation";
 
 export class Dropper {
 	dropperQueue: DropperQueue;
 
-	pieceA: Piece;
-	pieceB: Piece;
+	pieceA: PieceSprite;
+	pieceB: PieceSprite;
 
 	position: number;
 	orientation: number;

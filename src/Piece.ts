@@ -3,7 +3,7 @@ import { PieceCycle } from "./PieceCycle";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
 import { animateInterpolation, queue, waitMs } from "./Animation";
 
-export class Piece {
+export class PieceSprite {
 	color: number;
 	key: boolean;
 	position: Coord;
@@ -26,19 +26,21 @@ export class Piece {
 	static spriteSheet: SpriteSheet | undefined;
 
 	static getSprites() {
-		if (!Piece.sprites) {
-			Piece.sprites = Piece.getSpriteSheet().getSprites();
+		if (!PieceSprite.sprites) {
+			PieceSprite.sprites = PieceSprite.getSpriteSheet().getSprites();
 		}
 
-		return Piece.sprites;
+		return PieceSprite.sprites;
 	}
 
 	static getSpriteSheet() {
-		if (!Piece.spriteSheet) {
-			Piece.spriteSheet = new SpriteSheet(Piece.getSpriteSheetSettings());
+		if (!PieceSprite.spriteSheet) {
+			PieceSprite.spriteSheet = new SpriteSheet(
+				PieceSprite.getSpriteSheetSettings(),
+			);
 		}
 
-		return Piece.spriteSheet;
+		return PieceSprite.spriteSheet;
 	}
 
 	static getSpriteSheetSettings() {
@@ -127,7 +129,7 @@ export class Piece {
 
 		const jitterX =
 			disturbance *
-			(Piece.size *
+			(PieceSprite.size *
 				boardScale *
 				0.05 *
 				Math.sin(
@@ -137,7 +139,7 @@ export class Piece {
 				));
 		const jitterY =
 			disturbance *
-			(Piece.size *
+			(PieceSprite.size *
 				boardScale *
 				0.05 *
 				Math.sin(
@@ -147,7 +149,7 @@ export class Piece {
 				));
 		const jitterZ =
 			disturbance *
-			(Piece.size *
+			(PieceSprite.size *
 				boardScale *
 				0.1 *
 				Math.sin(
@@ -156,31 +158,31 @@ export class Piece {
 						this.position.x * 5,
 				));
 
-		Piece.getSprites()[(this.key ? "key" : "piece") + this.color].draw(
+		PieceSprite.getSprites()[(this.key ? "key" : "piece") + this.color].draw(
 			context,
 			new Coord({
 				x:
 					boardCenter.x +
 					(this.position.x / boardSize.x - 0.5) *
 						boardSize.x *
-						Piece.size *
+						PieceSprite.size *
 						boardScale +
-					Piece.size / 2 -
-					0.5 * (Piece.size + jitterZ) +
+					PieceSprite.size / 2 -
+					0.5 * (PieceSprite.size + jitterZ) +
 					jitterX,
 				y:
 					boardCenter.y +
 					(this.position.y / boardSize.y - 0.5) *
 						boardSize.y *
-						Piece.size *
+						PieceSprite.size *
 						boardScale +
-					Piece.size / 2 -
-					0.5 * (Piece.size + jitterZ) +
+					PieceSprite.size / 2 -
+					0.5 * (PieceSprite.size + jitterZ) +
 					jitterY,
 			}),
 			new Coord({
-				x: Piece.size * boardScale,
-				y: Piece.size * boardScale,
+				x: PieceSprite.size * boardScale,
+				y: PieceSprite.size * boardScale,
 			}),
 		);
 	}

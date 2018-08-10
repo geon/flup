@@ -1,5 +1,5 @@
 import { Coord } from "./Coord";
-import { Piece } from "./Piece";
+import { PieceSprite } from "./Piece";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
 import { waitMs } from "./Animation";
 
@@ -9,7 +9,7 @@ export class UnlockingEffect {
 	accumulatedDeltaTime: number;
 	initialVelocities: Array<Coord>;
 
-	constructor(piece: Piece) {
+	constructor(piece: PieceSprite) {
 		this.color = piece.color;
 		// TODO: Fix syncing.
 		this.coord = piece.position; //piece.animationQueue.getLastTo();
@@ -95,17 +95,17 @@ export class UnlockingEffect {
 				boardCenter.x +
 				(this.coord.x / boardSize.x - 0.5) *
 					boardSize.x *
-					Piece.size *
+					PieceSprite.size *
 					boardScale +
-				Piece.size / 2 -
+				PieceSprite.size / 2 -
 				0.5 * UnlockingEffect.size,
 			y:
 				boardCenter.y +
 				(this.coord.y / boardSize.y - 0.5) *
 					boardSize.y *
-					Piece.size *
+					PieceSprite.size *
 					boardScale +
-				Piece.size / 2 -
+				PieceSprite.size / 2 -
 				0.5 * UnlockingEffect.size,
 		});
 

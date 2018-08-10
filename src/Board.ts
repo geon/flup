@@ -5,12 +5,12 @@ import { Coord } from "./Coord";
 import { Dropper } from "./Dropper";
 import { DropperQueue } from "./DropperQueue";
 import { GameMode } from "./GameMode";
-import { Piece } from "./Piece";
+import { PieceSprite } from "./Piece";
 import { PieceCycle } from "./PieceCycle";
 import { UnlockingEffect } from "./UnlockingEffect";
 
 interface FallMove {
-	piece: Piece;
+	piece: PieceSprite;
 	from: Coord;
 	distance: number;
 	numConsecutive: number;
@@ -20,7 +20,7 @@ export class Board {
 	gameMode: GameMode;
 	frameCoroutine: IterableIterator<void>;
 
-	pieces: Array<Piece | undefined>;
+	pieces: Array<PieceSprite | undefined>;
 	unlockingEffects: Array<UnlockingEffect>;
 	pieceCycle: PieceCycle;
 	dropperQueue: DropperQueue;
@@ -79,11 +79,11 @@ export class Board {
 	}
 
 	static getWidth() {
-		return (Board.size.x + 2) * Piece.size;
+		return (Board.size.x + 2) * PieceSprite.size;
 	}
 
 	static getHeight() {
-		return (Board.size.y + 2) * Piece.size;
+		return (Board.size.y + 2) * PieceSprite.size;
 	}
 
 	*makeGameLogicCoroutine(): IterableIterator<void> {
@@ -220,7 +220,7 @@ export class Board {
 		return moves;
 	}
 
-	unlockChains(): Array<Piece> {
+	unlockChains(): Array<PieceSprite> {
 		return this.pieces
 			.map((_piece, position) => position)
 			.filter(position => {
@@ -232,10 +232,12 @@ export class Board {
 				);
 			})
 			.map(position => this.unLockChainRecursively(position))
-			.reduce((soFar, current) => [...soFar, ...current], [] as Array<Piece>);
+			.reduce((soFar, current) => [...soFar, ...current], [] as Array<
+				PieceSprite
+			>);
 	}
 
-	unLockChainRecursively(position: number): Array<Piece> {
+	unLockChainRecursively(position: number): Array<PieceSprite> {
 		// Must search for neighbors before removing the piece matching against.
 		const matchingNeighborPositions = this.matchingNeighborsOfPosition(
 			position,
@@ -258,7 +260,7 @@ export class Board {
 			unlockedPiece,
 			...unlockedChainsFromNeighbors.reduce(
 				(soFar, current) => [...soFar, ...current],
-				[] as Array<Piece>,
+				[] as Array<PieceSprite>,
 			),
 		];
 	}
@@ -357,7 +359,7 @@ export class Board {
 		const row = avatar.getPunishColors();
 
 		for (let x = 0; x < row.length; x++) {
-			const piece = new Piece({
+			const piece = new PieceSprite({
 				color: row[x],
 				key: false,
 				position: new Coord({
@@ -402,7 +404,7 @@ export class Board {
 				this.dropper.pieceA,
 				this.dropper.pieceB,
 			]
-				.filter((piece): piece is Piece => !!piece)
+				.filter((piece): piece is PieceSprite => !!piece)
 				.map(piece => piece.frameCoroutine)
 				.forEach(coroutine => coroutine.next(deltaTime));
 		}
@@ -434,12 +436,12 @@ export class Board {
 				slateSprites[useDetail ? details : basePattern].draw(
 					context,
 					new Coord({
-						x: center.x + (x - Board.size.x / 2) * scale * Piece.size,
-						y: center.y + (y - Board.size.y / 2) * scale * Piece.size,
+						x: center.x + (x - Board.size.x / 2) * scale * PieceSprite.size,
+						y: center.y + (y - Board.size.y / 2) * scale * PieceSprite.size,
 					}),
 					new Coord({
-						x: Piece.size * scale,
-						y: Piece.size * scale,
+						x: PieceSprite.size * scale,
+						y: PieceSprite.size * scale,
 					}),
 				);
 			}

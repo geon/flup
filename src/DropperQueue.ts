@@ -1,11 +1,11 @@
 import { easings } from "./Animation";
 import { Board } from "./Board";
 import { Coord } from "./Coord";
-import { Piece } from "./Piece";
+import { PieceSprite } from "./Piece";
 import { PieceCycle } from "./PieceCycle";
 
 export class DropperQueue {
-	pieces: Array<Piece>;
+	pieces: Array<PieceSprite>;
 
 	pieceCycle: PieceCycle;
 	dropperSide: "left" | "right";
@@ -22,7 +22,7 @@ export class DropperQueue {
 			const piece = this.pieceCycle.pop();
 
 			this.pieces.push(
-				new Piece({
+				new PieceSprite({
 					color: piece.color,
 					key: piece.key,
 					position: new Coord({
@@ -52,7 +52,7 @@ export class DropperQueue {
 		const piece = this.pieceCycle.pop();
 
 		this.pieces.push(
-			new Piece({
+			new PieceSprite({
 				color: piece.color,
 				key: piece.key,
 				position: new Coord({
