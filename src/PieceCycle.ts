@@ -1,13 +1,13 @@
-interface PieceValue {
+interface Piece {
 	color: number;
 	key: boolean;
 }
 
 export class PieceCycle {
 	currentIndex: number;
-	pieces: Array<PieceValue>;
+	pieces: Array<Piece>;
 
-	constructor(pieces: Array<PieceValue>) {
+	constructor(pieces: Array<Piece>) {
 		this.currentIndex = 0;
 		this.pieces = pieces;
 	}
@@ -25,8 +25,8 @@ export class PieceCycle {
 
 	static generate() {
 		// Create list of all colors.
-		const baseColors: Array<PieceValue> = [];
-		const keyColors: Array<PieceValue> = [];
+		const baseColors: Array<Piece> = [];
+		const keyColors: Array<Piece> = [];
 		for (let i = 0; i < this.numColors; ++i) {
 			baseColors[i] = {
 				color: i,
@@ -45,7 +45,7 @@ export class PieceCycle {
 		}
 
 		// Repeat the colors so there is a long cycle.
-		let pieces: Array<PieceValue> = [];
+		let pieces: Array<Piece> = [];
 		for (let i = 0; i < 32; ++i) {
 			// Shuffle the group of keys and colors separately, so the whole cycle gets the keys/colors evenly distributed.
 			this.fisherYatesArrayShuffle(properRatio);
