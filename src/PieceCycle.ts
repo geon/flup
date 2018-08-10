@@ -1,7 +1,4 @@
-interface Piece {
-	color: number;
-	key: boolean;
-}
+import { Piece } from "./Piece";
 
 export class PieceCycle {
 	currentIndex: number;
