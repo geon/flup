@@ -325,13 +325,8 @@ export class Board {
 	}
 
 	checkForGameOver() {
-		for (let i = 0; i < Board.size.x * 2; i++) {
-			if (this.pieces[i]) {
-				return true;
-				break;
-			}
-		}
-		return false;
+		// Check if there are any pieces sticking up into the top 2 rows of the board.
+		return this.pieces.slice(0, Board.size.x * 2).some(piece => !!piece);
 	}
 
 	*startGameOverEffect() {
