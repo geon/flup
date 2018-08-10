@@ -63,15 +63,8 @@ export class Dropper {
 		const aPos = Board.coordToIndex(coords.a);
 		const bPos = Board.coordToIndex(coords.b);
 
-		// Make sure the board space is not used, and is not outside the Board.
-		if (
-			board.pieces[aPos] ||
-			board.pieces[bPos] ||
-			coords.a.x < 0 ||
-			coords.a.x > Board.size.x - 1 ||
-			coords.b.x < 0 ||
-			coords.b.x > Board.size.x - 1
-		) {
+		// Make sure the board space is not used.
+		if (board.pieces[aPos] || board.pieces[bPos]) {
 			return false;
 		}
 
