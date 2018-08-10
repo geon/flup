@@ -26,7 +26,6 @@ export class Board {
 	dropperQueue: DropperQueue;
 
 	dropper: Dropper;
-	gameOver: boolean;
 	slateRandomExp: number;
 
 	constructor(options: {
@@ -45,7 +44,6 @@ export class Board {
 			options.dropperSide,
 		);
 		this.dropper = new Dropper(this.dropperQueue);
-		this.gameOver = false;
 		this.slateRandomExp = 2 + Math.random();
 
 		// var colors = [
@@ -329,7 +327,6 @@ export class Board {
 	checkForGameOver() {
 		for (let i = 0; i < Board.size.x * 2; i++) {
 			if (this.pieces[i]) {
-				this.gameOver = true;
 				return true;
 				break;
 			}
@@ -503,8 +500,6 @@ export class Board {
 		this.dropperQueue.draw(context, deltaTime, center, scale, Board.size);
 
 		// Draw the dropper pieces.
-		if (!this.gameOver) {
-			this.dropper.draw(context, deltaTime, center, scale, Board.size);
-		}
+		this.dropper.draw(context, deltaTime, center, scale, Board.size);
 	}
 }

@@ -9,6 +9,7 @@ import { PieceCycle } from "./PieceCycle";
 export class GameMode2pLocal implements GameMode {
 	boards: Array<Board>;
 	avatars: Array<Avatar>;
+	isGameOver: boolean;
 	frameCoroutine: IterableIterator<void>;
 
 	constructor() {
@@ -28,6 +29,7 @@ export class GameMode2pLocal implements GameMode {
 		];
 
 		this.avatars = [new AvatarOwl(), new AvatarAztecJade()];
+		this.isGameOver = false;
 
 		this.frameCoroutine = this.makeFrameCoroutine();
 	}
@@ -44,12 +46,12 @@ export class GameMode2pLocal implements GameMode {
 		}
 	}
 
-	isGameOver() {
-		return this.boards[0].gameOver || this.boards[1].gameOver;
+	onGameOver() {
+		this.isGameOver = true;
 	}
 
 	onKeyDown(_keyCode: number) {
-		if (this.isGameOver()) {
+		if (this.isGameOver) {
 			return;
 		}
 
@@ -98,6 +100,10 @@ export class GameMode2pLocal implements GameMode {
 			this.boards
 				.map(board => board.frameCoroutine)
 				.forEach(coroutine => coroutine.next(deltaTime));
+
+			if (this.isGameOver) {
+				break;
+			}
 		}
 	}
 

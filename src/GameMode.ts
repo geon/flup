@@ -3,7 +3,7 @@ import { Coord } from "./Coord";
 
 export interface GameMode {
 	frameCoroutine: IterableIterator<void>;
-	isGameOver: () => boolean;
+	onGameOver: (board: Board) => void;
 	onUnlockedChains: (board: Board) => void;
 	onKeyDown: (keyCode: number) => void;
 	draw: (

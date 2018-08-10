@@ -8,6 +8,7 @@ import { PieceCycle } from "./PieceCycle";
 export class GameMode1p implements GameMode {
 	board: Board;
 	avatar: Avatar;
+	isGameOver: boolean;
 	frameCoroutine: IterableIterator<void>;
 
 	constructor() {
@@ -15,6 +16,7 @@ export class GameMode1p implements GameMode {
 
 		this.board = new Board({ pieceCycle, gameMode: this, dropperSide: "left" });
 		this.avatar = new AvatarOwl();
+		this.isGameOver = false;
 
 		this.frameCoroutine = this.board.frameCoroutine;
 	}
@@ -23,12 +25,12 @@ export class GameMode1p implements GameMode {
 		// Do nothing.
 	}
 
-	isGameOver() {
-		return this.board.gameOver;
+	onGameOver() {
+		this.isGameOver = true;
 	}
 
 	onKeyDown(_keyCode: number) {
-		if (this.isGameOver()) {
+		if (this.isGameOver) {
 			return;
 		}
 
