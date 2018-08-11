@@ -2,6 +2,7 @@ import { Avatar } from "./Avatar";
 import { AvatarAztecJade } from "./AvatarAztecJade";
 import { AvatarOwl } from "./AvatarOwl";
 import { Board } from "./Board";
+import { BoardLogic } from "./BoardLogic";
 import { Coord } from "./Coord";
 import { GameMode } from "./GameMode";
 import { PieceCycle } from "./PieceCycle";
@@ -109,7 +110,7 @@ export class GameMode2pLocal implements GameMode {
 
 	draw(context: CanvasRenderingContext2D, deltaTime: number, appSize: Coord) {
 		const center = new Coord({ x: appSize.x / 2, y: appSize.y / 2 });
-		const boardSpread = Board.getWidth() * 0.66;
+		const boardSpread = BoardLogic.getWidth() * 0.66;
 
 		// The player boards.
 		this.boards[0].draw(
@@ -131,9 +132,9 @@ export class GameMode2pLocal implements GameMode {
 			1 / 1,
 		);
 
-		const avatarSpread = Board.getWidth() * 0.75;
+		const avatarSpread = BoardLogic.getWidth() * 0.75;
 		const avatarDownStickiness = 1.1;
-		const avatarDownset = Board.getHeight() / 2 * avatarDownStickiness;
+		const avatarDownset = BoardLogic.getHeight() / 2 * avatarDownStickiness;
 
 		// Draw the player avatars.
 		this.avatars[0].draw(

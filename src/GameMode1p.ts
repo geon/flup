@@ -1,6 +1,7 @@
 import { Avatar } from "./Avatar";
 import { AvatarOwl } from "./AvatarOwl";
 import { Board } from "./Board";
+import { BoardLogic } from "./BoardLogic";
 import { Coord } from "./Coord";
 import { GameMode } from "./GameMode";
 import { PieceCycle } from "./PieceCycle";
@@ -67,8 +68,8 @@ export class GameMode1p implements GameMode {
 			context,
 			deltaTime,
 			new Coord({
-				x: appSize.x / 2 + Board.getWidth() * -1.1 / 2,
-				y: appSize.y / 2 + Board.getWidth() * 0.65,
+				x: appSize.x / 2 + BoardLogic.getWidth() * -1.1 / 2,
+				y: appSize.y / 2 + BoardLogic.getWidth() * 0.65,
 			}),
 		);
 	}

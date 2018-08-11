@@ -3,6 +3,7 @@ import { Board } from "./Board";
 import { Coord } from "./Coord";
 import { PieceCycle } from "./PieceCycle";
 import { Piece } from "./Piece";
+import { BoardLogic } from "./BoardLogic";
 
 export class DropperQueue {
 	board: Board;
@@ -28,7 +29,7 @@ export class DropperQueue {
 					color: piece.color,
 					key: piece.key,
 					position: new Coord({
-						x: this.dropperSide == "left" ? -1 : Board.size.x,
+						x: this.dropperSide == "left" ? -1 : BoardLogic.size.x,
 						y: this.pieces.length,
 					}),
 				}),
@@ -58,7 +59,7 @@ export class DropperQueue {
 				color: piece.color,
 				key: piece.key,
 				position: new Coord({
-					x: this.dropperSide == "left" ? -1 : Board.size.x,
+					x: this.dropperSide == "left" ? -1 : BoardLogic.size.x,
 					y: startYPos,
 				}),
 			}),
@@ -71,7 +72,7 @@ export class DropperQueue {
 		for (let i = 0; i < this.pieces.length; i++) {
 			this.pieces[i].sprite.move({
 				to: new Coord({
-					x: this.dropperSide == "left" ? -1 : Board.size.x,
+					x: this.dropperSide == "left" ? -1 : BoardLogic.size.x,
 					y: i,
 				}),
 				duration: DropperQueue.dropperQueueTimePerPieceWidth,

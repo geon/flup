@@ -1,5 +1,5 @@
 import { Avatar } from "./Avatar";
-import { Board } from "./Board";
+import { BoardLogic } from "./BoardLogic";
 import { Coord } from "./Coord";
 import { PieceCycle } from "./PieceCycle";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
@@ -75,7 +75,7 @@ export class AvatarAztecJade extends Avatar {
 			++rowNumber;
 
 			const colors = [];
-			for (let x = 0; x < Board.size.x; x++) {
+			for (let x = 0; x < BoardLogic.size.x; x++) {
 				colors.push(Math.floor((rowNumber + x) / 2) % PieceCycle.numColors);
 			}
 			yield colors;

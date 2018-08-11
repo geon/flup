@@ -2,27 +2,23 @@ import { easings, waitMs, queue, parallel, makeIterable } from "./Animation";
 import { App } from "./App";
 import { Avatar } from "./Avatar";
 import { Coord } from "./Coord";
-import { Dropper } from "./Dropper";
 import { DropperQueue } from "./DropperQueue";
 import { GameMode } from "./GameMode";
 import { Piece } from "./Piece";
 import { PieceSprite } from "./PieceSprite";
 import { PieceCycle } from "./PieceCycle";
 import { UnlockingEffect } from "./UnlockingEffect";
-import { Movement } from "./Movement";
+import { BoardLogic } from "./BoardLogic";
 
 export class Board {
 	gameMode: GameMode;
 	frameCoroutine: IterableIterator<void>;
 
-	pieces: Array<Piece | undefined>;
+	boardLogic: BoardLogic;
 	piecesSprites: Set<PieceSprite>;
 
 	unlockingEffects: Array<UnlockingEffect>;
-	pieceCycle: PieceCycle;
-	dropperQueue: DropperQueue;
 
-	dropper: Dropper;
 	slateRandomExp: number;
 
 	constructor(options: {
@@ -33,29 +29,20 @@ export class Board {
 		this.gameMode = options.gameMode;
 		this.frameCoroutine = this.makeFrameCoroutine();
 
-		this.pieces = [];
 		this.piecesSprites = new Set();
 
-		this.unlockingEffects = [];
-		this.pieceCycle = options.pieceCycle;
-		this.dropperQueue = new DropperQueue(
-			{ pieceCycle: this.pieceCycle, board: this },
+		const dropperQueue = new DropperQueue(
+			{ pieceCycle: options.pieceCycle, board: this },
 			options.dropperSide,
 		);
-		this.dropper = new Dropper(this.dropperQueue);
-		this.slateRandomExp = 2 + Math.random();
 
-		// var colors = [
-		// 	undefined, undefined, {color: 1}, undefined, undefined, undefined, undefined, undefined,
-		// 	undefined, undefined, {color: 0}, undefined, undefined, undefined, undefined, undefined
-		// ];
-		// for (var i = colors.length - 1; i >= 0; i--) {
-		// 	if (colors[i])
-		// 		this.pieces[i] = this.makePiece(colors[i]);
-		// };
-		// this.makePiecesFall(0);
-		// options.pieceCycle[0] = this.makePiece({color: 0, key:true});
-		// options.pieceCycle[1] = this.makePiece({color: 0, key:false});
+		this.boardLogic = new BoardLogic({
+			pieceCycle: options.pieceCycle,
+			dropperQueue,
+		});
+
+		this.unlockingEffects = [];
+		this.slateRandomExp = 2 + Math.random();
 	}
 
 	makePiece(options: { color: number; key: boolean; position: Coord }) {
@@ -65,33 +52,6 @@ export class Board {
 		return piece;
 	}
 
-	static size: Coord = new Coord({ x: 8, y: 18 });
-
-	static gameOverUnlockEffectDelayPerPieceWidth: number = 100;
-
-	static xyToIndex(x: number, y: number) {
-		return x + y * Board.size.x;
-	}
-
-	static coordToIndex(coord: Coord) {
-		return Board.xyToIndex(coord.x, coord.y);
-	}
-
-	static indexToCoord(index: number) {
-		return new Coord({
-			x: index % Board.size.x,
-			y: Math.floor(index / Board.size.x),
-		});
-	}
-
-	static getWidth() {
-		return (Board.size.x + 2) * PieceSprite.size;
-	}
-
-	static getHeight() {
-		return (Board.size.y + 2) * PieceSprite.size;
-	}
-
 	*makeGameLogicCoroutine(): IterableIterator<void> {
 		for (;;) {
 			yield;
@@ -99,7 +59,7 @@ export class Board {
 			let foundChains = true;
 
 			while (foundChains) {
-				const movements = this.makePiecesFall();
+				const movements = this.boardLogic.makePiecesFall();
 
 				const timePerPieceHeight = 100;
 				yield* parallel(
@@ -118,7 +78,7 @@ export class Board {
 					),
 				);
 
-				const unlockedPieces = this.unlockChains();
+				const unlockedPieces = this.boardLogic.unlockChains();
 				foundChains = !!unlockedPieces.length;
 
 				yield* parallel(
@@ -151,7 +111,7 @@ export class Board {
 				}
 			}
 
-			const gameOver = this.checkForGameOver();
+			const gameOver = this.boardLogic.checkForGameOver();
 			if (gameOver) {
 				yield* this.startGameOverEffect();
 
@@ -161,263 +121,54 @@ export class Board {
 	}
 
 	moveLeft() {
-		this.dropper.moveLeft();
+		this.boardLogic.moveLeft();
 	}
 
 	moveRight() {
-		this.dropper.moveRight();
+		this.boardLogic.moveRight();
 	}
 
 	rotate() {
-		this.dropper.rotate();
+		this.boardLogic.rotate();
 	}
 
 	drop() {
-		const drops = this.dropper.getDrops();
-
-		// Make sure the board space is not used.
-		if (drops.some(drop => !!this.pieces[Board.coordToIndex(drop.coord)])) {
-		}
-
-		for (const drop of drops) {
-			// Add the pieces.
-			this.pieces[Board.coordToIndex(drop.coord)] = drop.piece;
-		}
-
-		this.dropper.charge();
-	}
-
-	makePiecesFall(): ReadonlyArray<Movement> {
-		/*
-
-		This might seem like an awful lot of code for something as simple as
-		making the pieces fall.
-
-		Turns out it isn't that simple...
-
-		I need to set the animation properly so it is initiated only when a
-		piece *starts* falling. That makes it tricky to do it in multiple
-		passes. I also want a slight delay in the animation for each
-		consecutive piece in a falling block. That means I need to keep track
-		of wether the line of pieces is broken.
-
-		If you have a better solution, I'm happy to see it.
-
-		*/
-
-		const movements: Array<Movement> = [];
-
-		// For each collumn.
-		for (let x = 0; x < Board.size.x; ++x) {
-			// Start at the bottom.
-			let yPut = Board.size.y - 1;
-
-			// Search for a space that can be filled from above.
-			while (yPut && this.pieces[Board.xyToIndex(x, yPut)]) {
-				--yPut;
-			}
-
-			let yGet = yPut - 1;
-
-			let numConsecutive = 0;
-
-			// For the whole collumn...
-			collumnLoop: while (yGet >= 0) {
-				// Search for a piece to put in the empty space.
-				while (!this.pieces[Board.xyToIndex(x, yGet)]) {
-					--yGet;
-
-					numConsecutive = 0;
-
-					if (yGet < 0) {
-						break collumnLoop;
-					}
-				}
-
-				const getPos = Board.xyToIndex(x, yGet);
-				const putPos = Board.xyToIndex(x, yPut);
-
-				// Move the piece.
-				this.pieces[putPos] = this.pieces[getPos];
-				this.pieces[getPos] = undefined;
-				const piece = this.pieces[putPos]!;
-
-				// Record moves.
-				movements.push({
-					sprite: piece.sprite,
-					to: Board.indexToCoord(putPos),
-					numConsecutive,
-				});
-				++numConsecutive;
-
-				// Raise the put/put-positions.
-				--yGet;
-				--yPut;
-			}
-		}
-
-		return movements;
-	}
-
-	unlockChains(): Array<Piece> {
-		return this.pieces
-			.map((_piece, position) => position)
-			.filter(position => {
-				const piece = this.pieces[position];
-				return (
-					piece &&
-					piece.key &&
-					this.matchingNeighborsOfPosition(position).length
-				);
-			})
-			.map(position => this.unLockChainRecursively(position))
-			.reduce((soFar, current) => [...soFar, ...current], [] as Array<Piece>);
-	}
-
-	unLockChainRecursively(position: number): Array<Piece> {
-		// Must search for neighbors before removing the piece matching against.
-		const matchingNeighborPositions = this.matchingNeighborsOfPosition(
-			position,
-		);
-
-		const unlockedPiece = this.pieces[position];
-		this.pieces[position] = undefined;
-
-		// Another branch of the chain might have reached here before.
-		if (!unlockedPiece) {
-			return [];
-		}
-
-		// For all matching neighbors, recurse.
-		const unlockedChainsFromNeighbors = matchingNeighborPositions.map(
-			neighborPosition => this.unLockChainRecursively(neighborPosition),
-		);
-
-		return [
-			unlockedPiece,
-			...unlockedChainsFromNeighbors.reduce(
-				(soFar, current) => [...soFar, ...current],
-				[] as Array<Piece>,
-			),
-		];
-	}
-
-	matchingNeighborsOfPosition(position: number) {
-		const piece = this.pieces[position];
-
-		if (!piece) {
-			return [];
-		}
-
-		const neighborPositions = [];
-
-		const coord = Board.indexToCoord(position);
-
-		// Right
-		if (coord.x < Board.size.x - 1) {
-			neighborPositions.push(position + 1);
-		}
-
-		// Left
-		if (coord.x > 0) {
-			neighborPositions.push(position - 1);
-		}
-
-		// Down
-		if (coord.y < Board.size.y - 1) {
-			neighborPositions.push(position + Board.size.x);
-		}
-
-		// Up
-		if (coord.y > 0) {
-			neighborPositions.push(position - Board.size.x);
-		}
-
-		const matchingNeighborPositions = [];
-		const color = piece.color;
-		for (let i = neighborPositions.length - 1; i >= 0; i--) {
-			const neighborPosition = neighborPositions[i];
-			const neighborPiece = this.pieces[neighborPosition];
-
-			if (neighborPiece && neighborPiece.color === color) {
-				matchingNeighborPositions.push(neighborPosition);
-			}
-		}
-
-		return matchingNeighborPositions;
-	}
-
-	checkForGameOver() {
-		// Check if there are any pieces sticking up into the top 2 rows of the board.
-		return this.pieces.slice(0, Board.size.x * 2).some(piece => !!piece);
+		this.boardLogic.drop();
 	}
 
 	*startGameOverEffect() {
 		yield* parallel(
-			this.pieces.filter((piece): piece is Piece => !!piece).map(piece => {
-				const unlockingEffect = new UnlockingEffect(
-					piece.color,
-					piece.sprite.position,
-				);
-				this.unlockingEffects.push(unlockingEffect);
-				const unlockingEffectCoroutine = unlockingEffect.makeFrameCoroutine();
-				return queue([
-					// Unlock all pieces, from the center and out.
-					waitMs(
-						Coord.distance(
-							piece.sprite.position,
-							Coord.scale(Board.size, 0.5),
-						) * Board.gameOverUnlockEffectDelayPerPieceWidth,
-					),
-					makeIterable(() => {
-						// Remove the graphical representation.
-						this.piecesSprites.delete(piece.sprite);
-					}),
-					unlockingEffectCoroutine,
-					makeIterable(() => {
-						// Remove the unlockingEffect.
-						const index = this.unlockingEffects.indexOf(unlockingEffect);
-						this.unlockingEffects.splice(index, 1);
-					}),
-				]);
-			}),
+			// TODO: Use the piece set instead?
+			this.boardLogic.pieces
+				.filter((piece): piece is Piece => !!piece)
+				.map(piece => {
+					const unlockingEffect = new UnlockingEffect(
+						piece.color,
+						piece.sprite.position,
+					);
+					this.unlockingEffects.push(unlockingEffect);
+					const unlockingEffectCoroutine = unlockingEffect.makeFrameCoroutine();
+					return queue([
+						// Unlock all pieces, from the center and out.
+						waitMs(
+							Coord.distance(
+								piece.sprite.position,
+								Coord.scale(BoardLogic.size, 0.5),
+							) * 100,
+						),
+						makeIterable(() => {
+							// Remove the graphical representation.
+							this.piecesSprites.delete(piece.sprite);
+						}),
+						unlockingEffectCoroutine,
+						makeIterable(() => {
+							// Remove the unlockingEffect.
+							const index = this.unlockingEffects.indexOf(unlockingEffect);
+							this.unlockingEffects.splice(index, 1);
+						}),
+					]);
+				}),
 		);
-	}
-
-	punishLogic(row: ReadonlyArray<Piece>): ReadonlyArray<Movement> {
-		const movements: Array<Movement> = [];
-
-		// Make room. Move everything 1 step up.
-		for (let y = 0; y < Board.size.y - 1; y++) {
-			for (let x = 0; x < Board.size.x; x++) {
-				const from = Board.xyToIndex(x, y + 1);
-				const to = Board.xyToIndex(x, y);
-
-				const movedPiece = this.pieces[from];
-				this.pieces[to] = movedPiece;
-
-				if (movedPiece) {
-					movements.push({
-						to: Board.indexToCoord(to),
-						sprite: movedPiece.sprite,
-						numConsecutive: 0,
-					});
-				}
-			}
-		}
-
-		// Add a row of pieces at the bottom.
-		row.forEach((piece, x) => {
-			const to = Board.xyToIndex(x, Board.size.y - 1);
-			this.pieces[to] = piece;
-			movements.push({
-				to: Board.indexToCoord(to),
-				sprite: piece.sprite,
-				numConsecutive: 0,
-			});
-		});
-
-		return movements;
 	}
 
 	punish(avatar: Avatar) {
@@ -429,7 +180,7 @@ export class Board {
 			const position = new Coord({
 				x,
 				// Start the animation just outside the Board.
-				y: Board.size.y,
+				y: BoardLogic.size.y,
 			});
 
 			return this.makePiece({
@@ -439,7 +190,7 @@ export class Board {
 			});
 		});
 
-		const movements = this.punishLogic(pieces);
+		const movements = this.boardLogic.punishLogic(pieces);
 
 		// Animate.
 		for (const movement of movements) {
@@ -479,14 +230,14 @@ export class Board {
 		// Draw the board background.
 
 		const slateSprites = App.getSprites();
-		for (let y = 0; y < Board.size.y; ++y) {
-			for (let x = 0; x < Board.size.x; ++x) {
+		for (let y = 0; y < BoardLogic.size.y; ++y) {
+			for (let x = 0; x < BoardLogic.size.x; ++x) {
 				const numTiles = 8;
 				const numBaseTiles = 2;
 
 				// This is just BS. The magic munber don't mean anything.
 				const pseudoRandomByXY = Math.floor(
-					Math.pow(113 + x + y * Board.size.y, this.slateRandomExp),
+					Math.pow(113 + x + y * BoardLogic.size.y, this.slateRandomExp),
 				);
 				const basePattern = pseudoRandomByXY % numBaseTiles;
 				const details =
@@ -496,8 +247,10 @@ export class Board {
 				slateSprites[useDetail ? details : basePattern].draw(
 					context,
 					new Coord({
-						x: center.x + (x - Board.size.x / 2) * scale * PieceSprite.size,
-						y: center.y + (y - Board.size.y / 2) * scale * PieceSprite.size,
+						x:
+							center.x + (x - BoardLogic.size.x / 2) * scale * PieceSprite.size,
+						y:
+							center.y + (y - BoardLogic.size.y / 2) * scale * PieceSprite.size,
 					}),
 					new Coord({
 						x: PieceSprite.size * scale,
@@ -509,27 +262,35 @@ export class Board {
 
 		// Calculate how much to stress the player. (Piece wobbling increases as
 		// they approach the maximum height before game over.)
+		// TODO: Move ratio calculation to BoardLogic.
 		let height = 0;
-		for (let i = 0; i < this.pieces.length; i++) {
-			if (this.pieces[i]) {
-				const position = Board.indexToCoord(i);
-				height = Board.size.y - 1 - position.y;
+		for (let i = 0; i < this.boardLogic.pieces.length; i++) {
+			if (this.boardLogic.pieces[i]) {
+				const position = BoardLogic.indexToCoord(i);
+				height = BoardLogic.size.y - 1 - position.y;
 				break;
 			}
 		}
-		const ratio = height / (Board.size.y - 2 - 1);
+		const ratio = height / (BoardLogic.size.y - 2 - 1);
 		const cutOffPoint = 0.65;
 		const disturbance =
 			ratio < cutOffPoint ? 0 : (ratio - cutOffPoint) / (1 - cutOffPoint);
 
 		// Draw the unlocking effects.
 		for (const unlockingEffect of this.unlockingEffects) {
-			unlockingEffect.draw(context, deltaTime, center, scale, Board.size);
+			unlockingEffect.draw(context, deltaTime, center, scale, BoardLogic.size);
 		}
 
 		// Draw all pieces.
 		for (const sprite of this.piecesSprites) {
-			sprite.draw(context, deltaTime, center, scale, disturbance, Board.size);
+			sprite.draw(
+				context,
+				deltaTime,
+				center,
+				scale,
+				disturbance,
+				BoardLogic.size,
+			);
 		}
 	}
 }

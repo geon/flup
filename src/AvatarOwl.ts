@@ -1,5 +1,5 @@
 import { Avatar } from "./Avatar";
-import { Board } from "./Board";
+import { BoardLogic } from "./BoardLogic";
 import { Coord } from "./Coord";
 import { PieceCycle } from "./PieceCycle";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
@@ -149,7 +149,7 @@ export class AvatarOwl extends Avatar {
 	*generatePunishColors() {
 		for (;;) {
 			const colors = [];
-			for (let x = 0; x < Board.size.x; x++) {
+			for (let x = 0; x < BoardLogic.size.x; x++) {
 				colors.push(x % PieceCycle.numColors);
 			}
 			yield colors;
@@ -161,7 +161,6 @@ export class AvatarOwl extends Avatar {
 		deltaTime: number,
 		avatarCenter: Coord,
 	) {
-
 		this.accumulatedDeltaTime += deltaTime;
 
 		const sprites = AvatarOwl.getSprites();
@@ -183,12 +182,14 @@ export class AvatarOwl extends Avatar {
 			size,
 		);
 
-		const bobFactor =
-			 Math.sin(this.accumulatedDeltaTime / 200);
+		const bobFactor = Math.sin(this.accumulatedDeltaTime / 200);
 
 		sprites.head.draw(
 			context,
-			Coord.add(new Coord({x:0, y: bobFactor * 2}), Coord.subtract(avatarCenter, Coord.scale(size, 0.5))),
+			Coord.add(
+				new Coord({ x: 0, y: bobFactor * 2 }),
+				Coord.subtract(avatarCenter, Coord.scale(size, 0.5)),
+			),
 			size,
 		);
 	}

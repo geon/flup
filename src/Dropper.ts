@@ -1,4 +1,4 @@
-import { Board } from "./Board";
+import { BoardLogic } from "./BoardLogic";
 import { Coord } from "./Coord";
 import { DropperQueue } from "./DropperQueue";
 import { Piece } from "./Piece";
@@ -16,7 +16,7 @@ export class Dropper {
 	constructor(dropperQueue: DropperQueue) {
 		this.dropperQueue = dropperQueue;
 
-		this.position = Math.floor((Board.size.x - 1) / 2);
+		this.position = Math.floor((BoardLogic.size.x - 1) / 2);
 		this.orientation = 0;
 
 		const { a, b } = this.dropperQueue.pop();
@@ -34,7 +34,7 @@ export class Dropper {
 
 	moveRight() {
 		this.position = Math.min(
-			Board.size.x - (this.orientation % 2 ? 1 : 2),
+			BoardLogic.size.x - (this.orientation % 2 ? 1 : 2),
 			this.position + 1,
 		);
 
@@ -51,9 +51,9 @@ export class Dropper {
 
 	private preventDropperFromStickingOutAfterRotation() {
 		// If the orientation is horizontal, and the pieces were at the right wall, now making the last one stick out...
-		if (!(this.orientation % 2) && this.position >= Board.size.x - 1) {
+		if (!(this.orientation % 2) && this.position >= BoardLogic.size.x - 1) {
 			// ...move the pair up just against the wall.
-			this.position = Board.size.x - 2;
+			this.position = BoardLogic.size.x - 2;
 		}
 	}
 
@@ -113,7 +113,7 @@ export class Dropper {
 		// A needs to wait just beside the queue until B is ready.
 		this.pieceA.sprite.move({
 			to: new Coord({
-				x: this.dropperQueue.dropperSide == "left" ? 0 : Board.size.x - 1,
+				x: this.dropperQueue.dropperSide == "left" ? 0 : BoardLogic.size.x - 1,
 				y: 0,
 			}),
 			duration: DropperQueue.dropperQueueTimePerPieceWidth,
@@ -123,9 +123,9 @@ export class Dropper {
 
 		const duration =
 			this.dropperQueue.dropperSide == "left"
-				? (coords.b.x - Board.size.x) * timePerPieceWidths
-				: (Board.size.x - coords.b.x) * timePerPieceWidths;
-		if (this.orientation && this.position < Board.size.x - 1) {
+				? (coords.b.x - BoardLogic.size.x) * timePerPieceWidths
+				: (BoardLogic.size.x - coords.b.x) * timePerPieceWidths;
+		if (this.orientation && this.position < BoardLogic.size.x - 1) {
 			// Make A go via B.
 			this.pieceA.sprite.move({
 				to: coords.b,
