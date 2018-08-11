@@ -10,16 +10,10 @@ import { PieceSprite } from "./PieceSprite";
 import { PieceCycle } from "./PieceCycle";
 import { UnlockingEffect } from "./UnlockingEffect";
 
-interface FallMove {
-	piece: PieceSprite;
-	from: Coord;
-	distance: number;
-	numConsecutive: number;
-}
-
-interface PunishMove {
+interface Movement {
 	sprite: PieceSprite;
 	to: Coord;
+	numConsecutive: number;
 }
 
 export class Board {
@@ -110,19 +104,19 @@ export class Board {
 			let foundChains = true;
 
 			while (foundChains) {
-				const moves = this.makePiecesFall();
+				const movements = this.makePiecesFall();
 
 				const timePerPieceHeight = 100;
 				yield* parallel(
-					moves.map(move =>
+					movements.map(movement =>
 						queue([
-							waitMs(move.numConsecutive * 50),
-							move.piece.makeMoveCoroutine({
-								to: new Coord({
-									x: move.from.x,
-									y: move.from.y + move.distance,
-								}),
-								duration: Math.sqrt(move.distance) * timePerPieceHeight,
+							waitMs(movement.numConsecutive * 50),
+							movement.sprite.makeMoveCoroutine({
+								to: movement.to,
+								duration:
+									Math.sqrt(
+										Coord.distance(movement.sprite.position, movement.to),
+									) * timePerPieceHeight,
 								easing: easings.easeInQuad,
 							}),
 						]),
@@ -198,7 +192,7 @@ export class Board {
 		this.dropper.charge();
 	}
 
-	makePiecesFall(): ReadonlyArray<FallMove> {
+	makePiecesFall(): ReadonlyArray<Movement> {
 		/*
 
 		This might seem like an awful lot of code for something as simple as
@@ -216,7 +210,7 @@ export class Board {
 
 		*/
 
-		const moves: Array<FallMove> = [];
+		const movements: Array<Movement> = [];
 
 		// For each collumn.
 		for (let x = 0; x < Board.size.x; ++x) {
@@ -254,10 +248,9 @@ export class Board {
 				const piece = this.pieces[putPos]!;
 
 				// Record moves.
-				moves.push({
-					piece: piece.sprite,
-					from: Board.indexToCoord(getPos),
-					distance: yPut - yGet,
+				movements.push({
+					sprite: piece.sprite,
+					to: Board.indexToCoord(putPos),
 					numConsecutive,
 				});
 				++numConsecutive;
@@ -268,7 +261,7 @@ export class Board {
 			}
 		}
 
-		return moves;
+		return movements;
 	}
 
 	unlockChains(): Array<Piece> {
@@ -396,8 +389,8 @@ export class Board {
 		);
 	}
 
-	punishLogic(row: ReadonlyArray<Piece>): ReadonlyArray<PunishMove> {
-		const movements: Array<PunishMove> = [];
+	punishLogic(row: ReadonlyArray<Piece>): ReadonlyArray<Movement> {
+		const movements: Array<Movement> = [];
 
 		// Make room. Move everything 1 step up.
 		for (let y = 0; y < Board.size.y - 1; y++) {
@@ -412,6 +405,7 @@ export class Board {
 					movements.push({
 						to: Board.indexToCoord(to),
 						sprite: movedPiece.sprite,
+						numConsecutive: 0,
 					});
 				}
 			}
@@ -424,6 +418,7 @@ export class Board {
 			movements.push({
 				to: Board.indexToCoord(to),
 				sprite: piece.sprite,
+				numConsecutive: 0,
 			});
 		});
 
