@@ -9,12 +9,7 @@ import { Piece } from "./Piece";
 import { PieceSprite } from "./PieceSprite";
 import { PieceCycle } from "./PieceCycle";
 import { UnlockingEffect } from "./UnlockingEffect";
-
-interface Movement {
-	sprite: PieceSprite;
-	to: Coord;
-	numConsecutive: number;
-}
+import { Movement } from "./Movement";
 
 export class Board {
 	gameMode: GameMode;
