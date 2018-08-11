@@ -17,6 +17,11 @@ interface FallMove {
 	numConsecutive: number;
 }
 
+interface PunishMove {
+	sprite: PieceSprite;
+	to: Coord;
+}
+
 export class Board {
 	gameMode: GameMode;
 	frameCoroutine: IterableIterator<void>;
@@ -391,44 +396,69 @@ export class Board {
 		);
 	}
 
-	punish(avatar: Avatar) {
-		// Make room.
+	punishLogic(row: ReadonlyArray<Piece>): ReadonlyArray<PunishMove> {
+		const movements: Array<PunishMove> = [];
+
+		// Make room. Move everything 1 step up.
 		for (let y = 0; y < Board.size.y - 1; y++) {
 			for (let x = 0; x < Board.size.x; x++) {
-				this.pieces[Board.xyToIndex(x, y)] = this.pieces[
-					Board.xyToIndex(x, y + 1)
-				];
+				const from = Board.xyToIndex(x, y + 1);
+				const to = Board.xyToIndex(x, y);
+
+				const movedPiece = this.pieces[from];
+				this.pieces[to] = movedPiece;
+
+				if (movedPiece) {
+					movements.push({
+						to: Board.indexToCoord(to),
+						sprite: movedPiece.sprite,
+					});
+				}
 			}
 		}
 
+		// Add a row of pieces at the bottom.
+		row.forEach((piece, x) => {
+			const to = Board.xyToIndex(x, Board.size.y - 1);
+			this.pieces[to] = piece;
+			movements.push({
+				to: Board.indexToCoord(to),
+				sprite: piece.sprite,
+			});
+		});
+
+		return movements;
+	}
+
+	punish(avatar: Avatar) {
 		// Add pieces.
 		const row = avatar.getPunishColors();
 
-		for (let x = 0; x < row.length; x++) {
-			const piece = this.makePiece({
-				color: row[x],
-				key: false,
-				position: new Coord({
-					x,
-					// Start the animation just outside the Board.
-					y: Board.size.y,
-				}),
+		const pieces = row.map((color, x): Piece => {
+			const key = false;
+			const position = new Coord({
+				x,
+				// Start the animation just outside the Board.
+				y: Board.size.y,
 			});
 
-			this.pieces[Board.xyToIndex(x, Board.size.y - 1)] = piece;
-		}
+			return this.makePiece({
+				color,
+				key,
+				position,
+			});
+		});
+
+		const movements = this.punishLogic(pieces);
 
 		// Animate.
-		for (let i = 0; i < this.pieces.length; i++) {
-			const piece = this.pieces[i];
-			if (piece) {
-				piece.sprite.move({
-					to: Board.indexToCoord(i),
-					duration: DropperQueue.dropperQueueTimePerPieceWidth,
-					easing: easings.sine,
-					delay: 0,
-				});
-			}
+		for (const movement of movements) {
+			movement.sprite.move({
+				to: movement.to,
+				duration: DropperQueue.dropperQueueTimePerPieceWidth,
+				easing: easings.sine,
+				delay: 0,
+			});
 		}
 	}
 
