@@ -65,7 +65,6 @@ export class Board {
 				yield* parallel(
 					movements.map(movement =>
 						queue([
-							waitMs(movement.numConsecutive * 50),
 							movement.sprite.makeMoveCoroutine({
 								to: movement.to,
 								duration:

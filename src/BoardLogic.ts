@@ -91,15 +91,11 @@ export class BoardLogic {
 
 			let yGet = yPut - 1;
 
-			let numConsecutive = 0;
-
 			// For the whole collumn...
 			collumnLoop: while (yGet >= 0) {
 				// Search for a piece to put in the empty space.
 				while (!this.pieces[BoardLogic.xyToIndex(x, yGet)]) {
 					--yGet;
-
-					numConsecutive = 0;
 
 					if (yGet < 0) {
 						break collumnLoop;
@@ -118,9 +114,7 @@ export class BoardLogic {
 				movements.push({
 					sprite: piece.sprite,
 					to: BoardLogic.indexToCoord(putPos),
-					numConsecutive,
 				});
-				++numConsecutive;
 
 				// Raise the put/put-positions.
 				--yGet;
@@ -240,7 +234,6 @@ export class BoardLogic {
 					movements.push({
 						to: BoardLogic.indexToCoord(to),
 						sprite: movedPiece.sprite,
-						numConsecutive: 0,
 					});
 				}
 			}
@@ -253,7 +246,6 @@ export class BoardLogic {
 			movements.push({
 				to: BoardLogic.indexToCoord(to),
 				sprite: piece.sprite,
-				numConsecutive: 0,
 			});
 		});
 
