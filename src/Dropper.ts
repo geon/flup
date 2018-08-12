@@ -7,8 +7,9 @@ import { easings } from "./Animation";
 export class Dropper {
 	dropperQueue: DropperQueue;
 
-	pieceA: Piece;
-	pieceB: Piece;
+	// Initialized by charge().
+	pieceA!: Piece;
+	pieceB!: Piece;
 
 	position: number;
 	orientation: number;
@@ -18,10 +19,6 @@ export class Dropper {
 
 		this.position = Math.floor((BoardLogic.size.x - 1) / 2);
 		this.orientation = 0;
-
-		const { a, b } = this.dropperQueue.pop();
-		this.pieceA = a;
-		this.pieceB = b;
 
 		this.charge();
 	}
