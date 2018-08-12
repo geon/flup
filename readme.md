@@ -38,7 +38,6 @@ TODO
 
 The next few issues on the map:
 
-* Animation timing is tedious and tricky to get it all just right. Possibly switch to some other method.
 * Pieces in the column above an exploding piece should fall immediately, not after the whole chain is gone.
 * Try how it feels if the droppedd pieces can never land on top of each-other, but will disappear immediately when they land, making room for the piece above. That makes it possible to make the pieces shatter immediately when a chain is made, instead of waiting for everything to settle.
 * The visual queue of pieces feeding the dropper feels weird when the dropper is vertical. The pieces und up upside-down compared to how they sat in the queue. Feed the queue from above, move the pieces straight to the side, or flip them in the opposite direction at the end.
