@@ -76,8 +76,9 @@ export class BoardLogic {
 		this.dropper.charge();
 	}
 
-	makePiecesFall(): ReadonlyArray<Movement> {
-		const movements: Array<Movement> = [];
+	makePiecesFall(): ReadonlyArray<ReadonlyArray<Movement>> {
+		const movements: Array<Array<Movement>> = [];
+		let columnMovements: Array<Movement> = [];
 
 		// For each collumn.
 		for (let x = 0; x < BoardLogic.size.x; ++x) {
@@ -97,6 +98,9 @@ export class BoardLogic {
 				while (!this.pieces[BoardLogic.xyToIndex(x, yGet)]) {
 					--yGet;
 
+					columnMovements = [];
+					movements.push(columnMovements);
+
 					if (yGet < 0) {
 						break collumnLoop;
 					}
@@ -111,7 +115,7 @@ export class BoardLogic {
 				const piece = this.pieces[putPos]!;
 
 				// Record moves.
-				movements.push({
+				columnMovements.push({
 					sprite: piece.sprite,
 					to: BoardLogic.indexToCoord(putPos),
 				});

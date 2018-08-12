@@ -59,22 +59,29 @@ export class Board {
 			let foundChains = true;
 
 			while (foundChains) {
-				const movements = this.boardLogic.makePiecesFall();
+				const consecutive = this.boardLogic.makePiecesFall();
 
 				const timePerPieceHeight = 100;
 				yield* parallel(
-					movements.map(movement =>
-						queue([
-							movement.sprite.makeMoveCoroutine({
-								to: movement.to,
-								duration:
-									Math.sqrt(
-										Coord.distance(movement.sprite.position, movement.to),
-									) * timePerPieceHeight,
-								easing: easings.easeInQuad,
-							}),
-						]),
-					),
+					consecutive
+						.map(movements =>
+							movements.map((movement, index) =>
+								queue([
+									waitMs(index * 50),
+									movement.sprite.makeMoveCoroutine({
+										to: movement.to,
+										duration:
+											Math.sqrt(
+												Coord.distance(movement.sprite.position, movement.to),
+											) * timePerPieceHeight,
+										easing: easings.easeInQuad,
+									}),
+								]),
+							),
+						)
+						.reduce((soFar, current) => [...soFar, ...current], [] as Array<
+							IterableIterator<void>
+						>),
 				);
 
 				const unlockedPieces = this.boardLogic.unlockChains();
