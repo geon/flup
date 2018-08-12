@@ -4,7 +4,11 @@ import { DropperQueue } from "./DropperQueue";
 import { Piece } from "./Piece";
 import { PieceSprite } from "./PieceSprite";
 import { PieceCycle } from "./PieceCycle";
-import { Movement } from "./Movement";
+
+interface Movement {
+	sprite: PieceSprite;
+	to: Coord;
+}
 
 export class BoardLogic {
 	pieces: Array<Piece | undefined>;
