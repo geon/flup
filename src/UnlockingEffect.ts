@@ -8,6 +8,7 @@ export class UnlockingEffect {
 	coord: Coord;
 	accumulatedDeltaTime: number;
 	initialVelocities: Array<Coord>;
+	frameCoroutine: IterableIterator<void>;
 
 	constructor(color: number, position: Coord) {
 		this.color = color;
@@ -23,6 +24,8 @@ export class UnlockingEffect {
 				y: Math.random() * 2 - 1 - 0.2,
 			}).scaled(0.35);
 		}
+
+		this.frameCoroutine = this.makeFrameCoroutine();
 	}
 
 	static size: number = 16;
@@ -77,6 +80,7 @@ export class UnlockingEffect {
 	};
 
 	*makeFrameCoroutine() {
+		// TODO: Move the animation here.
 		yield* waitMs(UnlockingEffect.duration);
 	}
 

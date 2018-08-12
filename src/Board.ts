@@ -93,7 +93,6 @@ export class Board {
 							unlocking.color,
 							unlocking.sprite.position,
 						);
-						const unlockingEffectCoroutine = unlockingEffect.makeFrameCoroutine();
 
 						return queue([
 							waitMs(unlocking.depth * 50),
@@ -103,12 +102,6 @@ export class Board {
 
 								// Replace with the unlocking effect.
 								this.unlockingEffects.push(unlockingEffect);
-							}),
-							unlockingEffectCoroutine,
-							makeIterable(() => {
-								// Remove the unlockingEffect.
-								const index = this.unlockingEffects.indexOf(unlockingEffect);
-								this.unlockingEffects.splice(index, 1);
 							}),
 						]);
 					}),
@@ -226,6 +219,15 @@ export class Board {
 
 			for (const sprite of this.piecesSprites) {
 				sprite.frameCoroutine.next(deltaTime);
+			}
+
+			for (const unlockingEffect of this.unlockingEffects) {
+				const done = unlockingEffect.frameCoroutine.next(deltaTime).done;
+				if (done) {
+					// Remove the unlockingEffect.
+					const index = this.unlockingEffects.indexOf(unlockingEffect);
+					this.unlockingEffects.splice(index, 1);
+				}
 			}
 		}
 	}
