@@ -84,22 +84,22 @@ export class Board {
 						>),
 				);
 
-				const unlockedPieces = this.boardLogic.unlockChains();
-				foundChains = !!unlockedPieces.length;
+				const unlockings = this.boardLogic.unlockChains();
+				foundChains = !!unlockings.length;
 
 				yield* parallel(
-					unlockedPieces.map((piece, i) => {
+					unlockings.map(unlocking => {
 						const unlockingEffect = new UnlockingEffect(
-							piece.color,
-							piece.sprite.position,
+							unlocking.color,
+							unlocking.sprite.position,
 						);
 						this.unlockingEffects.push(unlockingEffect);
 						const unlockingEffectCoroutine = unlockingEffect.makeFrameCoroutine();
 						return queue([
-							waitMs(i * 50),
+							waitMs(unlocking.depth * 50),
 							makeIterable(() => {
 								// Remove the graphical representation.
-								this.piecesSprites.delete(piece.sprite);
+								this.piecesSprites.delete(unlocking.sprite);
 							}),
 							unlockingEffectCoroutine,
 							makeIterable(() => {

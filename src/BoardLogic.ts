@@ -10,6 +10,12 @@ interface Movement {
 	to: Coord;
 }
 
+interface Unlocking {
+	sprite: PieceSprite;
+	depth: number;
+	color: number;
+}
+
 export class BoardLogic {
 	pieces: Array<Piece | undefined>;
 
@@ -133,7 +139,7 @@ export class BoardLogic {
 		return movements;
 	}
 
-	unlockChains(): Array<Piece> {
+	unlockChains(): Array<Unlocking> {
 		return this.pieces
 			.map((_piece, position) => position)
 			.filter(position => {
@@ -144,11 +150,14 @@ export class BoardLogic {
 					this.matchingNeighborsOfPosition(position).length
 				);
 			})
-			.map(position => this.unLockChainRecursively(position))
-			.reduce((soFar, current) => [...soFar, ...current], [] as Array<Piece>);
+			.map(position => this.unLockChainRecursively(position, 0))
+			.reduce((soFar, current) => [...soFar, ...current], [] as Array<
+				Unlocking
+			>);
 	}
 
-	unLockChainRecursively(position: number): Array<Piece> {
+	// TODO: Make breadth-first. Looks nicer and more consistent.
+	unLockChainRecursively(position: number, depth: number): Array<Unlocking> {
 		// Must search for neighbors before removing the piece matching against.
 		const matchingNeighborPositions = this.matchingNeighborsOfPosition(
 			position,
@@ -164,14 +173,15 @@ export class BoardLogic {
 
 		// For all matching neighbors, recurse.
 		const unlockedChainsFromNeighbors = matchingNeighborPositions.map(
-			neighborPosition => this.unLockChainRecursively(neighborPosition),
+			neighborPosition =>
+				this.unLockChainRecursively(neighborPosition, depth + 1),
 		);
 
 		return [
-			unlockedPiece,
+			{ sprite: unlockedPiece.sprite, depth, color: unlockedPiece.color },
 			...unlockedChainsFromNeighbors.reduce(
 				(soFar, current) => [...soFar, ...current],
-				[] as Array<Piece>,
+				[] as Array<Unlocking>,
 			),
 		];
 	}
