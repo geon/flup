@@ -17,7 +17,7 @@ export class Board {
 	boardLogic: BoardLogic;
 	piecesSprites: Set<PieceSprite>;
 
-	unlockingEffects: Array<UnlockingEffect>;
+	unlockingEffects: Set<UnlockingEffect>;
 
 	slateRandomExp: number;
 
@@ -41,7 +41,7 @@ export class Board {
 			dropperQueue,
 		});
 
-		this.unlockingEffects = [];
+		this.unlockingEffects = new Set();
 		this.slateRandomExp = 2 + Math.random();
 	}
 
@@ -101,7 +101,7 @@ export class Board {
 								this.piecesSprites.delete(unlocking.sprite);
 
 								// Replace with the unlocking effect.
-								this.unlockingEffects.push(unlockingEffect);
+								this.unlockingEffects.add(unlockingEffect);
 							}),
 						]);
 					}),
@@ -148,7 +148,7 @@ export class Board {
 						piece.color,
 						piece.sprite.position,
 					);
-					this.unlockingEffects.push(unlockingEffect);
+					this.unlockingEffects.add(unlockingEffect);
 					const unlockingEffectCoroutine = unlockingEffect.makeFrameCoroutine();
 					return queue([
 						// Unlock all pieces, from the center and out.
@@ -165,8 +165,7 @@ export class Board {
 						unlockingEffectCoroutine,
 						makeIterable(() => {
 							// Remove the unlockingEffect.
-							const index = this.unlockingEffects.indexOf(unlockingEffect);
-							this.unlockingEffects.splice(index, 1);
+							this.unlockingEffects.delete(unlockingEffect);
 						}),
 					]);
 				}),
@@ -225,8 +224,7 @@ export class Board {
 				const done = unlockingEffect.frameCoroutine.next(deltaTime).done;
 				if (done) {
 					// Remove the unlockingEffect.
-					const index = this.unlockingEffects.indexOf(unlockingEffect);
-					this.unlockingEffects.splice(index, 1);
+					this.unlockingEffects.delete(unlockingEffect);
 				}
 			}
 		}
