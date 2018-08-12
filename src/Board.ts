@@ -89,11 +89,6 @@ export class Board {
 
 				yield* parallel(
 					unlockings.map(unlocking => {
-						const unlockingEffect = new UnlockingEffect(
-							unlocking.color,
-							unlocking.sprite.position,
-						);
-
 						return queue([
 							waitMs(unlocking.depth * 50),
 							makeIterable(() => {
@@ -101,7 +96,12 @@ export class Board {
 								this.piecesSprites.delete(unlocking.sprite);
 
 								// Replace with the unlocking effect.
-								this.unlockingEffects.add(unlockingEffect);
+								this.unlockingEffects.add(
+									new UnlockingEffect(
+										unlocking.color,
+										unlocking.sprite.position,
+									),
+								);
 							}),
 						]);
 					}),
@@ -144,10 +144,6 @@ export class Board {
 			this.boardLogic.pieces
 				.filter((piece): piece is Piece => !!piece)
 				.map(piece => {
-					const unlockingEffect = new UnlockingEffect(
-						piece.color,
-						piece.sprite.position,
-					);
 					return queue([
 						// Unlock all pieces, from the center and out.
 						waitMs(
@@ -161,7 +157,9 @@ export class Board {
 							this.piecesSprites.delete(piece.sprite);
 
 							// Replace with the unlocking effect.
-							this.unlockingEffects.add(unlockingEffect);
+							this.unlockingEffects.add(
+								new UnlockingEffect(piece.color, piece.sprite.position),
+							);
 						}),
 					]);
 				}),
