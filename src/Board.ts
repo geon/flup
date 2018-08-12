@@ -148,8 +148,6 @@ export class Board {
 						piece.color,
 						piece.sprite.position,
 					);
-					this.unlockingEffects.add(unlockingEffect);
-					const unlockingEffectCoroutine = unlockingEffect.makeFrameCoroutine();
 					return queue([
 						// Unlock all pieces, from the center and out.
 						waitMs(
@@ -161,11 +159,9 @@ export class Board {
 						makeIterable(() => {
 							// Remove the graphical representation.
 							this.piecesSprites.delete(piece.sprite);
-						}),
-						unlockingEffectCoroutine,
-						makeIterable(() => {
-							// Remove the unlockingEffect.
-							this.unlockingEffects.delete(unlockingEffect);
+
+							// Replace with the unlocking effect.
+							this.unlockingEffects.add(unlockingEffect);
 						}),
 					]);
 				}),
