@@ -35,14 +35,16 @@ export class GameMode2pLocal implements GameMode {
 		this.frameCoroutine = this.makeFrameCoroutine();
 	}
 
-	onUnlockedChains(board: Board) {
-		this.punishOpponents(board);
+	onUnlockedChains(board: Board, chainCount: number) {
+		this.punishOpponents(board, chainCount);
 	}
 
-	punishOpponents(board: Board) {
+	punishOpponents(board: Board, chainCount: number) {
 		for (let i = 0; i < this.boards.length; i++) {
 			if (this.boards[i] !== board) {
-				this.boards[i].punish(this.avatars[i]);
+				for (let j = 0; j < chainCount - 1; ++j) {
+					this.boards[i].punish(this.avatars[i]);
+				}
 			}
 		}
 	}

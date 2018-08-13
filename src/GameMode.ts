@@ -4,7 +4,7 @@ import { Coord } from "./Coord";
 export interface GameMode {
 	frameCoroutine: IterableIterator<void>;
 	onGameOver: (board: Board) => void;
-	onUnlockedChains: (board: Board) => void;
+	onUnlockedChains: (board: Board, chainCount: number) => void;
 	onKeyDown: (keyCode: number) => void;
 	draw: (
 		context: CanvasRenderingContext2D,

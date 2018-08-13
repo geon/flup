@@ -57,6 +57,7 @@ export class Board {
 			yield;
 
 			let foundChains = true;
+			let chainCount = 0;
 
 			while (foundChains) {
 				const consecutive = this.boardLogic.makePiecesFall();
@@ -108,9 +109,13 @@ export class Board {
 				);
 
 				if (foundChains) {
-					// The player scored, so punish opponents.
-					this.gameMode.onUnlockedChains(this);
+					++chainCount;
 				}
+			}
+
+			// The player scored, so punish opponents.
+			if (chainCount) {
+				this.gameMode.onUnlockedChains(this, chainCount);
 			}
 
 			const gameOver = this.boardLogic.checkForGameOver();
