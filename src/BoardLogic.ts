@@ -140,62 +140,69 @@ export class BoardLogic {
 	}
 
 	unlockChains(): Array<Unlocking> {
-		return this.pieces
-			.map((_piece, position) => position)
-			.filter(position => {
-				const piece = this.pieces[position];
-				return (
-					piece &&
-					piece.key &&
-					this.matchingNeighborsOfPosition(position).length
-				);
-			})
-			.map(position => this.unLockChainRecursively(position, 0))
-			.reduce((soFar, current) => [...soFar, ...current], [] as Array<
-				Unlocking
-			>);
-	}
+		const unlockings: Array<Unlocking> = [];
 
-	// TODO: Make breadth-first. Looks nicer and more consistent.
-	unLockChainRecursively(position: number, depth: number): Array<Unlocking> {
-		// Must search for neighbors before removing the piece matching against.
-		const matchingNeighborPositions = this.matchingNeighborsOfPosition(
-			position,
-		);
+		// Removes the piece and saves the unlocking.
+		const unlockPosition = (position: number, depth: number) => {
+			const piece = this.pieces[position];
+			this.pieces[position] = undefined;
 
-		const unlockedPiece = this.pieces[position];
-		this.pieces[position] = undefined;
+			if (piece) {
+				unlockings.push({
+					sprite: piece.sprite,
+					depth,
+					color: piece.color,
+				});
+			}
+		};
 
-		// Another branch of the chain might have reached here before.
-		if (!unlockedPiece) {
-			return [];
+		for (const [position, piece] of this.pieces.entries()) {
+			// Search for keys.
+			if (!(piece && piece.key)) {
+				continue;
+			}
+
+			const isSameColor = (neighborPosition: number) => {
+				const neighborPiece = this.pieces[neighborPosition];
+				return !!neighborPiece && neighborPiece.color == piece.color;
+			};
+
+			// If the key is touching any other piece of the same color, there is a chain.
+			const foundChain = this.neighborsOfPosition(position).some(isSameColor);
+
+			if (foundChain) {
+				// Unlock it.
+
+				// Breadth-first search.
+
+				// Start at the key.
+				let queue = [position];
+				let depth = 0;
+				while (queue.length) {
+					// Unlock everything at the wave-front.
+					for (const neighborPosition of queue) {
+						unlockPosition(neighborPosition, depth);
+					}
+					++depth;
+
+					// Find everything of the same color, that touched the recently unlocked pieces.
+					queue = queue
+						.map(p => this.neighborsOfPosition(p))
+						.reduce((soFar, current) => [...soFar, ...current], [] as Array<
+							number
+						>)
+						.filter(isSameColor);
+				}
+			}
 		}
 
-		// For all matching neighbors, recurse.
-		const unlockedChainsFromNeighbors = matchingNeighborPositions.map(
-			neighborPosition =>
-				this.unLockChainRecursively(neighborPosition, depth + 1),
-		);
-
-		return [
-			{ sprite: unlockedPiece.sprite, depth, color: unlockedPiece.color },
-			...unlockedChainsFromNeighbors.reduce(
-				(soFar, current) => [...soFar, ...current],
-				[] as Array<Unlocking>,
-			),
-		];
+		return unlockings;
 	}
 
-	matchingNeighborsOfPosition(position: number) {
-		const piece = this.pieces[position];
-
-		if (!piece) {
-			return [];
-		}
+	neighborsOfPosition(position: number) {
+		const coord = BoardLogic.indexToCoord(position);
 
 		const neighborPositions = [];
-
-		const coord = BoardLogic.indexToCoord(position);
 
 		// Right
 		if (coord.x < BoardLogic.size.x - 1) {
@@ -217,18 +224,7 @@ export class BoardLogic {
 			neighborPositions.push(position - BoardLogic.size.x);
 		}
 
-		const matchingNeighborPositions = [];
-		const color = piece.color;
-		for (let i = neighborPositions.length - 1; i >= 0; i--) {
-			const neighborPosition = neighborPositions[i];
-			const neighborPiece = this.pieces[neighborPosition];
-
-			if (neighborPiece && neighborPiece.color === color) {
-				matchingNeighborPositions.push(neighborPosition);
-			}
-		}
-
-		return matchingNeighborPositions;
+		return neighborPositions;
 	}
 
 	checkForGameOver() {
