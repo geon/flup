@@ -7,7 +7,10 @@
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"start": "webpack-dev-server -d",
 		"tsc": "tsc",
-		"lint": "tslint -c tslint.json 'src/**/*.ts' -e 'src/**/*.d.ts' --fix"
+		"lint": "tslint -c tslint.json 'src/**/*.ts' -e 'src/**/*.d.ts' --fix",
+		"build:clean": "rm -rf dist",
+		"build":
+			"npm run build:clean && webpack-cli --mode production --optimize-minimize && cp -r src/graphics dist/ && cp src/index.html dist/"
 	},
 	"repository": {
 		"type": "git",
