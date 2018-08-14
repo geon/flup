@@ -76,6 +76,7 @@ export class BoardLogic {
 		if (
 			drops.some(drop => !!this.pieces[BoardLogic.coordToIndex(drop.coord)])
 		) {
+			return;
 		}
 
 		for (const drop of drops) {
