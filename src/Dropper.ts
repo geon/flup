@@ -12,13 +12,13 @@ export class Dropper {
 	pieceB!: Piece;
 
 	position: number;
-	orientation: number;
+	orientation: "horizontal" | "vertical";
 
 	constructor(dropperQueue: DropperQueue) {
 		this.dropperQueue = dropperQueue;
 
 		this.position = Math.floor((BoardLogic.size.x - 1) / 2);
-		this.orientation = 0;
+		this.orientation = "horizontal";
 
 		this.charge();
 	}
@@ -31,7 +31,7 @@ export class Dropper {
 
 	moveRight() {
 		this.position = Math.min(
-			BoardLogic.size.x - (this.orientation % 2 ? 1 : 2),
+			BoardLogic.size.x - (this.orientation == "vertical" ? 1 : 2),
 			this.position + 1,
 		);
 
@@ -39,7 +39,14 @@ export class Dropper {
 	}
 
 	rotate() {
-		this.orientation = (this.orientation + 1) % 4;
+		this.orientation =
+			this.orientation == "vertical" ? "horizontal" : "vertical";
+
+		if (this.orientation == "horizontal") {
+			const temp = this.pieceA;
+			this.pieceA = this.pieceB;
+			this.pieceB = temp;
+		}
 
 		this.preventDropperFromStickingOutAfterRotation();
 
@@ -48,7 +55,7 @@ export class Dropper {
 
 	private preventDropperFromStickingOutAfterRotation() {
 		// If the orientation is horizontal, and the pieces were at the right wall, now making the last one stick out...
-		if (!(this.orientation % 2) && this.position >= BoardLogic.size.x - 1) {
+		if (this.orientation == "horizontal" && this.position >= BoardLogic.size.x - 1) {
 			// ...move the pair up just against the wall.
 			this.position = BoardLogic.size.x - 2;
 		}
@@ -64,36 +71,19 @@ export class Dropper {
 	}
 
 	private getCoordinates() {
-		/* Player Orientations:
-
-			ab	a.	ba	b.
-			..	b.	..	a.
-		*/
-
 		return {
 			a: new Coord({
-				x: this.position + (this.orientation === 2 ? 1 : 0),
-				y: this.orientation === 3 ? 1 : 0,
+				x: this.position,
+				y: 0,
 			}),
 			b: new Coord({
-				x: this.position + (this.orientation === 0 ? 1 : 0),
-				y: this.orientation === 1 ? 1 : 0,
+				x: this.position + (this.orientation === "horizontal" ? 1 : 0),
+				y: this.orientation === "vertical" ? 1 : 0,
 			}),
 		};
 	}
 
 	charge() {
-		// Set the orientation back to horiz. or vert., but not backwards or upside-down.
-		// this.orientation %= 2;
-
-		if (this.orientation === 2) {
-			this.orientation = 0;
-		}
-
-		if (this.orientation === 1) {
-			this.orientation = 3;
-		}
-
 		const coords = this.getCoordinates();
 
 		const timePerPieceWidths = 50;
