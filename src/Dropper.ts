@@ -1,4 +1,4 @@
-import { BoardLogic } from "./BoardLogic";
+import { BoardLogic, MoveEvent } from "./BoardLogic";
 import { Coord } from "./Coord";
 import { DropperQueue } from "./DropperQueue";
 import { Piece } from "./Piece";
@@ -26,7 +26,7 @@ export class Dropper {
 	moveLeft() {
 		this.position = Math.max(0, this.position - 1);
 
-		this.animate();
+		return this.animate();
 	}
 
 	moveRight() {
@@ -35,7 +35,7 @@ export class Dropper {
 			this.position + 1,
 		);
 
-		this.animate();
+		return this.animate();
 	}
 
 	rotate() {
@@ -50,12 +50,15 @@ export class Dropper {
 
 		this.preventDropperFromStickingOutAfterRotation();
 
-		this.animate();
+		return this.animate();
 	}
 
 	private preventDropperFromStickingOutAfterRotation() {
 		// If the orientation is horizontal, and the pieces were at the right wall, now making the last one stick out...
-		if (this.orientation == "horizontal" && this.position >= BoardLogic.size.x - 1) {
+		if (
+			this.orientation == "horizontal" &&
+			this.position >= BoardLogic.size.x - 1
+		) {
 			// ...move the pair up just against the wall.
 			this.position = BoardLogic.size.x - 2;
 		}
@@ -148,22 +151,21 @@ export class Dropper {
 		});
 	}
 
-	private animate() {
+	private animate(): MoveEvent {
 		const coords = this.getCoordinates();
 
-		const timePerPieceWidths = 50;
-
-		this.pieceA.sprite.move({
-			to: coords.a,
-			duration: timePerPieceWidths,
-			easing: easings.sine,
-			delay: 0,
-		});
-		this.pieceB.sprite.move({
-			to: coords.b,
-			duration: timePerPieceWidths,
-			easing: easings.sine,
-			delay: 0,
-		});
+		return {
+			type: "move",
+			movements: [
+				{
+					sprite: this.pieceA.sprite,
+					to: coords.a,
+				},
+				{
+					sprite: this.pieceB.sprite,
+					to: coords.b,
+				},
+			],
+		};
 	}
 }

@@ -67,6 +67,18 @@ export class Board {
 			let chainCount = 0;
 
 			switch (event.type) {
+				case "move":
+					yield* parallel(
+						event.movements.map(movement =>
+							movement.sprite.makeMoveCoroutine({
+								to: movement.to,
+								duration: 50,
+								easing: easings.sine,
+							}),
+						),
+					);
+					break;
+
 				case "fall":
 					const timePerPieceHeight = 100;
 					yield* parallel(
@@ -112,6 +124,10 @@ export class Board {
 						),
 					);
 					break;
+
+				default:
+					exhaustionChecker(event);
+					break;
 			}
 
 			// The player scored, so punish opponents.
@@ -128,15 +144,15 @@ export class Board {
 	}
 
 	moveLeft() {
-		this.boardLogic.moveLeft();
+		this.eventQueue.push(this.boardLogic.moveLeft());
 	}
 
 	moveRight() {
-		this.boardLogic.moveRight();
+		this.eventQueue.push(this.boardLogic.moveRight());
 	}
 
 	rotate() {
-		this.boardLogic.rotate();
+		this.eventQueue.push(this.boardLogic.rotate());
 	}
 
 	drop() {
@@ -301,4 +317,8 @@ export class Board {
 			);
 		}
 	}
+}
+
+function exhaustionChecker(_unknownCase: never) {
+	throw new Error("Unknown case.");
 }

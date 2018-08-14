@@ -5,7 +5,7 @@ import { Piece } from "./Piece";
 import { PieceSprite } from "./PieceSprite";
 import { PieceCycle } from "./PieceCycle";
 
-interface Movement {
+export interface Movement {
 	sprite: PieceSprite;
 	to: Coord;
 }
@@ -14,6 +14,11 @@ interface Unlocking {
 	sprite: PieceSprite;
 	depth: number;
 	color: number;
+}
+
+export interface MoveEvent {
+	type: "move";
+	movements: ReadonlyArray<Movement>;
 }
 
 interface FallEvent {
@@ -26,7 +31,7 @@ interface UnlockingEvent {
 	unlockings: ReadonlyArray<Unlocking>;
 }
 
-export type Event = FallEvent | UnlockingEvent;
+export type Event = MoveEvent | FallEvent | UnlockingEvent;
 
 export class BoardLogic {
 	pieces: Array<Piece | undefined>;
@@ -70,15 +75,15 @@ export class BoardLogic {
 	}
 
 	moveLeft() {
-		this.dropper.moveLeft();
+		return this.dropper.moveLeft();
 	}
 
 	moveRight() {
-		this.dropper.moveRight();
+		return this.dropper.moveRight();
 	}
 
 	rotate() {
-		this.dropper.rotate();
+		return this.dropper.rotate();
 	}
 
 	drop(): ReadonlyArray<Event> {
