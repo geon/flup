@@ -16,6 +16,18 @@ interface Unlocking {
 	color: number;
 }
 
+interface FallEvent {
+	type: "fall";
+	movements: ReadonlyArray<ReadonlyArray<Movement>>;
+}
+
+interface UnlockingEvent {
+	type: "unlocking";
+	unlockings: ReadonlyArray<Unlocking>;
+}
+
+export type Event = FallEvent | UnlockingEvent;
+
 export class BoardLogic {
 	pieces: Array<Piece | undefined>;
 
@@ -69,22 +81,40 @@ export class BoardLogic {
 		this.dropper.rotate();
 	}
 
-	drop() {
+	drop(): ReadonlyArray<Event> {
 		const drops = this.dropper.getDrops();
 
-		// Make sure the board space is not used.
+		// Make sure the positions are not used.
 		if (
 			drops.some(drop => !!this.pieces[BoardLogic.coordToIndex(drop.coord)])
 		) {
-			return;
+			return [];
 		}
 
+		// TODO: Make this generate events as well and return them.
+		this.dropper.charge();
+
+		// Add the pieces.
 		for (const drop of drops) {
-			// Add the pieces.
 			this.pieces[BoardLogic.coordToIndex(drop.coord)] = drop.piece;
 		}
 
-		this.dropper.charge();
+		const events: Array<Event> = [];
+
+		// Do all falling and unlocking.
+		for (;;) {
+			events.push({ type: "fall", movements: this.makePiecesFall() });
+
+			const unlockings = this.unlockChains();
+
+			events.push({ type: "unlocking", unlockings });
+
+			if (!unlockings.length) {
+				break;
+			}
+		}
+
+		return events;
 	}
 
 	makePiecesFall(): ReadonlyArray<ReadonlyArray<Movement>> {

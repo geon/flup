@@ -8,16 +8,17 @@ import { Piece } from "./Piece";
 import { PieceSprite } from "./PieceSprite";
 import { PieceCycle } from "./PieceCycle";
 import { UnlockingEffect } from "./UnlockingEffect";
-import { BoardLogic } from "./BoardLogic";
+import { BoardLogic, Event } from "./BoardLogic";
 
 export class Board {
 	gameMode: GameMode;
 	frameCoroutine: IterableIterator<void>;
 
 	boardLogic: BoardLogic;
-	piecesSprites: Set<PieceSprite>;
 
+	piecesSprites: Set<PieceSprite>;
 	unlockingEffects: Set<UnlockingEffect>;
+	eventQueue: Array<Event>;
 
 	slateRandomExp: number;
 
@@ -42,6 +43,8 @@ export class Board {
 		});
 
 		this.unlockingEffects = new Set();
+		this.eventQueue = [];
+
 		this.slateRandomExp = 2 + Math.random();
 	}
 
@@ -54,63 +57,61 @@ export class Board {
 
 	*makeGameLogicCoroutine(): IterableIterator<void> {
 		for (;;) {
-			yield;
+			const event = this.eventQueue.shift();
 
-			let foundChains = true;
+			if (!event) {
+				yield;
+				continue;
+			}
+
 			let chainCount = 0;
 
-			while (foundChains) {
-				const consecutive = this.boardLogic.makePiecesFall();
-
-				const timePerPieceHeight = 100;
-				yield* parallel(
-					consecutive
-						.map(movements =>
-							movements.map((movement, index) =>
-								queue([
-									waitMs(index * 50),
-									movement.sprite.makeMoveCoroutine({
-										to: movement.to,
-										duration:
-											Math.sqrt(
-												Coord.distance(movement.sprite.position, movement.to),
-											) * timePerPieceHeight,
-										easing: easings.easeInQuad,
-									}),
-								]),
+			switch (event.type) {
+				case "fall":
+					const timePerPieceHeight = 100;
+					yield* parallel(
+						event.movements.map(collumn =>
+							parallel(
+								collumn.map((movement, index) =>
+									queue([
+										waitMs(index * 50),
+										movement.sprite.makeMoveCoroutine({
+											to: movement.to,
+											duration:
+												Math.sqrt(
+													Coord.distance(movement.sprite.position, movement.to),
+												) * timePerPieceHeight,
+											easing: easings.easeInQuad,
+										}),
+									]),
+								),
 							),
-						)
-						.reduce((soFar, current) => [...soFar, ...current], [] as Array<
-							IterableIterator<void>
-						>),
-				);
+						),
+					);
+					break;
 
-				const unlockings = this.boardLogic.unlockChains();
-				foundChains = !!unlockings.length;
-
-				yield* parallel(
-					unlockings.map(unlocking => {
-						return queue([
-							waitMs(unlocking.depth * 50),
-							makeIterable(() => {
-								// Remove the graphical representation.
-								this.piecesSprites.delete(unlocking.sprite);
-
-								// Replace with the unlocking effect.
-								this.unlockingEffects.add(
-									new UnlockingEffect(
-										unlocking.color,
-										unlocking.sprite.position,
-									),
-								);
-							}),
-						]);
-					}),
-				);
-
-				if (foundChains) {
+				case "unlocking":
 					++chainCount;
-				}
+					yield* parallel(
+						event.unlockings.map(unlocking =>
+							queue([
+								waitMs(unlocking.depth * 50),
+								makeIterable(() => {
+									// Remove the graphical representation.
+									this.piecesSprites.delete(unlocking.sprite);
+
+									// Replace with the unlocking effect.
+									this.unlockingEffects.add(
+										new UnlockingEffect(
+											unlocking.color,
+											unlocking.sprite.position,
+										),
+									);
+								}),
+							]),
+						),
+					);
+					break;
 			}
 
 			// The player scored, so punish opponents.
@@ -121,7 +122,6 @@ export class Board {
 			const gameOver = this.boardLogic.checkForGameOver();
 			if (gameOver) {
 				yield* this.startGameOverEffect();
-
 				break;
 			}
 		}
@@ -140,7 +140,7 @@ export class Board {
 	}
 
 	drop() {
-		this.boardLogic.drop();
+		this.eventQueue.push(...this.boardLogic.drop());
 	}
 
 	*startGameOverEffect() {
