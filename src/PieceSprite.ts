@@ -1,7 +1,7 @@
 import { Coord } from "./Coord";
 import { PieceCycle } from "./PieceCycle";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
-import { animateInterpolation, queue, waitMs } from "./Animation";
+import { animateInterpolation, queue } from "./Animation";
 
 export class PieceSprite {
 	spriteName: string;
@@ -101,16 +101,6 @@ export class PieceSprite {
 		yield* animateInterpolation(duration, timeFactor => {
 			this.position = Coord.interpolate(from, to, easing(timeFactor));
 		});
-	}
-
-	move(options: {
-		to: Coord;
-		duration: number;
-		easing: (t: number) => number;
-		delay: number;
-	}) {
-		this.queueUpAnimation(waitMs(options.delay));
-		this.queueUpAnimation(this.makeMoveCoroutine(options));
 	}
 
 	draw(
