@@ -60,101 +60,100 @@ export class Board {
 
 	*makeGameLogicCoroutine(): IterableIterator<void> {
 		for (;;) {
-			const event = this.eventQueue.shift();
-
-			if (!event) {
-				yield;
-				continue;
-			}
-
 			let chainCount = 0;
 
-			switch (event.type) {
-				case "charge":
-					yield* parallel([
-						event.a.sprite.makeMoveCoroutine({
-							to: event.a.to,
-							duration:
-								Coord.distance(event.a.sprite.position, event.a.to) * 50,
-							easing: easings.sine,
-						}),
-						event.b.sprite.makeMoveCoroutine({
-							to: event.b.to,
-							duration:
-								Coord.distance(event.b.sprite.position, event.b.to) * 50,
-							easing: easings.sine,
-						}),
-						...event.queueMovements.map(movement =>
-							movement.sprite.makeMoveCoroutine({
-								to: movement.to,
-								duration: 150,
+			let event: Event | undefined;
+			while ((event = this.eventQueue.shift())) {
+				switch (event.type) {
+					case "charge":
+						yield* parallel([
+							event.a.sprite.makeMoveCoroutine({
+								to: event.a.to,
+								duration:
+									Coord.distance(event.a.sprite.position, event.a.to) * 50,
 								easing: easings.sine,
 							}),
-						),
-					]);
-					break;
-
-				case "move":
-					yield* parallel(
-						event.movements.map(movement =>
-							movement.sprite.makeMoveCoroutine({
-								to: movement.to,
-								duration: 50,
+							event.b.sprite.makeMoveCoroutine({
+								to: event.b.to,
+								duration:
+									Coord.distance(event.b.sprite.position, event.b.to) * 50,
 								easing: easings.sine,
 							}),
-						),
-					);
-					break;
+							...event.queueMovements.map(movement =>
+								movement.sprite.makeMoveCoroutine({
+									to: movement.to,
+									duration: 150,
+									easing: easings.sine,
+								}),
+							),
+						]);
+						break;
 
-				case "fall":
-					const timePerPieceHeight = 100;
-					yield* parallel(
-						event.movements.map(collumn =>
-							parallel(
-								collumn.map((movement, index) =>
-									queue([
-										waitMs(index * 50),
-										movement.sprite.makeMoveCoroutine({
-											to: movement.to,
-											duration:
-												Math.sqrt(
-													Coord.distance(movement.sprite.position, movement.to),
-												) * timePerPieceHeight,
-											easing: easings.easeInQuad,
-										}),
-									]),
+					case "move":
+						yield* parallel(
+							event.movements.map(movement =>
+								movement.sprite.makeMoveCoroutine({
+									to: movement.to,
+									duration: 50,
+									easing: easings.sine,
+								}),
+							),
+						);
+						break;
+
+					case "fall":
+						const timePerPieceHeight = 100;
+						yield* parallel(
+							event.movements.map(collumn =>
+								parallel(
+									collumn.map((movement, index) =>
+										queue([
+											waitMs(index * 50),
+											movement.sprite.makeMoveCoroutine({
+												to: movement.to,
+												duration:
+													Math.sqrt(
+														Coord.distance(
+															movement.sprite.position,
+															movement.to,
+														),
+													) * timePerPieceHeight,
+												easing: easings.easeInQuad,
+											}),
+										]),
+									),
 								),
 							),
-						),
-					);
-					break;
+						);
+						break;
 
-				case "unlocking":
-					++chainCount;
-					yield* parallel(
-						event.unlockings.map(unlocking =>
-							queue([
-								waitMs(unlocking.depth * 50),
-								makeIterable(() => {
-									// Remove the graphical representation.
-									this.piecesSprites.delete(unlocking.sprite);
+					case "unlocking":
+						++chainCount;
+						yield* parallel(
+							event.unlockings.map(unlocking =>
+								queue([
+									waitMs(unlocking.depth * 50),
+									makeIterable(() => {
+										// Remove the graphical representation.
+										this.piecesSprites.delete(unlocking.sprite);
 
-									// Replace with the unlocking effect.
-									this.unlockingEffects.add(
-										new UnlockingEffect(
-											unlocking.color,
-											unlocking.sprite.position,
-										),
-									);
-								}),
-							]),
-						),
-					);
-					break;
+										// Replace with the unlocking effect.
+										this.unlockingEffects.add(
+											new UnlockingEffect(
+												unlocking.color,
+												unlocking.sprite.position,
+											),
+										);
+									}),
+								]),
+							),
+						);
+						break;
 
-				default:
-					exhaustionChecker(event);
-					break;
+					default:
+						exhaustionChecker(event);
+						break;
+				}
 			}
 
 			// The player scored, so punish opponents.
@@ -167,6 +166,8 @@ export class Board {
 				yield* this.startGameOverEffect();
 				break;
 			}
+
+			yield;
 		}
 	}
 
