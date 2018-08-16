@@ -48,12 +48,10 @@ The next few issues on the map:
 		* Blinking eyes.
 		* Bobbing head to the beat of the music.
 * Add a start and game over/winner screen.
-* Make punishments (extra pieces added from below) depend on the score.
 * Add a time limit to the piece-dropping. 5 seconds initially, and shrinking by a second per minute? After that, the piece will drop automatically whereever the dropper is at the moment.
 * Add input for touch.
 * Add a menu system. To begin with, just "Start". Then "Select Game Mode" and "Select Character" as they get implemented. DOM-based?
 * Add alternative game styles; Single player (for points) with and without piece-dropping time limit. Implement as multiple "Game" objects that takes care of the gameplay mechanics and layout differences?
-* Switch makePiecesFall to use breadth-first.
 * Add sound effects.
 * Add music with varying stress levels depending on how close you are to losing.
 * Sync all visuals and sound effects to the music. Lock the most significant effects to whole beats, and smaller effects to 1/2, 1/4, 1/8, 1/16 of a beat and so on. (The game Rez did this, and it was awesome.) With the existing animation queue system, it should be relatively easy to implement.
