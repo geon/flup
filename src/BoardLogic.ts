@@ -16,6 +16,18 @@ interface Unlocking {
 	color: number;
 }
 
+export interface ChargePieceMovement {
+	sprite: PieceSprite;
+	to: Coord;
+}
+
+export interface ChargeEvent {
+	type: "charge";
+	a: ChargePieceMovement;
+	b: ChargePieceMovement;
+	queueMovements: ReadonlyArray<Movement>;
+}
+
 export interface MoveEvent {
 	type: "move";
 	movements: ReadonlyArray<Movement>;
@@ -31,7 +43,7 @@ interface UnlockingEvent {
 	unlockings: ReadonlyArray<Unlocking>;
 }
 
-export type Event = MoveEvent | FallEvent | UnlockingEvent;
+export type Event = ChargeEvent | MoveEvent | FallEvent | UnlockingEvent;
 
 export class BoardLogic {
 	pieces: Array<Piece | undefined>;
@@ -96,9 +108,6 @@ export class BoardLogic {
 			return [];
 		}
 
-		// TODO: Make this generate events as well and return them.
-		this.dropper.charge();
-
 		// Add the pieces.
 		for (const drop of drops) {
 			this.pieces[BoardLogic.coordToIndex(drop.coord)] = drop.piece;
@@ -118,6 +127,8 @@ export class BoardLogic {
 				break;
 			}
 		}
+
+		events.push(this.dropper.charge());
 
 		return events;
 	}

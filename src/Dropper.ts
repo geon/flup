@@ -1,8 +1,7 @@
-import { BoardLogic, MoveEvent } from "./BoardLogic";
+import { BoardLogic, ChargeEvent, MoveEvent } from "./BoardLogic";
 import { Coord } from "./Coord";
 import { DropperQueue } from "./DropperQueue";
 import { Piece } from "./Piece";
-import { easings } from "./Animation";
 
 export class Dropper {
 	dropperQueue: DropperQueue;
@@ -19,8 +18,6 @@ export class Dropper {
 
 		this.position = Math.floor((BoardLogic.size.x - 1) / 2);
 		this.orientation = "horizontal";
-
-		this.charge();
 	}
 
 	moveLeft() {
@@ -86,13 +83,14 @@ export class Dropper {
 		};
 	}
 
-	charge() {
+	charge(): ChargeEvent {
 		const coords = this.getCoordinates();
 
-		const timePerPieceWidths = 50;
-
 		const pieces = this.dropperQueue.pop();
-		if (this.dropperQueue.dropperSide == "left") {
+		if (
+			this.dropperQueue.dropperSide == "left" &&
+			this.orientation == "horizontal"
+		) {
 			this.pieceA = pieces.b;
 			this.pieceB = pieces.a;
 		} else {
@@ -100,55 +98,12 @@ export class Dropper {
 			this.pieceB = pieces.b;
 		}
 
-		// A needs to wait just beside the queue until B is ready.
-		this.pieceA.sprite.move({
-			to: new Coord({
-				x: this.dropperQueue.dropperSide == "left" ? 0 : BoardLogic.size.x - 1,
-				y: 0,
-			}),
-			duration: DropperQueue.dropperQueueTimePerPieceWidth,
-			easing: easings.sine,
-			delay: 0,
-		});
-
-		const duration =
-			this.dropperQueue.dropperSide == "left"
-				? (coords.b.x - BoardLogic.size.x) * timePerPieceWidths
-				: (BoardLogic.size.x - coords.b.x) * timePerPieceWidths;
-		if (this.orientation && this.position < BoardLogic.size.x - 1) {
-			// Make A go via B.
-			this.pieceA.sprite.move({
-				to: coords.b,
-				duration,
-				easing: easings.sine,
-				delay: 0,
-			});
-
-			// Make B stop next to A.
-			this.pieceB.sprite.move({
-				to: new Coord({ x: coords.b.x + 1, y: 0 }),
-				duration,
-				easing: easings.sine,
-				delay: 0,
-			});
-		}
-
-		// Move to final positions.
-		this.pieceA.sprite.move({
-			to: coords.a,
-			// TODO: Fix syncing.
-			duration: 1000, // Coord.distance(this.pieceA.animationQueue.getLastTo(), coords.a) * timePerPieceWidths,
-			easing: easings.sine,
-			delay: 0,
-		});
-
-		this.pieceB.sprite.move({
-			to: coords.b,
-			// TODO: Fix syncing.
-			duration: 1000, // Coord.distance(this.pieceB.animationQueue.getLastTo(), coords.b) * timePerPieceWidths,
-			easing: easings.sine,
-			delay: 0,
-		});
+		return {
+			type: "charge",
+			a: { sprite: this.pieceA.sprite, to: coords.a },
+			b: { sprite: this.pieceB.sprite, to: coords.b },
+			queueMovements: pieces.queueMovements,
+		};
 	}
 
 	private animate(): MoveEvent {

@@ -1,9 +1,8 @@
-import { easings } from "./Animation";
 import { Board } from "./Board";
 import { Coord } from "./Coord";
 import { PieceCycle } from "./PieceCycle";
 import { Piece } from "./Piece";
-import { BoardLogic } from "./BoardLogic";
+import { BoardLogic, Movement } from "./BoardLogic";
 
 export class DropperQueue {
 	board: Board;
@@ -45,10 +44,22 @@ export class DropperQueue {
 		this.pushSingle(DropperQueue.dropperQueueVisibleLength + 1);
 
 		// 2 new pieces were pushed above, so unshift will never be undefined.
-		const a = this.popSingle()!;
-		const b = this.popSingle()!;
+		const a = this.pieces.shift()!;
+		const b = this.pieces.shift()!;
 
-		return { a, b };
+		const queueMovements = this.pieces.map((piece, i): Movement => ({
+			sprite: piece.sprite,
+			to: new Coord({
+				x: this.dropperSide == "left" ? -1 : BoardLogic.size.x,
+				y: i,
+			}),
+		}));
+
+		return {
+			a,
+			b,
+			queueMovements,
+		};
 	}
 
 	private pushSingle(startYPos: number) {
@@ -64,23 +75,5 @@ export class DropperQueue {
 				}),
 			}),
 		);
-	}
-
-	private popSingle() {
-		const piece = this.pieces.shift();
-
-		for (let i = 0; i < this.pieces.length; i++) {
-			this.pieces[i].sprite.move({
-				to: new Coord({
-					x: this.dropperSide == "left" ? -1 : BoardLogic.size.x,
-					y: i,
-				}),
-				duration: DropperQueue.dropperQueueTimePerPieceWidth,
-				easing: easings.sine,
-				delay: i * 5,
-			});
-		}
-
-		return piece;
 	}
 }

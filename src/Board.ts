@@ -45,6 +45,9 @@ export class Board {
 		this.unlockingEffects = new Set();
 		this.eventQueue = [];
 
+		// The first charge must be done here, where the event can be handled.
+		this.eventQueue.push(this.boardLogic.dropper.charge());
+
 		this.slateRandomExp = 2 + Math.random();
 	}
 
@@ -67,6 +70,30 @@ export class Board {
 			let chainCount = 0;
 
 			switch (event.type) {
+				case "charge":
+					yield* parallel([
+						event.a.sprite.makeMoveCoroutine({
+							to: event.a.to,
+							duration:
+								Coord.distance(event.a.sprite.position, event.a.to) * 50,
+							easing: easings.sine,
+						}),
+						event.b.sprite.makeMoveCoroutine({
+							to: event.b.to,
+							duration:
+								Coord.distance(event.b.sprite.position, event.b.to) * 50,
+							easing: easings.sine,
+						}),
+						...event.queueMovements.map(movement =>
+							movement.sprite.makeMoveCoroutine({
+								to: movement.to,
+								duration: 150,
+								easing: easings.sine,
+							}),
+						),
+					]);
+					break;
+
 				case "move":
 					yield* parallel(
 						event.movements.map(movement =>
