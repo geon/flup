@@ -121,11 +121,11 @@ export class BoardLogic {
 
 			const unlockings = this.unlockChains();
 
-			events.push({ type: "unlocking", unlockings });
-
 			if (!unlockings.length) {
 				break;
 			}
+
+			events.push({ type: "unlocking", unlockings });
 		}
 
 		events.push(this.dropper.charge());
