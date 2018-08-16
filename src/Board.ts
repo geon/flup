@@ -150,6 +150,22 @@ export class Board {
 						);
 						break;
 
+					case "punish":
+						yield* queue(
+							event.movements.map(collumn =>
+								parallel(
+									collumn.map(movement =>
+										movement.sprite.makeMoveCoroutine({
+											to: movement.to,
+											duration: 100,
+											easing: easings.sine,
+										}),
+									),
+								),
+							),
+						);
+						break;
+
 					default:
 						exhaustionChecker(event);
 						break;
@@ -215,36 +231,33 @@ export class Board {
 		);
 	}
 
-	punish(avatar: Avatar) {
+	punish(avatar: Avatar, punishCount: number) {
 		// Add pieces.
-		const row = avatar.getPunishColors();
+		const movements = [];
+		for (let i = 0; i < punishCount; ++i) {
+			const row = avatar.getPunishColors();
 
-		const pieces = row.map((color, x): Piece => {
-			const key = false;
-			const position = new Coord({
-				x,
-				// Start the animation just outside the Board.
-				y: BoardLogic.size.y,
+			const pieces = row.map((color, x): Piece => {
+				const key = false;
+				const position = new Coord({
+					x,
+					// Start the animation just outside the Board.
+					y: BoardLogic.size.y,
+				});
+
+				return this.makePiece({
+					color,
+					key,
+					position,
+				});
 			});
 
-			return this.makePiece({
-				color,
-				key,
-				position,
-			});
-		});
+			const rowMovements = this.boardLogic.punishLogic(pieces);
 
-		const movements = this.boardLogic.punishLogic(pieces);
-
-		// Animate.
-		for (const movement of movements) {
-			movement.sprite.move({
-				to: movement.to,
-				duration: DropperQueue.dropperQueueTimePerPieceWidth,
-				easing: easings.sine,
-				delay: 0,
-			});
+			movements.push(rowMovements);
 		}
+
+		this.eventQueue.push({ type: "punish", movements });
 	}
 
 	*makeFrameCoroutine(): IterableIterator<void> {

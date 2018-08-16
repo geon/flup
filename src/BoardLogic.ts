@@ -43,7 +43,17 @@ interface UnlockingEvent {
 	unlockings: ReadonlyArray<Unlocking>;
 }
 
-export type Event = ChargeEvent | MoveEvent | FallEvent | UnlockingEvent;
+export interface PunishEvent {
+	type: "punish";
+	movements: ReadonlyArray<ReadonlyArray<Movement>>;
+}
+
+export type Event =
+	| PunishEvent
+	| ChargeEvent
+	| MoveEvent
+	| FallEvent
+	| UnlockingEvent;
 
 export class BoardLogic {
 	pieces: Array<Piece | undefined>;

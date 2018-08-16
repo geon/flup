@@ -42,8 +42,9 @@ export class GameMode2pLocal implements GameMode {
 	punishOpponents(board: Board, chainCount: number) {
 		for (let i = 0; i < this.boards.length; i++) {
 			if (this.boards[i] !== board) {
-				for (let j = 0; j < chainCount - 1; ++j) {
-					this.boards[i].punish(this.avatars[i]);
+				const punishCount = Math.max(0, chainCount - 1);
+				if (punishCount) {
+					this.boards[i].punish(this.avatars[i], punishCount);
 				}
 			}
 		}
@@ -92,6 +93,9 @@ export class GameMode2pLocal implements GameMode {
 			case "S".charCodeAt(0): // Down
 				this.boards[0].drop();
 				break;
+
+			case "Q".charCodeAt(0):
+				this.punishOpponents(this.boards[0], 4);
 		}
 	}
 
