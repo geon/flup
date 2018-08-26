@@ -18,9 +18,9 @@ export class UnlockingEffect {
 		for (let i = 0; i < 8; i++) {
 			this.initialVelocities[i] = new Coord({
 				// Spread a little less sideways.
-				x: (Math.random() * 2 - 1) * 0.75,
+				x: (Math.random() * 2 - 1) * 1.5,
 				// Spray up a bit more than down.
-				y: Math.random() * 2 - 1 - 0.2,
+				y: (Math.random() * 2 - 1) * 2 - 0.4,
 			}).scaled(0.35);
 		}
 
@@ -28,7 +28,7 @@ export class UnlockingEffect {
 	}
 
 	static size: number = 16;
-	static gravity: number = 0.0005;
+	static gravity: number = 0.001;
 	static duration: number = 3000;
 	static sprites: SpriteSet | undefined;
 	static spriteSheet: SpriteSheet | undefined;
@@ -83,8 +83,7 @@ export class UnlockingEffect {
 
 		for (;;) {
 			const deltaTime = yield;
-			// TODO: Fix the x2 factor.
-			this.accumulatedDeltaTime += deltaTime * 2;
+			this.accumulatedDeltaTime += deltaTime;
 
 			if (this.accumulatedDeltaTime > UnlockingEffect.duration) {
 				return;
