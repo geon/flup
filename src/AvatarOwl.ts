@@ -3,13 +3,23 @@ import { BoardLogic } from "./BoardLogic";
 import { Coord } from "./Coord";
 import { PieceCycle } from "./PieceCycle";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
+import { waitMs } from "./Animation";
+
+type WingSpriteName =
+	| "wingsClosed"
+	| "wingsTransition1"
+	| "wingsTransition2"
+	| "wingsTransition3"
+	| "wingsOpen";
 
 export class AvatarOwl extends Avatar {
-	accumulatedDeltaTime: number;
+	bobFactor: number;
+	currentWingSprite: WingSpriteName;
 
 	constructor() {
 		super();
-		this.accumulatedDeltaTime = 0;
+		this.bobFactor = 0;
+		this.currentWingSprite = AvatarOwl.wingFlapCycle[0].name;
 	}
 
 	static size: number = 256;
@@ -109,42 +119,19 @@ export class AvatarOwl extends Avatar {
 		};
 	}
 
-	static wingFlapCycle = {
-		frames: [
-			{ name: "wingsClosed", time: 2000 },
-			{ name: "wingsTransition1", time: 50 },
-			{ name: "wingsTransition2", time: 50 },
-			{ name: "wingsTransition3", time: 50 },
-			{ name: "wingsOpen", time: 1000 },
-			{ name: "wingsTransition3", time: 50 },
-			{ name: "wingsTransition2", time: 50 },
-			{ name: "wingsTransition1", time: 50 },
-		],
-		currentFrameIndex: 0,
-		frameTimer: undefined as number | undefined,
-		getCurrentFrameName() {
-			// If there is no timer to the next frame...
-			if (!AvatarOwl.wingFlapCycle.frameTimer) {
-				// ...create one.
-				AvatarOwl.wingFlapCycle.frameTimer = setTimeout(() => {
-					// Next frame.
-					++AvatarOwl.wingFlapCycle.currentFrameIndex;
-					AvatarOwl.wingFlapCycle.currentFrameIndex %=
-						AvatarOwl.wingFlapCycle.frames.length;
-
-					// Clear the timer.
-					AvatarOwl.wingFlapCycle.frameTimer = undefined;
-
-					// Wait this long before switching frame.
-				}, AvatarOwl.wingFlapCycle.frames[AvatarOwl.wingFlapCycle.currentFrameIndex].time);
-			}
-
-			// The current frame name.
-			return AvatarOwl.wingFlapCycle.frames[
-				AvatarOwl.wingFlapCycle.currentFrameIndex
-			].name;
-		},
-	};
+	static wingFlapCycle: ReadonlyArray<{
+		name: WingSpriteName;
+		time: number;
+	}> = [
+		{ name: "wingsClosed", time: 2000 },
+		{ name: "wingsTransition1", time: 50 },
+		{ name: "wingsTransition2", time: 50 },
+		{ name: "wingsTransition3", time: 50 },
+		{ name: "wingsOpen", time: 1000 },
+		{ name: "wingsTransition3", time: 50 },
+		{ name: "wingsTransition2", time: 50 },
+		{ name: "wingsTransition1", time: 50 },
+	];
 
 	*generatePunishColors() {
 		for (;;) {
@@ -156,13 +143,39 @@ export class AvatarOwl extends Avatar {
 		}
 	}
 
+	*makeFrameCoroutine(): IterableIterator<void> {
+		const wingsCoroutine = this.makeWingsCoroutine();
+		const headBobCoroutine = this.makeHeadBobCoroutine();
+
+		for (;;) {
+			const deltaTime = yield;
+			wingsCoroutine.next(deltaTime);
+			headBobCoroutine.next(deltaTime);
+		}
+	}
+
+	*makeWingsCoroutine(): IterableIterator<void> {
+		for (;;) {
+			for (const frame of AvatarOwl.wingFlapCycle) {
+				this.currentWingSprite = frame.name;
+				yield* waitMs(frame.time);
+			}
+		}
+	}
+
+	*makeHeadBobCoroutine(): IterableIterator<void> {
+		let accumulatedDeltaTime = 0;
+		for (;;) {
+			accumulatedDeltaTime += yield;
+			this.bobFactor = Math.sin(accumulatedDeltaTime / 200);
+		}
+	}
+
 	draw(
 		context: CanvasRenderingContext2D,
-		deltaTime: number,
+		_deltaTime: number,
 		avatarCenter: Coord,
 	) {
-		this.accumulatedDeltaTime += deltaTime;
-
 		const sprites = AvatarOwl.getSprites();
 
 		const size = new Coord({
@@ -170,7 +183,7 @@ export class AvatarOwl extends Avatar {
 			y: AvatarOwl.size,
 		});
 
-		sprites[AvatarOwl.wingFlapCycle.getCurrentFrameName()].draw(
+		sprites[this.currentWingSprite].draw(
 			context,
 			Coord.subtract(avatarCenter, Coord.scale(size, 0.5)),
 			size,
@@ -182,12 +195,10 @@ export class AvatarOwl extends Avatar {
 			size,
 		);
 
-		const bobFactor = Math.sin(this.accumulatedDeltaTime / 200);
-
 		sprites.head.draw(
 			context,
 			Coord.add(
-				new Coord({ x: 0, y: bobFactor * 2 }),
+				new Coord({ x: 0, y: this.bobFactor * 2 }),
 				Coord.subtract(avatarCenter, Coord.scale(size, 0.5)),
 			),
 			size,

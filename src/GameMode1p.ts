@@ -54,6 +54,17 @@ export class GameMode1p implements GameMode {
 		}
 	}
 
+	*makeFrameCoroutine(): IterableIterator<void> {
+		const boardCoroutine = this.board.frameCoroutine;
+		const avatarCoroutine = this.avatar.frameCoroutine;
+
+		for (;;) {
+			const deltaTime = yield;
+			boardCoroutine.next(deltaTime);
+			avatarCoroutine.next(deltaTime);
+		}
+	}
+
 	draw(context: CanvasRenderingContext2D, deltaTime: number, appSize: Coord) {
 		// The player boards.
 		this.board.draw(

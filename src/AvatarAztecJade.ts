@@ -5,11 +5,11 @@ import { PieceCycle } from "./PieceCycle";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
 
 export class AvatarAztecJade extends Avatar {
-	accumulatedDeltaTime: number;
+	diskSizeFactor: number;
 
 	constructor() {
 		super();
-		this.accumulatedDeltaTime = 0;
+		this.diskSizeFactor = 1;
 	}
 
 	static size: number = 256;
@@ -82,13 +82,20 @@ export class AvatarAztecJade extends Avatar {
 		}
 	}
 
+	*makeFrameCoroutine(): IterableIterator<void> {
+		let accumulatedDeltaTime = 0;
+		for (;;) {
+			accumulatedDeltaTime += yield;
+			this.diskSizeFactor =
+				1 - (1 + Math.sin(accumulatedDeltaTime / 1000 * 3)) / 2 * 0.1;
+		}
+	}
+
 	draw(
 		context: CanvasRenderingContext2D,
-		deltaTime: number,
+		_deltaTime: number,
 		avatarCenter: Coord,
 	) {
-		this.accumulatedDeltaTime += deltaTime;
-
 		const sprites = AvatarAztecJade.getSprites();
 
 		const size = new Coord({
@@ -96,13 +103,13 @@ export class AvatarAztecJade extends Avatar {
 			y: AvatarAztecJade.size,
 		});
 
-		const diskSizeFactor =
-			1 - (1 + Math.sin(this.accumulatedDeltaTime / 1000 * 3)) / 2 * 0.1;
-
 		sprites.gold.draw(
 			context,
-			Coord.subtract(avatarCenter, Coord.scale(size, 0.5 * diskSizeFactor)),
-			Coord.scale(size, diskSizeFactor),
+			Coord.subtract(
+				avatarCenter,
+				Coord.scale(size, 0.5 * this.diskSizeFactor),
+			),
+			Coord.scale(size, this.diskSizeFactor),
 		);
 
 		sprites.idol.draw(

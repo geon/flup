@@ -108,6 +108,10 @@ export class GameMode2pLocal implements GameMode {
 				.map(board => board.frameCoroutine)
 				.forEach(coroutine => coroutine.next(deltaTime));
 
+			this.avatars
+				.map(avatar => avatar.frameCoroutine)
+				.forEach(coroutine => coroutine.next(deltaTime));
+
 			if (this.isGameOver) {
 				break;
 			}
