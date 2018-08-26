@@ -65,11 +65,10 @@ export class GameMode1p implements GameMode {
 		}
 	}
 
-	draw(context: CanvasRenderingContext2D, deltaTime: number, appSize: Coord) {
+	draw(context: CanvasRenderingContext2D, appSize: Coord) {
 		// The player boards.
 		this.board.draw(
 			context,
-			deltaTime,
 			new Coord({ x: appSize.x / 2, y: appSize.y / 2 }),
 			1 / 1,
 		);
@@ -77,7 +76,6 @@ export class GameMode1p implements GameMode {
 		// Draw the player avatars.
 		this.avatar.draw(
 			context,
-			deltaTime,
 			new Coord({
 				x: appSize.x / 2 + BoardLogic.getWidth() * -1.1 / 2,
 				y: appSize.y / 2 + BoardLogic.getWidth() * 0.65,

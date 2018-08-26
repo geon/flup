@@ -6,9 +6,5 @@ export interface GameMode {
 	onGameOver: (board: Board) => void;
 	onUnlockedChains: (board: Board, chainCount: number) => void;
 	onKeyDown: (keyCode: number) => void;
-	draw: (
-		context: CanvasRenderingContext2D,
-		deltaTime: number,
-		appSize: Coord,
-	) => void;
+	draw: (context: CanvasRenderingContext2D, appSize: Coord) => void;
 }

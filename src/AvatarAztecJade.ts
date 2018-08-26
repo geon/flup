@@ -91,11 +91,7 @@ export class AvatarAztecJade extends Avatar {
 		}
 	}
 
-	draw(
-		context: CanvasRenderingContext2D,
-		_deltaTime: number,
-		avatarCenter: Coord,
-	) {
+	draw(context: CanvasRenderingContext2D, avatarCenter: Coord) {
 		const sprites = AvatarAztecJade.getSprites();
 
 		const size = new Coord({

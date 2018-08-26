@@ -72,6 +72,8 @@ export class PieceSprite {
 		for (;;) {
 			const deltaTime: number = yield;
 
+			this.accumulatedDeltaTime += deltaTime;
+
 			if (this.animationCoroutine) {
 				const done = this.animationCoroutine.next(deltaTime).done;
 				if (done) {
@@ -105,14 +107,11 @@ export class PieceSprite {
 
 	draw(
 		context: CanvasRenderingContext2D,
-		deltaTime: number,
 		boardCenter: Coord,
 		boardScale: number,
 		disturbance: number,
 		boardSize: Coord,
 	) {
-		this.accumulatedDeltaTime += deltaTime;
-
 		const jitterX =
 			disturbance *
 			(PieceSprite.size *

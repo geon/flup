@@ -19,9 +19,5 @@ export abstract class Avatar {
 
 	abstract makeFrameCoroutine(): IterableIterator<void>;
 
-	abstract draw(
-		context: CanvasRenderingContext2D,
-		deltaTime: number,
-		avatarCenter: Coord,
-	): void;
+	abstract draw(context: CanvasRenderingContext2D, avatarCenter: Coord): void;
 }

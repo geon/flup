@@ -161,8 +161,7 @@ export class App {
 			this.lastRenderTime = currentTime;
 
 			const done = this.gameMode.frameCoroutine.next(deltaTime).done;
-			// TODO: Remove deltatime from rendering.
-			this.render(deltaTime);
+			this.render();
 
 			// Restart the game after game over.
 			if (done) {
@@ -172,7 +171,7 @@ export class App {
 		}
 	}
 
-	render(deltaTime: number) {
+	render() {
 		// Draw the board background.
 		this.context.fillStyle = "rgba(0, 0, 0, 1)";
 		this.context.fillRect(0, 0, this.getWidth(), this.getHeight());
@@ -180,7 +179,6 @@ export class App {
 		// Boards and avatars.
 		this.gameMode.draw(
 			this.context,
-			deltaTime,
 			new Coord({
 				x: this.getWidth(),
 				y: this.getHeight(),

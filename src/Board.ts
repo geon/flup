@@ -286,12 +286,7 @@ export class Board {
 		}
 	}
 
-	draw(
-		context: CanvasRenderingContext2D,
-		deltaTime: number,
-		center: Coord,
-		scale: number,
-	) {
+	draw(context: CanvasRenderingContext2D, center: Coord, scale: number) {
 		// Draw the board background.
 
 		const slateSprites = App.getSprites();
@@ -343,19 +338,12 @@ export class Board {
 
 		// Draw the unlocking effects.
 		for (const unlockingEffect of this.unlockingEffects) {
-			unlockingEffect.draw(context, deltaTime, center, scale, BoardLogic.size);
+			unlockingEffect.draw(context, center, scale, BoardLogic.size);
 		}
 
 		// Draw all pieces.
 		for (const sprite of this.piecesSprites) {
-			sprite.draw(
-				context,
-				deltaTime,
-				center,
-				scale,
-				disturbance,
-				BoardLogic.size,
-			);
+			sprite.draw(context, center, scale, disturbance, BoardLogic.size);
 		}
 	}
 }

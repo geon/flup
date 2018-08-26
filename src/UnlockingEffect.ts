@@ -1,7 +1,6 @@
 import { Coord } from "./Coord";
 import { PieceSprite } from "./PieceSprite";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
-import { waitMs } from "./Animation";
 
 export class UnlockingEffect {
 	color: number;
@@ -81,18 +80,24 @@ export class UnlockingEffect {
 
 	*makeFrameCoroutine() {
 		// TODO: Move the animation here.
-		yield* waitMs(UnlockingEffect.duration);
+
+		for (;;) {
+			const deltaTime = yield;
+			// TODO: Fix the x2 factor.
+			this.accumulatedDeltaTime += deltaTime * 2;
+
+			if (this.accumulatedDeltaTime > UnlockingEffect.duration) {
+				return;
+			}
+		}
 	}
 
 	draw(
 		context: CanvasRenderingContext2D,
-		deltaTime: number,
 		boardCenter: Coord,
 		boardScale: number,
 		boardSize: Coord,
 	) {
-		this.accumulatedDeltaTime += deltaTime;
-
 		const origin = new Coord({
 			x:
 				boardCenter.x +
@@ -132,7 +137,5 @@ export class UnlockingEffect {
 				}),
 			);
 		}
-
-		this.accumulatedDeltaTime += deltaTime;
 	}
 }

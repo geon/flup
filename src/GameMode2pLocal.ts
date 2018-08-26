@@ -118,14 +118,13 @@ export class GameMode2pLocal implements GameMode {
 		}
 	}
 
-	draw(context: CanvasRenderingContext2D, deltaTime: number, appSize: Coord) {
+	draw(context: CanvasRenderingContext2D, appSize: Coord) {
 		const center = new Coord({ x: appSize.x / 2, y: appSize.y / 2 });
 		const boardSpread = BoardLogic.getWidth() * 0.66;
 
 		// The player boards.
 		this.boards[0].draw(
 			context,
-			deltaTime,
 			new Coord({
 				x: center.x - boardSpread,
 				y: center.y,
@@ -134,7 +133,6 @@ export class GameMode2pLocal implements GameMode {
 		);
 		this.boards[1].draw(
 			context,
-			deltaTime,
 			new Coord({
 				x: center.x + boardSpread,
 				y: center.y,
@@ -149,7 +147,6 @@ export class GameMode2pLocal implements GameMode {
 		// Draw the player avatars.
 		this.avatars[0].draw(
 			context,
-			deltaTime,
 			new Coord({
 				x: center.x - boardSpread - avatarSpread,
 				y: center.y + avatarDownset - this.avatars[0].getSize() / 2,
@@ -157,7 +154,6 @@ export class GameMode2pLocal implements GameMode {
 		);
 		this.avatars[1].draw(
 			context,
-			deltaTime,
 			new Coord({
 				x: center.x + boardSpread + avatarSpread,
 				y: center.y + avatarDownset - this.avatars[1].getSize() / 2,
