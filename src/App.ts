@@ -166,7 +166,7 @@ export class App {
 			// Restart the game after game over.
 			if (done) {
 				// TODO
-				console.log("Game Over");
+				// console.log("Game Over");
 			}
 		}
 	}

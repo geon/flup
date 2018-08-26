@@ -37,6 +37,9 @@ export class GameMode2pLocal implements GameMode {
 
 	onUnlockedChains(board: Board, chainCount: number) {
 		this.punishOpponents(board, chainCount);
+
+		const playerIndex = this.boards.indexOf(board);
+		this.avatars[playerIndex].onUnlock();
 	}
 
 	punishOpponents(board: Board, chainCount: number) {
@@ -45,13 +48,22 @@ export class GameMode2pLocal implements GameMode {
 				const punishCount = Math.max(0, chainCount - 1);
 				if (punishCount) {
 					this.boards[i].punish(this.avatars[i], punishCount);
+					this.avatars[i].onPunish();
 				}
 			}
 		}
 	}
 
-	onGameOver() {
+	onGameOver(board: Board) {
 		this.isGameOver = true;
+
+		const playerIndex = this.boards.indexOf(board);
+		this.avatars[playerIndex].onLose();
+		this.avatars
+			.filter((_, index) => index != playerIndex)
+			.forEach(opponentAvatar => {
+				opponentAvatar.onWin();
+			});
 	}
 
 	onKeyDown(_keyCode: number) {
@@ -112,9 +124,9 @@ export class GameMode2pLocal implements GameMode {
 				.map(avatar => avatar.frameCoroutine)
 				.forEach(coroutine => coroutine.next(deltaTime));
 
-			if (this.isGameOver) {
-				break;
-			}
+			// if (this.isGameOver) {
+			// 	break;
+			// }
 		}
 	}
 

@@ -9,6 +9,11 @@ export abstract class Avatar {
 		this.frameCoroutine = this.makeFrameCoroutine();
 	}
 
+	abstract onUnlock(): void;
+	abstract onPunish(): void;
+	abstract onWin(): void;
+	abstract onLose(): void;
+
 	getPunishColors() {
 		return this.colorGenerator.next().value;
 	}

@@ -179,6 +179,7 @@ export class Board {
 
 			const gameOver = this.boardLogic.checkForGameOver();
 			if (gameOver) {
+				this.gameMode.onGameOver(this);
 				yield* this.startGameOverEffect();
 				break;
 			}

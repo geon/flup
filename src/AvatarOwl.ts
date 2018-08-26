@@ -3,7 +3,7 @@ import { BoardLogic } from "./BoardLogic";
 import { Coord } from "./Coord";
 import { PieceCycle } from "./PieceCycle";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
-import { waitMs } from "./Animation";
+import { waitMs, animateInterpolation, easings } from "./Animation";
 
 type WingSpriteName =
 	| "wingsClosed"
@@ -15,11 +15,13 @@ type WingSpriteName =
 export class AvatarOwl extends Avatar {
 	bobFactor: number;
 	currentWingSprite: WingSpriteName;
+	animationQueue: Array<IterableIterator<void>>;
 
 	constructor() {
 		super();
 		this.bobFactor = 0;
-		this.currentWingSprite = AvatarOwl.wingFlapCycle[0].name;
+		this.currentWingSprite = "wingsClosed";
+		this.animationQueue = [];
 	}
 
 	static size: number = 256;
@@ -119,19 +121,18 @@ export class AvatarOwl extends Avatar {
 		};
 	}
 
-	static wingFlapCycle: ReadonlyArray<{
-		name: WingSpriteName;
-		time: number;
-	}> = [
-		{ name: "wingsClosed", time: 2000 },
-		{ name: "wingsTransition1", time: 50 },
-		{ name: "wingsTransition2", time: 50 },
-		{ name: "wingsTransition3", time: 50 },
-		{ name: "wingsOpen", time: 1000 },
-		{ name: "wingsTransition3", time: 50 },
-		{ name: "wingsTransition2", time: 50 },
-		{ name: "wingsTransition1", time: 50 },
-	];
+	onUnlock() {
+		this.animationQueue.push(this.makeUnlockCoroutine());
+	}
+	onPunish() {
+		this.animationQueue.push(this.makePunishCoroutine());
+	}
+	onWin() {
+		this.animationQueue.push(this.makeWinCoroutine());
+	}
+	onLose() {
+		this.animationQueue.push(this.makeLoseCoroutine());
+	}
 
 	*generatePunishColors() {
 		for (;;) {
@@ -144,31 +145,81 @@ export class AvatarOwl extends Avatar {
 	}
 
 	*makeFrameCoroutine(): IterableIterator<void> {
-		const wingsCoroutine = this.makeWingsCoroutine();
-		const headBobCoroutine = this.makeHeadBobCoroutine();
-
 		for (;;) {
-			const deltaTime = yield;
-			wingsCoroutine.next(deltaTime);
-			headBobCoroutine.next(deltaTime);
+			const animation = this.animationQueue.shift() || this.makeIdleCoroutine();
+			yield* animation;
 		}
 	}
 
-	*makeWingsCoroutine(): IterableIterator<void> {
+	*makeUnlockCoroutine(): IterableIterator<void> {
+		const wingFlapCycle: ReadonlyArray<{
+			name: WingSpriteName;
+			time: number;
+		}> = [
+			{ name: "wingsTransition1", time: 50 },
+			{ name: "wingsTransition2", time: 50 },
+			{ name: "wingsTransition3", time: 50 },
+			{ name: "wingsOpen", time: 1000 },
+			{ name: "wingsTransition3", time: 50 },
+			{ name: "wingsTransition2", time: 50 },
+			{ name: "wingsTransition1", time: 50 },
+			{ name: "wingsClosed", time: 0 },
+		];
+
+		for (const frame of wingFlapCycle) {
+			this.currentWingSprite = frame.name;
+			yield* waitMs(frame.time);
+		}
+	}
+
+	*makePunishCoroutine(): IterableIterator<void> {
+		// TODO
+	}
+
+	*makeWinCoroutine(): IterableIterator<void> {
+		const wingFlapCycle: ReadonlyArray<{
+			name: WingSpriteName;
+			time: number;
+		}> = [
+			{ name: "wingsTransition1", time: 50 },
+			{ name: "wingsTransition2", time: 50 },
+			{ name: "wingsTransition3", time: 50 },
+			{ name: "wingsOpen", time: 50 },
+			{ name: "wingsTransition3", time: 50 },
+			{ name: "wingsTransition2", time: 50 },
+			{ name: "wingsTransition1", time: 50 },
+			{ name: "wingsClosed", time: 50 },
+		];
+
 		for (;;) {
-			for (const frame of AvatarOwl.wingFlapCycle) {
+			for (const frame of wingFlapCycle) {
 				this.currentWingSprite = frame.name;
 				yield* waitMs(frame.time);
 			}
 		}
 	}
 
-	*makeHeadBobCoroutine(): IterableIterator<void> {
-		let accumulatedDeltaTime = 0;
-		for (;;) {
-			accumulatedDeltaTime += yield;
-			this.bobFactor = Math.sin(accumulatedDeltaTime / 200);
-		}
+	*makeLoseCoroutine(): IterableIterator<void> {
+		// TODO
+	}
+
+	*makeIdleCoroutine(): IterableIterator<void> {
+		const stepTime = 500;
+
+		yield* waitMs(stepTime * 2);
+
+		// Starting in the middle, bob up...
+		yield* animateInterpolation(stepTime, factor => {
+			this.bobFactor = easings.sine(0 + 1 * factor);
+		});
+		// ...all the way down...
+		yield* animateInterpolation(stepTime, factor => {
+			this.bobFactor = easings.sine(1 - 2 * factor);
+		});
+		// ...and back to normal.
+		yield* animateInterpolation(stepTime, factor => {
+			this.bobFactor = easings.sine(-1 + 1 * factor);
+		});
 	}
 
 	draw(context: CanvasRenderingContext2D, avatarCenter: Coord) {

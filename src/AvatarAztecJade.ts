@@ -69,6 +69,19 @@ export class AvatarAztecJade extends Avatar {
 		};
 	}
 
+	onUnlock() {
+		// this.animationQueue.push(this.makeUnlockCoroutine());
+	}
+	onPunish() {
+		// this.animationQueue.push(this.makePunishCoroutine());
+	}
+	onWin() {
+		// this.animationQueue.push(this.makeWinCoroutine());
+	}
+	onLose() {
+		// this.animationQueue.push(this.makeLoseCoroutine());
+	}
+
 	*generatePunishColors() {
 		let rowNumber = 0;
 		for (;;) {

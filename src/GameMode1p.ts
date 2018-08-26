@@ -27,6 +27,7 @@ export class GameMode1p implements GameMode {
 	}
 
 	onGameOver() {
+		this.avatar.onLose();
 		this.isGameOver = true;
 	}
 
