@@ -3,13 +3,24 @@ import { BoardLogic } from "./BoardLogic";
 import { Coord } from "./Coord";
 import { PieceCycle } from "./PieceCycle";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
+import { animateInterpolation, easings } from "./Animation";
+
+const smallDiskSize = 0.8;
+const baseDiskSize = 0.9;
+const enlargedDiskSize = 1;
+
+function makeNumberInterpolator(a: number, b: number) {
+	return (factor: number) => a * (1 - factor) + b * factor;
+}
 
 export class AvatarAztecJade extends Avatar {
 	diskSizeFactor: number;
+	animationQueue: Array<IterableIterator<void>>;
 
 	constructor() {
 		super();
-		this.diskSizeFactor = 1;
+		this.diskSizeFactor = baseDiskSize;
+		this.animationQueue = [];
 	}
 
 	static size: number = 256;
@@ -70,16 +81,16 @@ export class AvatarAztecJade extends Avatar {
 	}
 
 	onUnlock() {
-		// this.animationQueue.push(this.makeUnlockCoroutine());
+		this.animationQueue.push(this.makeUnlockCoroutine());
 	}
 	onPunish() {
-		// this.animationQueue.push(this.makePunishCoroutine());
+		this.animationQueue.push(this.makePunishCoroutine());
 	}
 	onWin() {
-		// this.animationQueue.push(this.makeWinCoroutine());
+		this.animationQueue.push(this.makeWinCoroutine());
 	}
 	onLose() {
-		// this.animationQueue.push(this.makeLoseCoroutine());
+		this.animationQueue.push(this.makeLoseCoroutine());
 	}
 
 	*generatePunishColors() {
@@ -96,12 +107,60 @@ export class AvatarAztecJade extends Avatar {
 	}
 
 	*makeFrameCoroutine(): IterableIterator<void> {
-		let accumulatedDeltaTime = 0;
 		for (;;) {
-			accumulatedDeltaTime += yield;
-			this.diskSizeFactor =
-				1 - (1 + Math.sin(accumulatedDeltaTime / 1000 * 3)) / 2 * 0.1;
+			const animation = this.animationQueue.shift() || this.makeIdleCoroutine();
+			yield* animation;
 		}
+	}
+
+	*makeUnlockCoroutine(): IterableIterator<void> {
+		const stepTime = 200;
+
+		const interpolator = makeNumberInterpolator(baseDiskSize, smallDiskSize);
+
+		yield* animateInterpolation(stepTime, factor => {
+			this.diskSizeFactor = interpolator(easings.sine2(factor));
+		});
+		yield* animateInterpolation(stepTime, factor => {
+			this.diskSizeFactor = interpolator(easings.sine2(1 - factor));
+		});
+	}
+
+	*makePunishCoroutine(): IterableIterator<void> {
+		// TODO
+	}
+
+	*makeWinCoroutine(): IterableIterator<void> {
+		const stepTime = 200;
+
+		yield* animateInterpolation(stepTime, factor => {
+			this.diskSizeFactor = easings.sine2(
+				makeNumberInterpolator(baseDiskSize, enlargedDiskSize)(factor),
+			);
+		});
+
+		for (;;) {
+			const interpolator = makeNumberInterpolator(
+				enlargedDiskSize,
+				baseDiskSize,
+			);
+
+			yield* animateInterpolation(stepTime, factor => {
+				this.diskSizeFactor = interpolator(easings.sine2(factor));
+			});
+			yield* animateInterpolation(stepTime, factor => {
+				this.diskSizeFactor = interpolator(easings.sine2(1 - factor));
+			});
+		}
+	}
+
+	*makeLoseCoroutine(): IterableIterator<void> {
+		// TODO
+	}
+
+	*makeIdleCoroutine(): IterableIterator<void> {
+		// TODO
+		yield;
 	}
 
 	draw(context: CanvasRenderingContext2D, avatarCenter: Coord) {

@@ -52,6 +52,8 @@ export function* makeIterable(callback: () => void): IterableIterator<void> {
 	callback();
 }
 
+const sine = (progress: number) => (Math.cos((1 - progress) * Math.PI) + 1) / 2;
+
 export const easings = {
 	linear(progress: number) {
 		return progress;
@@ -59,12 +61,6 @@ export const easings = {
 	easeInQuad(progress: number) {
 		return progress * progress;
 	},
-	sine(progress: number) {
-		return (Math.cos((1 - progress) * Math.PI) + 1) / 2;
-	},
-	// sine2(progress: number) {
-	// 	return Animation.interpolators.sine(
-	// 		Animation.interpolators.sine(progress),
-	// 	);
-	// },
+	sine,
+	sine2: (t: number) => sine(sine(t)),
 };
