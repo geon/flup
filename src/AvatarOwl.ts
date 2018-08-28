@@ -204,21 +204,21 @@ export class AvatarOwl extends Avatar {
 	}
 
 	*makeIdleCoroutine(): IterableIterator<void> {
-		const stepTime = 500;
+		const stepTime = 300;
 
 		yield* waitMs(stepTime * 2);
 
 		// Starting in the middle, bob up...
 		yield* animateInterpolation(stepTime, factor => {
-			this.bobFactor = easings.sine(0 + 1 * factor);
+			this.bobFactor = 0 + 1 * easings.sine(factor);
 		});
 		// ...all the way down...
 		yield* animateInterpolation(stepTime, factor => {
-			this.bobFactor = easings.sine(1 - 2 * factor);
+			this.bobFactor = 1 - 2 * easings.sine(factor);
 		});
 		// ...and back to normal.
 		yield* animateInterpolation(stepTime, factor => {
-			this.bobFactor = easings.sine(-1 + 1 * factor);
+			this.bobFactor = -1 + 1 * easings.sine(factor);
 		});
 	}
 
