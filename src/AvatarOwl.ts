@@ -12,15 +12,25 @@ type WingSpriteName =
 	| "wingsTransition3"
 	| "wingsOpen";
 
+type HeadSpriteName =
+	| "head"
+	| "headSpin1"
+	| "headSpin2"
+	| "headSpin3"
+	| "headSpin4"
+	| "headSpin5";
+
 export class AvatarOwl extends Avatar {
 	bobFactor: number;
 	currentWingSprite: WingSpriteName;
+	currentHeadSprite: HeadSpriteName;
 	animationQueue: Array<IterableIterator<void>>;
 
 	constructor() {
 		super();
 		this.bobFactor = 0;
 		this.currentWingSprite = "wingsClosed";
+		this.currentHeadSprite = "head";
 		this.animationQueue = [];
 	}
 
@@ -59,28 +69,28 @@ export class AvatarOwl extends Avatar {
 			},
 			{
 				name: "headSpin1",
-				sheetPosition: new Coord({ x: 0, y: 0 }),
+				sheetPosition: new Coord({ x: 1, y: 0 }),
 				sheetSize: new Coord({ x: 1, y: 1 }),
 			},
 			{
 				name: "headSpin2",
-				sheetPosition: new Coord({ x: 0, y: 0 }),
-				sheetSize: new Coord({ x: 2, y: 1 }),
+				sheetPosition: new Coord({ x: 2, y: 0 }),
+				sheetSize: new Coord({ x: 1, y: 1 }),
 			},
 			{
 				name: "headSpin3",
-				sheetPosition: new Coord({ x: 0, y: 0 }),
-				sheetSize: new Coord({ x: 3, y: 1 }),
+				sheetPosition: new Coord({ x: 3, y: 0 }),
+				sheetSize: new Coord({ x: 1, y: 1 }),
 			},
 			{
 				name: "headSpin4",
-				sheetPosition: new Coord({ x: 0, y: 0 }),
-				sheetSize: new Coord({ x: 4, y: 1 }),
+				sheetPosition: new Coord({ x: 4, y: 0 }),
+				sheetSize: new Coord({ x: 1, y: 1 }),
 			},
 			{
 				name: "headSpin5",
-				sheetPosition: new Coord({ x: 0, y: 0 }),
-				sheetSize: new Coord({ x: 5, y: 1 }),
+				sheetPosition: new Coord({ x: 5, y: 0 }),
+				sheetSize: new Coord({ x: 1, y: 1 }),
 			},
 			{
 				name: "body",
@@ -200,7 +210,23 @@ export class AvatarOwl extends Avatar {
 	}
 
 	*makeLoseCoroutine(): IterableIterator<void> {
-		// TODO
+		const headSpinCycle: ReadonlyArray<HeadSpriteName> = [
+			"headSpin1",
+			"headSpin2",
+			"headSpin3",
+			"headSpin4",
+			"headSpin5",
+			"head",
+		];
+
+		for (;;) {
+			for (const frame of headSpinCycle) {
+				this.currentHeadSprite = frame;
+				yield* waitMs(50);
+			}
+
+			yield* waitMs(200);
+		}
 	}
 
 	*makeIdleCoroutine(): IterableIterator<void> {
@@ -242,7 +268,7 @@ export class AvatarOwl extends Avatar {
 			size,
 		);
 
-		sprites.head.draw(
+		sprites[this.currentHeadSprite].draw(
 			context,
 			Coord.add(
 				new Coord({ x: 0, y: this.bobFactor * 2 }),
