@@ -268,10 +268,7 @@ export class Board {
 		for (;;) {
 			const deltaTime: number = yield;
 
-			const done = gameLogicCoroutine.next(deltaTime).done;
-			if (done) {
-				break;
-			}
+			gameLogicCoroutine.next(deltaTime);
 
 			for (const sprite of this.piecesSprites) {
 				sprite.frameCoroutine.next(deltaTime);
