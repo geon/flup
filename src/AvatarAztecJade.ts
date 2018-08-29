@@ -5,9 +5,9 @@ import { PieceCycle } from "./PieceCycle";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
 import { animateInterpolation, easings } from "./Animation";
 
-const smallDiskSize = 0.8;
-const baseDiskSize = 0.9;
-const enlargedDiskSize = 1;
+const baseDiskSize = 1;
+const smallDiskSize = baseDiskSize * 0.8;
+const enlargedDiskSize = baseDiskSize * 1.1;
 
 function makeNumberInterpolator(a: number, b: number) {
 	return (factor: number) => a * (1 - factor) + b * factor;
