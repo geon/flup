@@ -3,9 +3,10 @@ import { BoardLogic } from "./BoardLogic";
 import { Coord } from "./Coord";
 import { PieceCycle } from "./PieceCycle";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
-import { animateInterpolation, easings } from "./Animation";
+import { animateInterpolation, easings, waitMs } from "./Animation";
 
 const baseDiskSize = 1;
+const slightlySmallerDiskSize = baseDiskSize * 0.98;
 const smallDiskSize = baseDiskSize * 0.8;
 const enlargedDiskSize = baseDiskSize * 1.1;
 
@@ -159,8 +160,22 @@ export class AvatarAztecJade extends Avatar {
 	}
 
 	*makeIdleCoroutine(): IterableIterator<void> {
-		// TODO
-		yield;
+		const stepTime = 100;
+
+		const interpolator = makeNumberInterpolator(
+			baseDiskSize,
+			slightlySmallerDiskSize,
+		);
+
+		for (let i = 0; i < 2; ++i) {
+			yield* animateInterpolation(stepTime, factor => {
+				this.diskSizeFactor = interpolator(easings.sine2(factor));
+			});
+			yield* animateInterpolation(stepTime, factor => {
+				this.diskSizeFactor = interpolator(easings.sine2(1 - factor));
+			});
+		}
+		yield* waitMs(1200);
 	}
 
 	draw(context: CanvasRenderingContext2D, avatarCenter: Coord) {
