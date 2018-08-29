@@ -14,13 +14,20 @@ function makeNumberInterpolator(a: number, b: number) {
 	return (factor: number) => a * (1 - factor) + b * factor;
 }
 
+type DiskSpriteName = "gold" | "clay";
+type BodySpriteName = "idol" | "shards";
+
 export class AvatarAztecJade extends Avatar {
 	diskSizeFactor: number;
+	currentDiskSprite: DiskSpriteName;
+	currentBodySprite: BodySpriteName;
 	animationQueue: Array<IterableIterator<void>>;
 
 	constructor() {
 		super();
 		this.diskSizeFactor = baseDiskSize;
+		this.currentDiskSprite = "gold";
+		this.currentBodySprite = "idol";
 		this.animationQueue = [];
 	}
 
@@ -156,7 +163,8 @@ export class AvatarAztecJade extends Avatar {
 	}
 
 	*makeLoseCoroutine(): IterableIterator<void> {
-		// TODO
+		this.currentDiskSprite = "clay";
+		this.currentBodySprite = "shards";
 	}
 
 	*makeIdleCoroutine(): IterableIterator<void> {
@@ -186,7 +194,7 @@ export class AvatarAztecJade extends Avatar {
 			y: AvatarAztecJade.size,
 		});
 
-		sprites.gold.draw(
+		sprites[this.currentDiskSprite].draw(
 			context,
 			Coord.subtract(
 				avatarCenter,
@@ -195,7 +203,7 @@ export class AvatarAztecJade extends Avatar {
 			Coord.scale(size, this.diskSizeFactor),
 		);
 
-		sprites.idol.draw(
+		sprites[this.currentBodySprite].draw(
 			context,
 			Coord.subtract(avatarCenter, Coord.scale(size, 0.5)),
 			size,
