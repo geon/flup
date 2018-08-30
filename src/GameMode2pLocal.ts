@@ -7,6 +7,10 @@ import { Coord } from "./Coord";
 import { GameMode } from "./GameMode";
 import { PieceCycle } from "./PieceCycle";
 
+function randomArrayElement<T>(array: ReadonlyArray<T>): T {
+	return array[Math.floor(Math.random() * array.length)];
+}
+
 export class GameMode2pLocal implements GameMode {
 	boards: Array<Board>;
 	avatars: Array<Avatar>;
@@ -29,7 +33,11 @@ export class GameMode2pLocal implements GameMode {
 			}),
 		];
 
-		this.avatars = [new AvatarOwl(), new AvatarAztecJade()];
+		const avatarClasses = [AvatarOwl, AvatarAztecJade];
+		this.avatars = [
+			new (randomArrayElement(avatarClasses))(),
+			new (randomArrayElement(avatarClasses))(),
+		];
 		this.isGameOver = false;
 
 		this.frameCoroutine = this.makeFrameCoroutine();
