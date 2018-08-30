@@ -6,6 +6,7 @@ import { BoardLogic } from "./BoardLogic";
 import { Coord } from "./Coord";
 import { GameMode } from "./GameMode";
 import { PieceCycle } from "./PieceCycle";
+import { AvatarMonolith } from "./AvatarMonolith";
 
 function randomArrayElement<T>(array: ReadonlyArray<T>): T {
 	return array[Math.floor(Math.random() * array.length)];
@@ -33,7 +34,7 @@ export class GameMode2pLocal implements GameMode {
 			}),
 		];
 
-		const avatarClasses = [AvatarOwl, AvatarAztecJade];
+		const avatarClasses = [AvatarOwl, AvatarAztecJade, AvatarMonolith];
 		this.avatars = [
 			new (randomArrayElement(avatarClasses))(),
 			new (randomArrayElement(avatarClasses))(),

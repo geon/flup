@@ -6,6 +6,7 @@ import { GameMode2pLocal } from "./GameMode2pLocal";
 import { PieceSprite } from "./PieceSprite";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
 import { UnlockingEffect } from "./UnlockingEffect";
+import { AvatarMonolith } from "./AvatarMonolith";
 
 export class App {
 	context: CanvasRenderingContext2D;
@@ -87,11 +88,13 @@ export class App {
 	}
 
 	loadSprites() {
+		// TODO: This is really ugly.
 		return Promise.all([
 			PieceSprite.getSpriteSheet().loadImage(),
 			UnlockingEffect.getSpriteSheet().loadImage(),
 			AvatarOwl.getSpriteSheet().loadImage(),
 			AvatarAztecJade.getSpriteSheet().loadImage(),
+			AvatarMonolith.getSpriteSheet().loadImage(),
 			App.getSpriteSheet().loadImage(),
 		]);
 	}
