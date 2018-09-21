@@ -2,7 +2,8 @@ import { AvatarAztecJade } from "./AvatarAztecJade";
 import { AvatarOwl } from "./AvatarOwl";
 import { Coord } from "./Coord";
 import { GameMode } from "./GameMode";
-import { GameMode2pLocal } from "./GameMode2pLocal";
+// import { GameMode2pLocal } from "./GameMode2pLocal";
+import { GameMode2pAi } from "./GameMode2pAi";
 import { PieceSprite } from "./PieceSprite";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
 import { UnlockingEffect } from "./UnlockingEffect";
@@ -20,7 +21,8 @@ export class App {
 	constructor(options: { context: CanvasRenderingContext2D }) {
 		this.context = options.context;
 
-		this.gameMode = new GameMode2pLocal();
+		// this.gameMode = new GameMode2pLocal();
+		this.gameMode = new GameMode2pAi();
 
 		this.lastRenderTime = 0;
 
