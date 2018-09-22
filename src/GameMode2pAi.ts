@@ -8,15 +8,10 @@ import { GameMode } from "./GameMode";
 import { PieceCycle } from "./PieceCycle";
 import { AvatarMonolith } from "./AvatarMonolith";
 import { waitMs } from "./Animation";
-import { Dropper } from "./Dropper";
+import { Dropper, DropperPose } from "./Dropper";
 
 function randomArrayElement<T>(array: ReadonlyArray<T>): T {
 	return array[Math.floor(Math.random() * array.length)];
-}
-
-interface DropperPose {
-	position: number;
-	orientation: "horizontal" | "vertical";
 }
 
 function findMatchingDrop(
@@ -191,14 +186,7 @@ export class GameMode2pAi implements GameMode {
 
 			let move: (() => void) | undefined;
 			for (;;) {
-				move = this.nextMoveToGetToPose(
-					{
-						position: dropper.position,
-						orientation: dropper.orientation,
-					},
-					matchingPose,
-					ascending,
-				);
+				move = this.nextMoveToGetToPose(dropper.pose, matchingPose, ascending);
 
 				if (!move) {
 					break;

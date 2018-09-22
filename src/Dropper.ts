@@ -3,6 +3,11 @@ import { Coord } from "./Coord";
 import { DropperQueue } from "./DropperQueue";
 import { Piece } from "./Piece";
 
+export interface DropperPose {
+	position: number;
+	orientation: "horizontal" | "vertical";
+}
+
 export class Dropper {
 	dropperQueue: DropperQueue;
 
@@ -10,36 +15,37 @@ export class Dropper {
 	pieceA!: Piece;
 	pieceB!: Piece;
 
-	position: number;
-	orientation: "horizontal" | "vertical";
+	pose: DropperPose;
 
 	constructor(dropperQueue: DropperQueue) {
 		this.dropperQueue = dropperQueue;
 
-		this.position = Math.floor((BoardLogic.size.x - 1) / 2);
-		this.orientation = "horizontal";
+		this.pose = {
+			position: Math.floor((BoardLogic.size.x - 1) / 2),
+			orientation: "horizontal",
+		};
 	}
 
 	moveLeft() {
-		this.position = Math.max(0, this.position - 1);
+		this.pose.position = Math.max(0, this.pose.position - 1);
 
 		return this.animate();
 	}
 
 	moveRight() {
-		this.position = Math.min(
-			BoardLogic.size.x - (this.orientation == "vertical" ? 1 : 2),
-			this.position + 1,
+		this.pose.position = Math.min(
+			BoardLogic.size.x - (this.pose.orientation == "vertical" ? 1 : 2),
+			this.pose.position + 1,
 		);
 
 		return this.animate();
 	}
 
 	rotate() {
-		this.orientation =
-			this.orientation == "vertical" ? "horizontal" : "vertical";
+		this.pose.orientation =
+			this.pose.orientation == "vertical" ? "horizontal" : "vertical";
 
-		if (this.orientation == "horizontal") {
+		if (this.pose.orientation == "horizontal") {
 			const temp = this.pieceA;
 			this.pieceA = this.pieceB;
 			this.pieceB = temp;
@@ -53,11 +59,11 @@ export class Dropper {
 	private preventDropperFromStickingOutAfterRotation() {
 		// If the orientation is horizontal, and the pieces were at the right wall, now making the last one stick out...
 		if (
-			this.orientation == "horizontal" &&
-			this.position >= BoardLogic.size.x - 1
+			this.pose.orientation == "horizontal" &&
+			this.pose.position >= BoardLogic.size.x - 1
 		) {
 			// ...move the pair up just against the wall.
-			this.position = BoardLogic.size.x - 2;
+			this.pose.position = BoardLogic.size.x - 2;
 		}
 	}
 
@@ -73,12 +79,12 @@ export class Dropper {
 	private getCoordinates() {
 		return {
 			a: new Coord({
-				x: this.position,
+				x: this.pose.position,
 				y: 0,
 			}),
 			b: new Coord({
-				x: this.position + (this.orientation === "horizontal" ? 1 : 0),
-				y: this.orientation === "vertical" ? 1 : 0,
+				x: this.pose.position + (this.pose.orientation === "horizontal" ? 1 : 0),
+				y: this.pose.orientation === "vertical" ? 1 : 0,
 			}),
 		};
 	}
@@ -89,7 +95,7 @@ export class Dropper {
 		const pieces = this.dropperQueue.pop();
 		if (
 			this.dropperQueue.dropperSide == "left" &&
-			this.orientation == "horizontal"
+			this.pose.orientation == "horizontal"
 		) {
 			this.pieceA = pieces.b;
 			this.pieceB = pieces.a;
