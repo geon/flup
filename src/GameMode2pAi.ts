@@ -8,6 +8,7 @@ import { GameMode } from "./GameMode";
 import { PieceCycle } from "./PieceCycle";
 import { AvatarMonolith } from "./AvatarMonolith";
 import { OcdBot } from "./OcdBot";
+import { LocalHuman } from "./LocalHuman";
 
 function randomArrayElement<T>(array: ReadonlyArray<T>): T {
 	return array[Math.floor(Math.random() * array.length)];
@@ -18,6 +19,8 @@ export class GameMode2pAi implements GameMode {
 	avatars: Array<Avatar>;
 	isGameOver: boolean;
 	frameCoroutine: IterableIterator<void>;
+
+	human: LocalHuman;
 
 	constructor() {
 		const pieceCycleTemplate = PieceCycle.generate();
@@ -43,6 +46,9 @@ export class GameMode2pAi implements GameMode {
 		this.isGameOver = false;
 
 		this.frameCoroutine = this.makeFrameCoroutine();
+
+		// 38, 37, 40, 39 : ^, <, v, >
+		this.human = new LocalHuman(this.boards[1], [38, 37, 40, 39]);
 	}
 
 	onUnlockedChains(board: Board, chainCount: number) {
@@ -76,29 +82,8 @@ export class GameMode2pAi implements GameMode {
 			});
 	}
 
-	onKeyDown(_keyCode: number) {
-		if (this.isGameOver) {
-			return;
-		}
-
-		switch ((event as KeyboardEvent).keyCode) {
-			// Player 1.
-			case 37: // Left
-				this.boards[1].moveLeft();
-				break;
-
-			case 39: // Right
-				this.boards[1].moveRight();
-				break;
-
-			case 38: // Up
-				this.boards[1].rotate();
-				break;
-
-			case 40: // Down
-				this.boards[1].drop();
-				break;
-		}
+	onKeyDown(keyCode: number) {
+		this.human.onKeyDown(keyCode);
 	}
 
 	*makeFrameCoroutine(): IterableIterator<void> {

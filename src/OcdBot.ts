@@ -1,14 +1,8 @@
 import { waitMs } from "./Animation";
-import { Board } from "./Board";
 import { DropperPose, Dropper } from "./Dropper";
+import { Player } from "./Player";
 
-export class OcdBot {
-	board: Board;
-
-	constructor(board: Board) {
-		this.board = board;
-	}
-
+export class OcdBot extends Player {
 	*makeCoroutine(): IterableIterator<void> {
 		for (;;) {
 			// Simulate thinking time.
