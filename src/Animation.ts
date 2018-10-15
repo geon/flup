@@ -1,4 +1,19 @@
-export function* waitMs(duration: number): IterableIterator<void> {
+function primeGenerator<
+	T extends (...args: Array<any>) => IterableIterator<void>
+>(unPrimed: T): T {
+	return function(...args: Array<any>) {
+		const generator = unPrimed(...args);
+		generator.next();
+		return generator;
+	} as any; // Don't know why I need the cast.
+}
+/*
+This is more correct, since there won't be any lag because of the priming. But all makeFramCoroutine needs to be fixed as well. Also the ones that just yield*-s.
+*/
+
+export const waitMs = primeGenerator(function*(
+	duration: number,
+): IterableIterator<void> {
 	let elapsedTime = 0;
 
 	while (elapsedTime < duration) {
@@ -7,25 +22,25 @@ export function* waitMs(duration: number): IterableIterator<void> {
 	}
 
 	return elapsedTime;
-}
+});
 
-export function* animateInterpolation(
+export const animateInterpolation = primeGenerator(function*(
 	duration: number,
 	frame: (timeFactor: number) => void,
 ): IterableIterator<void> {
 	let elapsedTime = 0;
 
 	while (elapsedTime < duration) {
-		frame(elapsedTime / duration);
 		const deltaTime: number = yield;
+		frame(elapsedTime / duration);
 		elapsedTime += deltaTime;
 	}
 	frame(1);
 
 	return elapsedTime;
-}
+});
 
-export function* parallel(
+export const parallel = primeGenerator(function*(
 	branches: ReadonlyArray<IterableIterator<void>>,
 ): IterableIterator<void> {
 	let incompleteBranches = branches.slice();
@@ -38,19 +53,21 @@ export function* parallel(
 			}
 		}
 	}
-}
+});
 
-export function* queue(
+export const queue = primeGenerator(function*(
 	steps: ReadonlyArray<IterableIterator<void>>,
 ): IterableIterator<void> {
 	for (const step of steps) {
 		yield* step;
 	}
-}
+});
 
-export function* makeIterable(callback: () => void): IterableIterator<void> {
+export const makeIterable = primeGenerator(function*(
+	callback: () => void,
+): IterableIterator<void> {
 	callback();
-}
+});
 
 const sine = (progress: number) => (Math.cos((1 - progress) * Math.PI) + 1) / 2;
 
