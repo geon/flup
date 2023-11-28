@@ -219,13 +219,13 @@ export class BoardLogic {
 				continue;
 			}
 
-			const isSameColor = (neighborPosition: number) => {
+			const isUnlockable = (neighborPosition: number) => {
 				const neighborPiece = this.pieces[neighborPosition];
-				return !!neighborPiece && neighborPiece.color == piece.color;
+				return !!neighborPiece && neighborPiece.color == piece.color && !neighborPiece.key;
 			};
 
 			// If the key is touching any other piece of the same color, there is a chain.
-			const foundChain = this.neighborsOfPosition(position).some(isSameColor);
+			const foundChain = this.neighborsOfPosition(position).some(isUnlockable);
 
 			if (foundChain) {
 				// Unlock it.
@@ -248,7 +248,7 @@ export class BoardLogic {
 						.reduce((soFar, current) => [...soFar, ...current], [] as Array<
 							number
 						>)
-						.filter(isSameColor);
+						.filter(isUnlockable);
 				}
 			}
 		}
