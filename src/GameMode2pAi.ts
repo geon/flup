@@ -83,6 +83,10 @@ export class GameMode2pAi implements GameMode {
 	}
 
 	onKeyDown(keyCode: number) {
+		if (this.isGameOver) {
+			return;
+		}
+
 		this.human.onKeyDown(keyCode);
 	}
 
