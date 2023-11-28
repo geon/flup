@@ -36,7 +36,7 @@ export class DropperQueue {
 		}
 	}
 
-	static dropperQueueVisibleLength: number = 18;
+	static dropperQueueVisibleLength: number = BoardLogic.size.y;
 	static dropperQueueTimePerPieceWidth: number = 200;
 
 	pop() {
