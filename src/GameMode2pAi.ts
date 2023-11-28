@@ -98,7 +98,9 @@ export class GameMode2pAi implements GameMode {
 		for (;;) {
 			const deltaTime = yield;
 
-			aiCoroutine.next(deltaTime);
+			if (!this.isGameOver) {
+				aiCoroutine.next(deltaTime);
+			}
 
 			this.boards
 				.map(board => board.frameCoroutine)
