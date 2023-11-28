@@ -5,7 +5,10 @@ Puzzle game written in Javascript with Canvas.
 What?
 -----
 
-Way back in 1998 or so, I played a game on the original Play Station. It was a rather traditional puzzle game à la Tetris, Columns, Super Puzzle Fighter 2X, etc. You drop colored pieces into a grid, where you need to line up matching colors to remove them. You play against an opponent, and pieces are added to your grid when the opponent scores, and vice versa. Wholesome fun for the whole family.
+Way back in 1998 or so, I played a game called *Super Bub Contest* on the original Play Station. It was a rather traditional puzzle game à la Tetris, Columns, Super Puzzle Fighter 2X, etc. You drop colored pieces into a grid, where you need to line up matching colors to remove them. You play against an opponent, and pieces are added to your grid when the opponent scores, and vice versa. Wholesome fun for the whole family.
+
+* https://www.youtube.com/watch?v=7g_1861gSYs
+* https://www.caveofmonsters.co.uk/super-bub
 
 Why?
 ----
