@@ -71,7 +71,7 @@ export class BoardLogic {
 		this.dropper = new Dropper(this.dropperQueue);
 	}
 
-	static size: Coord = new Coord({ x: 8, y: 18 });
+	static size: Coord = new Coord({ x: 8, y: 14 });
 
 	static xyToIndex(x: number, y: number) {
 		return x + y * BoardLogic.size.x;
