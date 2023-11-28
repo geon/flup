@@ -18,7 +18,7 @@ export class PieceCycle {
 	}
 
 	static numColors: number = 4;
-	static nonKeyToKeyRatio: number = 7;
+	static nonKeyToKeyRatio: number = 5;
 
 	static generate() {
 		// Create list of all colors.
