@@ -16,7 +16,7 @@ export class GameMode2pLocal implements GameMode {
 	boards: Array<Board>;
 	avatars: Array<Avatar>;
 	isGameOver: boolean;
-	frameCoroutine: IterableIterator<void>;
+	frameCoroutine: Generator<void, void, number>;
 
 	constructor() {
 		const pieceCycleTemplate = PieceCycle.generate();
@@ -120,10 +120,10 @@ export class GameMode2pLocal implements GameMode {
 		}
 	}
 
-	*makeFrameCoroutine(): IterableIterator<void> {
+	*makeFrameCoroutine(): Generator<void, void, number> {
 		// Run board coroutines concurrently.
 		for (;;) {
-			const deltaTime: number = yield;
+			const deltaTime = yield;
 
 			this.boards
 				.map(board => board.frameCoroutine)

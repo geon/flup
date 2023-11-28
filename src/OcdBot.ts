@@ -3,7 +3,7 @@ import { DropperPose, Dropper } from "./Dropper";
 import { Player } from "./Player";
 
 export class OcdBot extends Player {
-	*makeCoroutine(): IterableIterator<void> {
+	*makeCoroutine(): Generator<void, void, number> {
 		for (;;) {
 			// Simulate thinking time.
 			yield* waitMs(500);

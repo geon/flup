@@ -10,7 +10,7 @@ export class GameMode1p implements GameMode {
 	board: Board;
 	avatar: Avatar;
 	isGameOver: boolean;
-	frameCoroutine: IterableIterator<void>;
+	frameCoroutine: Generator<void, void, number>;
 
 	constructor() {
 		const pieceCycle = new PieceCycle(PieceCycle.generate());
@@ -55,7 +55,7 @@ export class GameMode1p implements GameMode {
 		}
 	}
 
-	*makeFrameCoroutine(): IterableIterator<void> {
+	*makeFrameCoroutine(): Generator<void, void, number> {
 		const boardCoroutine = this.board.frameCoroutine;
 		const avatarCoroutine = this.avatar.frameCoroutine;
 

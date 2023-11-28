@@ -11,7 +11,7 @@ export class AvatarMonolith extends Avatar {
 	currentBaseSprite: BaseSpriteName;
 	hasWriting: boolean;
 	hasGalaxy: boolean;
-	animationQueue: Array<IterableIterator<void>>;
+	animationQueue: Array<Generator<void, void, number>>;
 
 	constructor() {
 		super();
@@ -91,7 +91,7 @@ export class AvatarMonolith extends Avatar {
 		this.animationQueue.push(this.makeLoseCoroutine());
 	}
 
-	*generatePunishColors() {
+	*generatePunishColors(): Generator<Array<number>, never, void> {
 		let cycleShift = 0;
 		for (;;) {
 			for (let i = 0; i < 2; ++i) {
@@ -105,14 +105,14 @@ export class AvatarMonolith extends Avatar {
 		}
 	}
 
-	*makeFrameCoroutine(): IterableIterator<void> {
+	*makeFrameCoroutine(): Generator<void, void, number> {
 		for (;;) {
 			const animation = this.animationQueue.shift() || this.makeIdleCoroutine();
 			yield* animation;
 		}
 	}
 
-	*makeUnlockCoroutine(): IterableIterator<void> {
+	*makeUnlockCoroutine(): Generator<void, void, number> {
 		const blinkTime = 50;
 		for (let i = 0; i < 3; ++i) {
 			this.hasGalaxy = true;
@@ -125,7 +125,7 @@ export class AvatarMonolith extends Avatar {
 		this.hasGalaxy = false;
 	}
 
-	*makePunishCoroutine(): IterableIterator<void> {
+	*makePunishCoroutine(): Generator<void, void, number> {
 		const blinkTime = 50;
 		for (let i = 0; i < 3; ++i) {
 			this.hasWriting = true;
@@ -138,16 +138,16 @@ export class AvatarMonolith extends Avatar {
 		this.hasWriting = false;
 	}
 
-	*makeWinCoroutine(): IterableIterator<void> {
+	*makeWinCoroutine(): Generator<void, void, number> {
 		this.hasGalaxy = true;
 		this.currentBaseSprite = "glass";
 	}
 
-	*makeLoseCoroutine(): IterableIterator<void> {
+	*makeLoseCoroutine(): Generator<void, void, number> {
 		this.hasWriting = true;
 	}
 
-	*makeIdleCoroutine(): IterableIterator<void> {
+	*makeIdleCoroutine(): Generator<void, void, number> {
 		yield;
 	}
 

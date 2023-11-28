@@ -12,7 +12,7 @@ import { BoardLogic, Event } from "./BoardLogic";
 
 export class Board {
 	gameMode: GameMode;
-	frameCoroutine: IterableIterator<void>;
+	frameCoroutine: Generator<void, void, number>;
 
 	boardLogic: BoardLogic;
 
@@ -58,7 +58,7 @@ export class Board {
 		return piece;
 	}
 
-	*makeGameLogicCoroutine(): IterableIterator<void> {
+	*makeGameLogicCoroutine(): Generator<void, void, number> {
 		for (;;) {
 			let chainCount = 0;
 
@@ -261,12 +261,12 @@ export class Board {
 		this.eventQueue.push({ type: "punish", movements });
 	}
 
-	*makeFrameCoroutine(): IterableIterator<void> {
+	*makeFrameCoroutine(): Generator<void, void, number> {
 		const gameLogicCoroutine = this.makeGameLogicCoroutine();
 
 		// Run pieces coroutines concurrently.
 		for (;;) {
-			const deltaTime: number = yield;
+			const deltaTime = yield;
 
 			gameLogicCoroutine.next(deltaTime);
 

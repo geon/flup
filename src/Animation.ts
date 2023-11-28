@@ -1,8 +1,10 @@
-export function* waitMs(duration: number): IterableIterator<void> {
+export type AnimationGenerator = Generator<void, number | void, number>;
+
+export function* waitMs(duration: number): AnimationGenerator {
 	let elapsedTime = 0;
 
 	while (elapsedTime < duration) {
-		const deltaTime: number = yield;
+		const deltaTime = yield;
 		elapsedTime += deltaTime;
 	}
 
@@ -12,12 +14,12 @@ export function* waitMs(duration: number): IterableIterator<void> {
 export function* animateInterpolation(
 	duration: number,
 	frame: (timeFactor: number) => void,
-): IterableIterator<void> {
+): AnimationGenerator {
 	let elapsedTime = 0;
 
 	while (elapsedTime < duration) {
 		frame(elapsedTime / duration);
-		const deltaTime: number = yield;
+		const deltaTime = yield;
 		elapsedTime += deltaTime;
 	}
 	frame(1);
@@ -26,11 +28,11 @@ export function* animateInterpolation(
 }
 
 export function* parallel(
-	branches: ReadonlyArray<IterableIterator<void>>,
-): IterableIterator<void> {
+	branches: ReadonlyArray<AnimationGenerator>,
+): AnimationGenerator {
 	let incompleteBranches = branches.slice();
 	while (incompleteBranches.length) {
-		const deltaTime: number = yield;
+		const deltaTime = yield;
 
 		for (let i = 0; i < incompleteBranches.length; ++i) {
 			if (incompleteBranches[i].next(deltaTime).done) {
@@ -41,14 +43,14 @@ export function* parallel(
 }
 
 export function* queue(
-	steps: ReadonlyArray<IterableIterator<void>>,
-): IterableIterator<void> {
+	steps: ReadonlyArray<AnimationGenerator>,
+): AnimationGenerator {
 	for (const step of steps) {
 		yield* step;
 	}
 }
 
-export function* makeIterable(callback: () => void): IterableIterator<void> {
+export function* makeIterable(callback: () => void): AnimationGenerator {
 	callback();
 }
 

@@ -7,7 +7,7 @@ export class UnlockingEffect {
 	coord: Coord;
 	accumulatedDeltaTime: number;
 	initialVelocities: Array<Coord>;
-	frameCoroutine: IterableIterator<void>;
+	frameCoroutine: Generator<void, void, number>;
 
 	constructor(color: number, position: Coord) {
 		this.color = color;
@@ -78,7 +78,7 @@ export class UnlockingEffect {
 		};
 	};
 
-	*makeFrameCoroutine() {
+	*makeFrameCoroutine(): Generator<void, void, number> {
 		// TODO: Move the animation here.
 
 		for (;;) {

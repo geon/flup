@@ -24,7 +24,7 @@ export class AvatarOwl extends Avatar {
 	bobFactor: number;
 	currentWingSprite: WingSpriteName;
 	currentHeadSprite: HeadSpriteName;
-	animationQueue: Array<IterableIterator<void>>;
+	animationQueue: Array<Generator<void, void, number>>;
 
 	constructor() {
 		super();
@@ -144,7 +144,7 @@ export class AvatarOwl extends Avatar {
 		this.animationQueue.push(this.makeLoseCoroutine());
 	}
 
-	*generatePunishColors() {
+	*generatePunishColors(): Generator<Array<number>, never, void> {
 		for (;;) {
 			const colors = [];
 			for (let x = 0; x < BoardLogic.size.x; x++) {
@@ -154,14 +154,14 @@ export class AvatarOwl extends Avatar {
 		}
 	}
 
-	*makeFrameCoroutine(): IterableIterator<void> {
+	*makeFrameCoroutine(): Generator<void, void, number> {
 		for (;;) {
 			const animation = this.animationQueue.shift() || this.makeIdleCoroutine();
 			yield* animation;
 		}
 	}
 
-	*makeUnlockCoroutine(): IterableIterator<void> {
+	*makeUnlockCoroutine(): Generator<void, void, number> {
 		const wingFlapCycle: ReadonlyArray<{
 			name: WingSpriteName;
 			time: number;
@@ -182,11 +182,11 @@ export class AvatarOwl extends Avatar {
 		}
 	}
 
-	*makePunishCoroutine(): IterableIterator<void> {
+	*makePunishCoroutine(): Generator<void, void, number> {
 		// TODO
 	}
 
-	*makeWinCoroutine(): IterableIterator<void> {
+	*makeWinCoroutine(): Generator<void, void, number> {
 		const wingFlapCycle: ReadonlyArray<{
 			name: WingSpriteName;
 			time: number;
@@ -209,7 +209,7 @@ export class AvatarOwl extends Avatar {
 		}
 	}
 
-	*makeLoseCoroutine(): IterableIterator<void> {
+	*makeLoseCoroutine(): Generator<void, void, number> {
 		const headSpinCycle: ReadonlyArray<HeadSpriteName> = [
 			"headSpin1",
 			"headSpin2",
@@ -229,7 +229,7 @@ export class AvatarOwl extends Avatar {
 		}
 	}
 
-	*makeIdleCoroutine(): IterableIterator<void> {
+	*makeIdleCoroutine(): Generator<void, void, number> {
 		const stepTime = 300;
 
 		yield* waitMs(stepTime * 2);

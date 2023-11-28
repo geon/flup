@@ -1,13 +1,13 @@
 import { Coord } from "./Coord";
 import { PieceCycle } from "./PieceCycle";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
-import { animateInterpolation, queue } from "./Animation";
+import { animateInterpolation, queue, AnimationGenerator } from "./Animation";
 
 export class PieceSprite {
 	spriteName: string;
 	position: Coord;
-	frameCoroutine: IterableIterator<void>;
-	animationCoroutine?: IterableIterator<void>;
+	frameCoroutine: Generator<void, void, number>;
+	animationCoroutine?: AnimationGenerator;
 	accumulatedDeltaTime: number;
 
 	constructor(options: { color: number; key: boolean; position: Coord }) {
@@ -67,10 +67,10 @@ export class PieceSprite {
 		};
 	}
 
-	*makeFrameCoroutine(): IterableIterator<void> {
+	*makeFrameCoroutine(): Generator<void, void, number> {
 		// I would just `yield*`, but `animationCoroutine` may be replaced at any frame.
 		for (;;) {
-			const deltaTime: number = yield;
+			const deltaTime = yield;
 
 			this.accumulatedDeltaTime += deltaTime;
 
@@ -83,7 +83,7 @@ export class PieceSprite {
 		}
 	}
 
-	queueUpAnimation(newPart: IterableIterator<void>) {
+	queueUpAnimation(newPart: Generator<void, void, number>) {
 		this.animationCoroutine = this.animationCoroutine
 			? queue([this.animationCoroutine, newPart])
 			: newPart;
@@ -97,7 +97,7 @@ export class PieceSprite {
 		to: Coord;
 		duration: number;
 		easing: (t: number) => number;
-	}): IterableIterator<void> {
+	}): Generator<void, void, number> {
 		const from = this.position;
 
 		yield* animateInterpolation(duration, timeFactor => {

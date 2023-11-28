@@ -9,8 +9,7 @@
 		"tsc": "tsc",
 		"lint": "tslint -c tslint.json 'src/**/*.ts' -e 'src/**/*.d.ts' --fix",
 		"build:clean": "rm -rf dist",
-		"build":
-			"npm run build:clean && webpack-cli --mode production --optimize-minimize && cp -r src/graphics dist/ && cp src/index.html dist/",
+		"build": "npm run build:clean && webpack-cli --mode production --optimize-minimize && cp -r src/graphics dist/ && cp src/index.html dist/",
 		"publish": "npm run build && ./publish.sh"
 	},
 	"repository": {
@@ -27,7 +26,7 @@
 		"prettier": "^1.9.2",
 		"ts-loader": "^4.4.2",
 		"tslint": "^5.8.0",
-		"typescript": "^3.0.1",
+		"typescript": "^5.3.2",
 		"webpack": "^4.16.4",
 		"webpack-cli": "^3.1.0",
 		"webpack-dev-server": "^3.1.5"

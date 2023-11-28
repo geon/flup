@@ -21,7 +21,7 @@ export class AvatarAztecJade extends Avatar {
 	diskSizeFactor: number;
 	currentDiskSprite: DiskSpriteName;
 	currentBodySprite: BodySpriteName;
-	animationQueue: Array<IterableIterator<void>>;
+	animationQueue: Array<Generator<void, void, number>>;
 
 	constructor() {
 		super();
@@ -101,7 +101,7 @@ export class AvatarAztecJade extends Avatar {
 		this.animationQueue.push(this.makeLoseCoroutine());
 	}
 
-	*generatePunishColors() {
+	*generatePunishColors(): Generator<Array<number>, never, void> {
 		let rowNumber = 0;
 		for (;;) {
 			++rowNumber;
@@ -114,14 +114,14 @@ export class AvatarAztecJade extends Avatar {
 		}
 	}
 
-	*makeFrameCoroutine(): IterableIterator<void> {
+	*makeFrameCoroutine(): Generator<void, void, number> {
 		for (;;) {
 			const animation = this.animationQueue.shift() || this.makeIdleCoroutine();
 			yield* animation;
 		}
 	}
 
-	*makeUnlockCoroutine(): IterableIterator<void> {
+	*makeUnlockCoroutine(): Generator<void, void, number> {
 		const stepTime = 200;
 
 		const interpolator = makeNumberInterpolator(baseDiskSize, smallDiskSize);
@@ -134,11 +134,11 @@ export class AvatarAztecJade extends Avatar {
 		});
 	}
 
-	*makePunishCoroutine(): IterableIterator<void> {
+	*makePunishCoroutine(): Generator<void, void, number> {
 		// TODO
 	}
 
-	*makeWinCoroutine(): IterableIterator<void> {
+	*makeWinCoroutine(): Generator<void, void, number> {
 		const stepTime = 200;
 
 		yield* animateInterpolation(stepTime, factor => {
@@ -162,12 +162,12 @@ export class AvatarAztecJade extends Avatar {
 		}
 	}
 
-	*makeLoseCoroutine(): IterableIterator<void> {
+	*makeLoseCoroutine(): Generator<void, void, number> {
 		this.currentDiskSprite = "clay";
 		this.currentBodySprite = "shards";
 	}
 
-	*makeIdleCoroutine(): IterableIterator<void> {
+	*makeIdleCoroutine(): Generator<void, void, number> {
 		const stepTime = 100;
 
 		const interpolator = makeNumberInterpolator(

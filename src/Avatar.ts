@@ -1,8 +1,8 @@
 import { Coord } from "./Coord";
 
 export abstract class Avatar {
-	colorGenerator: IterableIterator<Array<number>>;
-	frameCoroutine: IterableIterator<void>;
+	colorGenerator: Generator<Array<number>, never, void>;
+	frameCoroutine: Generator<void, void, number>;
 
 	constructor() {
 		this.colorGenerator = this.generatePunishColors();
@@ -20,9 +20,8 @@ export abstract class Avatar {
 
 	abstract getSize(): number;
 
-	abstract generatePunishColors(): IterableIterator<Array<number>>;
-
-	abstract makeFrameCoroutine(): IterableIterator<void>;
+	abstract generatePunishColors(): Generator<Array<number>, never, void>;
+	abstract makeFrameCoroutine(): Generator<void, void, number>;
 
 	abstract draw(context: CanvasRenderingContext2D, avatarCenter: Coord): void;
 }

@@ -18,7 +18,7 @@ export class GameMode2pAi implements GameMode {
 	boards: Array<Board>;
 	avatars: Array<Avatar>;
 	isGameOver: boolean;
-	frameCoroutine: IterableIterator<void>;
+	frameCoroutine: Generator<void, void, number>;
 
 	human: LocalHuman;
 
@@ -86,13 +86,13 @@ export class GameMode2pAi implements GameMode {
 		this.human.onKeyDown(keyCode);
 	}
 
-	*makeFrameCoroutine(): IterableIterator<void> {
+	*makeFrameCoroutine(): Generator<void, void, number> {
 		const bot = new OcdBot(this.boards[0]);
 		const aiCoroutine = bot.makeCoroutine();
 
 		// Run board coroutines concurrently.
 		for (;;) {
-			const deltaTime: number = yield;
+			const deltaTime = yield;
 
 			aiCoroutine.next(deltaTime);
 
