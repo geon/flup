@@ -41,27 +41,26 @@ TODO
 
 The next few issues on the map:
 
-* Pieces in the column above an exploding piece should fall immediately, not after the whole chain is gone.
-* Try how it feels if the droppedd pieces can never land on top of each-other, but will disappear immediately when they land, making room for the piece above. That makes it possible to make the pieces shatter immediately when a chain is made, instead of waiting for everything to settle.
-* The visual queue of pieces feeding the dropper feels weird when the dropper is vertical. The pieces und up upside-down compared to how they sat in the queue. Feed the queue from above, move the pieces straight to the side, or flip them in the opposite direction at the end.
-* Add characters to choose from when starting the game.
-	* Golden idols!
-	* One pic for menu/gameplay + one broken for losers. When losing, shake the sprite .5 seconds, then switch sprite and play break sound effect.
-	* Small, simple animations by switching/moving body part sprites.
-		* Blinking eyes.
-		* Bobbing head to the beat of the music.
+* Add a menu system. To begin with, just "Start". Then "Select Game Mode" and "Select Character" as they get implemented. DOM-based?
 * Add a start and game over/winner screen.
 * Add a time limit to the piece-dropping. 5 seconds initially, and shrinking by a second per minute? After that, the piece will drop automatically whereever the dropper is at the moment.
 * Add input for touch.
-* Add a menu system. To begin with, just "Start". Then "Select Game Mode" and "Select Character" as they get implemented. DOM-based?
-* Add alternative game styles; Single player (for points) with and without piece-dropping time limit. Implement as multiple "Game" objects that takes care of the gameplay mechanics and layout differences?
+* The visual queue of pieces feeding the dropper feels weird when the dropper is vertical. The pieces und up upside-down compared to how they sat in the queue. Feed the queue from above, move the pieces straight to the side, or flip them in the opposite direction at the end.
+* Pieces in the column above an exploding piece should fall immediately, not after the whole chain is gone.
+* Try how it feels if the droppedd pieces can never land on top of each-other, but will disappear immediately when they land, making room for the piece above. That makes it possible to make the pieces shatter immediately when a chain is made, instead of waiting for everything to settle.
+* Add characters to choose from when starting the game.
+	* Complete animation.
+		* One pic for menu/gameplay + one broken for losers. When losing, shake the sprite .5 seconds, then switch sprite and play break sound effect.
+	* Small, simple animations by switching/moving body part sprites.
+		* Blinking eyes.
+		* Bobbing head to the beat of the music.
 * Add sound effects.
 * Add music with varying stress levels depending on how close you are to losing.
-* Sync all visuals and sound effects to the music. Lock the most significant effects to whole beats, and smaller effects to 1/2, 1/4, 1/8, 1/16 of a beat and so on. (The game Rez did this, and it was awesome.) With the existing animation queue system, it should be relatively easy to implement.
+* Add alternative game styles; Single player (for points) with and without piece-dropping time limit. Implement as multiple "Game" objects that takes care of the gameplay mechanics and layout differences?
 
 Server/Client
 -------------
 
-I plan to build a websocket based server for multiplayer. MMO Puzzler anyone? Some notes about it:
+It could be done.
 
 Just send all input to the server, and broadcast to all players. The input don't affect the local board until they are echoed back. That way we can't get inconsitencies. Nice! If lag becomes a problem, do speculative anmations in parallell with an actual board and overwrite if they diverge.
