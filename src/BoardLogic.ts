@@ -293,6 +293,10 @@ export class BoardLogic {
 	}
 
 	punishLogic(row: ReadonlyArray<Piece>): ReadonlyArray<Movement> {
+		if (this.checkForGameOver()) {
+			return [];
+		}
+
 		const movements: Array<Movement> = [];
 
 		// Make room. Move everything 1 step up.
