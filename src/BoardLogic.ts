@@ -149,6 +149,9 @@ export class BoardLogic {
 
 		// For each collumn.
 		for (let x = 0; x < BoardLogic.size.x; ++x) {
+			columnMovements = [];
+			movements.push(columnMovements);
+
 			// Start at the bottom.
 			let yPut = BoardLogic.size.y - 1;
 
@@ -164,10 +167,6 @@ export class BoardLogic {
 				// Search for a piece to put in the empty space.
 				while (!this.pieces[BoardLogic.xyToIndex(x, yGet)]) {
 					--yGet;
-
-					columnMovements = [];
-					movements.push(columnMovements);
-
 					if (yGet < 0) {
 						break collumnLoop;
 					}
