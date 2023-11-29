@@ -294,8 +294,11 @@ export class BoardLogic {
 
 	punishLogic(row: ReadonlyArray<Piece>): ReadonlyArray<Movement> {
 		if (this.checkForGameOver()) {
+			// Alternatively, remove the top row of pieces, so the board doesn't overflow.
 			return [];
 		}
+
+		// TODO: Generate the row and add the pieces inside here as well.
 
 		const movements: Array<Movement> = [];
 
