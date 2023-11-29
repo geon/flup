@@ -145,11 +145,10 @@ export class BoardLogic {
 
 	makePiecesFall(): ReadonlyArray<ReadonlyArray<Movement>> {
 		const movements: Array<Array<Movement>> = [];
-		let columnMovements: Array<Movement> = [];
 
 		// For each collumn.
 		for (let x = 0; x < BoardLogic.size.x; ++x) {
-			columnMovements = [];
+			const columnMovements: Array<Movement> = [];
 			movements.push(columnMovements);
 
 			// Start at the bottom.
