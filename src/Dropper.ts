@@ -83,7 +83,8 @@ export class Dropper {
 				y: 0,
 			}),
 			b: new Coord({
-				x: this.pose.position + (this.pose.orientation === "horizontal" ? 1 : 0),
+				x:
+					this.pose.position + (this.pose.orientation === "horizontal" ? 1 : 0),
 				y: this.pose.orientation === "vertical" ? 1 : 0,
 			}),
 		};

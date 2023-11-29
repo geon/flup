@@ -235,15 +235,15 @@ export class AvatarOwl extends Avatar {
 		yield* waitMs(stepTime * 2);
 
 		// Starting in the middle, bob up...
-		yield* animateInterpolation(stepTime, factor => {
+		yield* animateInterpolation(stepTime, (factor) => {
 			this.bobFactor = 0 + 1 * easings.sine(factor);
 		});
 		// ...all the way down...
-		yield* animateInterpolation(stepTime, factor => {
+		yield* animateInterpolation(stepTime, (factor) => {
 			this.bobFactor = 1 - 2 * easings.sine(factor);
 		});
 		// ...and back to normal.
-		yield* animateInterpolation(stepTime, factor => {
+		yield* animateInterpolation(stepTime, (factor) => {
 			this.bobFactor = -1 + 1 * easings.sine(factor);
 		});
 	}

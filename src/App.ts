@@ -108,7 +108,7 @@ export class App {
 		// keydown events from holding the key.
 		window.addEventListener(
 			"keyup",
-			_event => {
+			(_event) => {
 				this.keydownEventInProgress = undefined;
 			},
 			false,
@@ -116,7 +116,7 @@ export class App {
 
 		window.addEventListener(
 			"keydown",
-			event => {
+			(event) => {
 				if (this.keydownEventInProgress !== event.keyCode) {
 					this.gameMode.onKeyDown(event.keyCode);
 				}
@@ -146,15 +146,17 @@ export class App {
 
 	async startRenderLoop() {
 		const requestAnimFrame = () =>
-			new Promise<number>(resolve => {
-				(window.requestAnimationFrame ||
+			new Promise<number>((resolve) => {
+				(
+					window.requestAnimationFrame ||
 					(window as any).webkitRequestAnimationFrame ||
 					(window as any).mozRequestAnimationFrame ||
 					(window as any).oRequestAnimationFrame ||
 					(window as any).msRequestAnimationFrame ||
-					(callback => {
+					((callback) => {
 						window.setTimeout(callback, 1000 / 60, new Date().getTime());
-					}))(resolve);
+					})
+				)(resolve);
 			});
 
 		// Start the loop.

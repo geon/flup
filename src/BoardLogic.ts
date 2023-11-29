@@ -113,7 +113,7 @@ export class BoardLogic {
 
 		// Make sure the positions are not used.
 		if (
-			drops.some(drop => !!this.pieces[BoardLogic.coordToIndex(drop.coord)])
+			drops.some((drop) => !!this.pieces[BoardLogic.coordToIndex(drop.coord)])
 		) {
 			return [];
 		}
@@ -220,7 +220,11 @@ export class BoardLogic {
 
 			const isUnlockable = (neighborPosition: number) => {
 				const neighborPiece = this.pieces[neighborPosition];
-				return !!neighborPiece && neighborPiece.color == piece.color && !neighborPiece.key;
+				return (
+					!!neighborPiece &&
+					neighborPiece.color == piece.color &&
+					!neighborPiece.key
+				);
 			};
 
 			// If the key is touching any other piece of the same color, there is a chain.
@@ -243,10 +247,11 @@ export class BoardLogic {
 
 					// Find everything of the same color, that touched the recently unlocked pieces.
 					queue = queue
-						.map(p => this.neighborsOfPosition(p))
-						.reduce((soFar, current) => [...soFar, ...current], [] as Array<
-							number
-						>)
+						.map((p) => this.neighborsOfPosition(p))
+						.reduce(
+							(soFar, current) => [...soFar, ...current],
+							[] as Array<number>,
+						)
 						.filter(isUnlockable);
 				}
 			}
@@ -285,7 +290,7 @@ export class BoardLogic {
 
 	checkForGameOver() {
 		// Check if there are any pieces sticking up into the top 2 rows of the board.
-		return this.pieces.slice(0, BoardLogic.size.x * 2).some(piece => !!piece);
+		return this.pieces.slice(0, BoardLogic.size.x * 2).some((piece) => !!piece);
 	}
 
 	punishLogic(row: ReadonlyArray<Piece>): ReadonlyArray<Movement> {

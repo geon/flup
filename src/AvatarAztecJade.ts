@@ -126,10 +126,10 @@ export class AvatarAztecJade extends Avatar {
 
 		const interpolator = makeNumberInterpolator(baseDiskSize, smallDiskSize);
 
-		yield* animateInterpolation(stepTime, factor => {
+		yield* animateInterpolation(stepTime, (factor) => {
 			this.diskSizeFactor = interpolator(easings.sine2(factor));
 		});
-		yield* animateInterpolation(stepTime, factor => {
+		yield* animateInterpolation(stepTime, (factor) => {
 			this.diskSizeFactor = interpolator(easings.sine2(1 - factor));
 		});
 	}
@@ -141,7 +141,7 @@ export class AvatarAztecJade extends Avatar {
 	*makeWinCoroutine(): Generator<void, void, number> {
 		const stepTime = 200;
 
-		yield* animateInterpolation(stepTime, factor => {
+		yield* animateInterpolation(stepTime, (factor) => {
 			this.diskSizeFactor = easings.sine2(
 				makeNumberInterpolator(baseDiskSize, enlargedDiskSize)(factor),
 			);
@@ -153,10 +153,10 @@ export class AvatarAztecJade extends Avatar {
 				baseDiskSize,
 			);
 
-			yield* animateInterpolation(stepTime, factor => {
+			yield* animateInterpolation(stepTime, (factor) => {
 				this.diskSizeFactor = interpolator(easings.sine2(factor));
 			});
-			yield* animateInterpolation(stepTime, factor => {
+			yield* animateInterpolation(stepTime, (factor) => {
 				this.diskSizeFactor = interpolator(easings.sine2(1 - factor));
 			});
 		}
@@ -176,10 +176,10 @@ export class AvatarAztecJade extends Avatar {
 		);
 
 		for (let i = 0; i < 2; ++i) {
-			yield* animateInterpolation(stepTime, factor => {
+			yield* animateInterpolation(stepTime, (factor) => {
 				this.diskSizeFactor = interpolator(easings.sine2(factor));
 			});
-			yield* animateInterpolation(stepTime, factor => {
+			yield* animateInterpolation(stepTime, (factor) => {
 				this.diskSizeFactor = interpolator(easings.sine2(1 - factor));
 			});
 		}

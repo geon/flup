@@ -79,7 +79,7 @@ export class Board {
 									Coord.distance(event.b.sprite.position, event.b.to) * 50,
 								easing: easings.sine,
 							}),
-							...event.queueMovements.map(movement =>
+							...event.queueMovements.map((movement) =>
 								movement.sprite.makeMoveCoroutine({
 									to: movement.to,
 									duration: 150,
@@ -91,7 +91,7 @@ export class Board {
 
 					case "move":
 						yield* parallel(
-							event.movements.map(movement =>
+							event.movements.map((movement) =>
 								movement.sprite.makeMoveCoroutine({
 									to: movement.to,
 									duration: 50,
@@ -104,7 +104,7 @@ export class Board {
 					case "fall":
 						const timePerPieceHeight = 100;
 						yield* parallel(
-							event.movements.map(collumn =>
+							event.movements.map((collumn) =>
 								parallel(
 									collumn.map((movement, index) =>
 										queue([
@@ -130,7 +130,7 @@ export class Board {
 					case "unlocking":
 						++chainCount;
 						yield* parallel(
-							event.unlockings.map(unlocking =>
+							event.unlockings.map((unlocking) =>
 								queue([
 									waitMs(unlocking.depth * 50),
 									makeIterable(() => {
@@ -152,9 +152,9 @@ export class Board {
 
 					case "punish":
 						yield* queue(
-							event.movements.map(collumn =>
+							event.movements.map((collumn) =>
 								parallel(
-									collumn.map(movement =>
+									collumn.map((movement) =>
 										movement.sprite.makeMoveCoroutine({
 											to: movement.to,
 											duration: 100,
@@ -209,7 +209,7 @@ export class Board {
 			// TODO: Use the piece set instead?
 			this.boardLogic.pieces
 				.filter((piece): piece is Piece => !!piece)
-				.map(piece => {
+				.map((piece) => {
 					return queue([
 						// Unlock all pieces, from the center and out.
 						waitMs(
@@ -299,7 +299,7 @@ export class Board {
 				);
 				const basePattern = pseudoRandomByXY % numBaseTiles;
 				const details =
-					pseudoRandomByXY % numTiles - numBaseTiles + numBaseTiles;
+					(pseudoRandomByXY % numTiles) - numBaseTiles + numBaseTiles;
 				const useDetail = !(Math.floor(pseudoRandomByXY / 13) % 10);
 
 				slateSprites[useDetail ? details : basePattern].draw(

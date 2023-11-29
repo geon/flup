@@ -100,7 +100,7 @@ export class PieceSprite {
 	}): Generator<void, void, number> {
 		const from = this.position;
 
-		yield* animateInterpolation(duration, timeFactor => {
+		yield* animateInterpolation(duration, (timeFactor) => {
 			this.position = Coord.interpolate(from, to, easing(timeFactor));
 		});
 	}
@@ -118,7 +118,7 @@ export class PieceSprite {
 				boardScale *
 				0.05 *
 				Math.sin(
-					this.accumulatedDeltaTime / 1000 * 27 +
+					(this.accumulatedDeltaTime / 1000) * 27 +
 						this.position.x +
 						this.position.y * 3,
 				));
@@ -128,7 +128,7 @@ export class PieceSprite {
 				boardScale *
 				0.05 *
 				Math.sin(
-					this.accumulatedDeltaTime / 1000 * 21 +
+					(this.accumulatedDeltaTime / 1000) * 21 +
 						this.position.y +
 						this.position.x * 2,
 				));
@@ -138,7 +138,7 @@ export class PieceSprite {
 				boardScale *
 				0.1 *
 				Math.sin(
-					this.accumulatedDeltaTime / 1000 * 13 +
+					(this.accumulatedDeltaTime / 1000) * 13 +
 						this.position.y +
 						this.position.x * 5,
 				));

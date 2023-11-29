@@ -70,7 +70,7 @@ export class GameMode2pLocal implements GameMode {
 		this.avatars[playerIndex].onLose();
 		this.avatars
 			.filter((_, index) => index != playerIndex)
-			.forEach(opponentAvatar => {
+			.forEach((opponentAvatar) => {
 				opponentAvatar.onWin();
 			});
 	}
@@ -126,12 +126,12 @@ export class GameMode2pLocal implements GameMode {
 			const deltaTime = yield;
 
 			this.boards
-				.map(board => board.frameCoroutine)
-				.forEach(coroutine => coroutine.next(deltaTime));
+				.map((board) => board.frameCoroutine)
+				.forEach((coroutine) => coroutine.next(deltaTime));
 
 			this.avatars
-				.map(avatar => avatar.frameCoroutine)
-				.forEach(coroutine => coroutine.next(deltaTime));
+				.map((avatar) => avatar.frameCoroutine)
+				.forEach((coroutine) => coroutine.next(deltaTime));
 
 			// if (this.isGameOver) {
 			// 	break;
@@ -163,7 +163,7 @@ export class GameMode2pLocal implements GameMode {
 
 		const avatarSpread = BoardLogic.getWidth() * 0.75;
 		const avatarDownStickiness = 1.1;
-		const avatarDownset = BoardLogic.getHeight() / 2 * avatarDownStickiness;
+		const avatarDownset = (BoardLogic.getHeight() / 2) * avatarDownStickiness;
 
 		// Draw the player avatars.
 		this.avatars[0].draw(

@@ -63,7 +63,7 @@ export class UnlockingEffect {
 				sprites.push({
 					name: "color " + i + ", variation " + j,
 					sheetPosition: new Coord({
-						x: 4 + j % 4,
+						x: 4 + (j % 4),
 						y: i * 2 + Math.floor(j / 4),
 					}),
 					sheetSize: new Coord({ x: 1, y: 1 }),

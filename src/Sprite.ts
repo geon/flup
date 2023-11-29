@@ -21,11 +21,9 @@ export class Sprite {
 			this.spriteSheet.image,
 
 			// Source xywh
-			this.sheetPosition.x *
-				this.spriteSheet.image.width /
+			(this.sheetPosition.x * this.spriteSheet.image.width) /
 				this.spriteSheet.gridSize.x,
-			this.sheetPosition.y *
-				this.spriteSheet.image.height /
+			(this.sheetPosition.y * this.spriteSheet.image.height) /
 				this.spriteSheet.gridSize.y,
 			this.spriteSheet.image.width / this.spriteSheet.gridSize.x,
 			this.spriteSheet.image.height / this.spriteSheet.gridSize.y,

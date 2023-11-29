@@ -47,13 +47,15 @@ export class DropperQueue {
 		const a = this.pieces.shift()!;
 		const b = this.pieces.shift()!;
 
-		const queueMovements = this.pieces.map((piece, i): Movement => ({
-			sprite: piece.sprite,
-			to: new Coord({
-				x: this.dropperSide == "left" ? -1 : BoardLogic.size.x,
-				y: i,
+		const queueMovements = this.pieces.map(
+			(piece, i): Movement => ({
+				sprite: piece.sprite,
+				to: new Coord({
+					x: this.dropperSide == "left" ? -1 : BoardLogic.size.x,
+					y: i,
+				}),
 			}),
-		}));
+		);
 
 		return {
 			a,

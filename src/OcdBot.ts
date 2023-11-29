@@ -58,9 +58,10 @@ export class OcdBot extends Player {
 	}
 }
 
-function findMatchingDrop(
-	dropper: Dropper,
-): { matchingPose: DropperPose; ascending: boolean } {
+function findMatchingDrop(dropper: Dropper): {
+	matchingPose: DropperPose;
+	ascending: boolean;
+} {
 	// This table has neighbours of allnumber, number]possible combinations, and still fits within the width of the board.
 	const colorTable = [0, 1, 2, 3, 1, 3, 0, 2];
 
