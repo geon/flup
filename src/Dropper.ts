@@ -8,6 +8,11 @@ export interface DropperPose {
 	orientation: "horizontal" | "vertical";
 }
 
+export interface Drop {
+	coord: Coord;
+	piece: Piece;
+}
+
 export class Dropper {
 	dropperQueue: DropperQueue;
 
@@ -67,7 +72,7 @@ export class Dropper {
 		}
 	}
 
-	getDrops() {
+	getDrops(): [Drop, Drop] {
 		const coords = this.getCoordinates();
 
 		return [
