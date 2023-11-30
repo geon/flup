@@ -58,17 +58,13 @@ export type Event =
 export class BoardLogic {
 	pieces: Array<Piece | undefined>;
 
-	pieceCycle: PieceCycle;
-	dropperQueue: DropperQueue;
-
 	dropper: Dropper;
 
 	constructor(options: { pieceCycle: PieceCycle; dropperQueue: DropperQueue }) {
 		this.pieces = [];
 
-		this.pieceCycle = options.pieceCycle;
-		this.dropperQueue = options.dropperQueue;
-		this.dropper = new Dropper(this.dropperQueue);
+		// TODO: Move to Board.
+		this.dropper = new Dropper(options.dropperQueue);
 	}
 
 	static size: Coord = new Coord({ x: 8, y: 14 });
