@@ -9,11 +9,13 @@ import { PieceSprite } from "./PieceSprite";
 import { PieceCycle } from "./PieceCycle";
 import { UnlockingEffect } from "./UnlockingEffect";
 import { BoardLogic, Event } from "./BoardLogic";
+import { Dropper } from "./Dropper";
 
 export class Board {
 	gameMode: GameMode;
 	frameCoroutine: Generator<void, void, number>;
 
+	dropper: Dropper;
 	boardLogic: BoardLogic;
 
 	piecesSprites: Set<PieceSprite>;
@@ -36,17 +38,15 @@ export class Board {
 			{ pieceCycle: options.pieceCycle, board: this },
 			options.dropperSide,
 		);
+		this.dropper = new Dropper(dropperQueue);
 
-		this.boardLogic = new BoardLogic({
-			pieceCycle: options.pieceCycle,
-			dropperQueue,
-		});
+		this.boardLogic = new BoardLogic();
 
 		this.unlockingEffects = new Set();
 		this.eventQueue = [];
 
 		// The first charge must be done here, where the event can be handled.
-		this.eventQueue.push(this.boardLogic.dropper.charge());
+		this.eventQueue.push(this.dropper.charge());
 
 		this.slateRandomExp = 2 + Math.random();
 	}
@@ -189,19 +189,19 @@ export class Board {
 	}
 
 	moveLeft() {
-		this.eventQueue.push(this.boardLogic.moveLeft());
+		this.eventQueue.push(this.dropper.moveLeft());
 	}
 
 	moveRight() {
-		this.eventQueue.push(this.boardLogic.moveRight());
+		this.eventQueue.push(this.dropper.moveRight());
 	}
 
 	rotate() {
-		this.eventQueue.push(this.boardLogic.rotate());
+		this.eventQueue.push(this.dropper.rotate());
 	}
 
 	drop() {
-		this.eventQueue.push(...this.boardLogic.drop());
+		this.eventQueue.push(...this.boardLogic.drop(this.dropper));
 	}
 
 	*startGameOverEffect() {

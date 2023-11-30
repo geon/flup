@@ -1,9 +1,7 @@
 import { Coord } from "./Coord";
 import { Dropper } from "./Dropper";
-import { DropperQueue } from "./DropperQueue";
 import { Piece } from "./Piece";
 import { PieceSprite } from "./PieceSprite";
-import { PieceCycle } from "./PieceCycle";
 
 export interface Movement {
 	sprite: PieceSprite;
@@ -58,13 +56,8 @@ export type Event =
 export class BoardLogic {
 	pieces: Array<Piece | undefined>;
 
-	dropper: Dropper;
-
-	constructor(options: { pieceCycle: PieceCycle; dropperQueue: DropperQueue }) {
+	constructor() {
 		this.pieces = [];
-
-		// TODO: Move to Board.
-		this.dropper = new Dropper(options.dropperQueue);
 	}
 
 	static size: Coord = new Coord({ x: 8, y: 14 });
@@ -92,20 +85,8 @@ export class BoardLogic {
 		return (BoardLogic.size.y + 2) * PieceSprite.size;
 	}
 
-	moveLeft() {
-		return this.dropper.moveLeft();
-	}
-
-	moveRight() {
-		return this.dropper.moveRight();
-	}
-
-	rotate() {
-		return this.dropper.rotate();
-	}
-
-	drop(): ReadonlyArray<Event> {
-		const drops = this.dropper.getDrops();
+	drop(dropper: Dropper): ReadonlyArray<Event> {
+		const drops = dropper.getDrops();
 
 		// Make sure the positions are not used.
 		if (
@@ -134,7 +115,7 @@ export class BoardLogic {
 			events.push({ type: "unlocking", unlockings });
 		}
 
-		events.push(this.dropper.charge());
+		events.push(dropper.charge());
 
 		return events;
 	}

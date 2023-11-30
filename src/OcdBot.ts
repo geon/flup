@@ -8,7 +8,7 @@ export class OcdBot extends Player {
 			// Simulate thinking time.
 			yield* waitMs(500);
 
-			const dropper = this.board.boardLogic.dropper;
+			const dropper = this.board.dropper;
 			const { matchingPose, ascending } = findMatchingDrop(dropper);
 
 			let move: (() => void) | undefined;
@@ -36,7 +36,7 @@ export class OcdBot extends Player {
 		to: DropperPose,
 		ascending: boolean,
 	): (() => void) | undefined {
-		const dropper = this.board.boardLogic.dropper;
+		const dropper = this.board.dropper;
 		const dropColors: [number, number] = [
 			dropper.pieceA.color,
 			dropper.pieceB.color,
