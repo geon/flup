@@ -7,8 +7,9 @@ import { Coord } from "./Coord";
 import { GameMode } from "./GameMode";
 import { PieceCycle } from "./PieceCycle";
 import { AvatarMonolith } from "./AvatarMonolith";
-import { OcdBot } from "./OcdBot";
+// import { OcdBot } from "./OcdBot";
 import { LocalHuman } from "./LocalHuman";
+import { UnlockBot } from "./UnlockBot";
 
 function randomArrayElement<T>(array: ReadonlyArray<T>): T {
 	return array[Math.floor(Math.random() * array.length)];
@@ -91,7 +92,8 @@ export class GameMode2pAi implements GameMode {
 	}
 
 	*makeFrameCoroutine(): Generator<void, void, number> {
-		const bot = new OcdBot(this.boards[0]);
+		// const bot = new OcdBot(this.boards[0]);
+		const bot = new UnlockBot(this.boards[0]);
 		const aiCoroutine = bot.makeCoroutine();
 
 		// Run board coroutines concurrently.

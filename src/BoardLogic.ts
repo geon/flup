@@ -85,7 +85,7 @@ export class BoardLogic {
 		return (BoardLogic.size.y + 2) * PieceSprite.size;
 	}
 
-	drop(drops: [Drop, Drop]): ReadonlyArray<Event> {
+	drop(drops: readonly [Drop, Drop]): ReadonlyArray<Event> {
 		// Make sure the positions are not used.
 		if (
 			drops.some((drop) => !!this.pieces[BoardLogic.coordToIndex(drop.coord)])
