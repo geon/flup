@@ -41,6 +41,12 @@ TODO
 
 The next few issues on the map:
 
+* Some events should not be queued up.
+	* Dropper charge shuld only wait for itself.
+	* Dropper movements should only wait for itself and the dropper charge.
+	* Eveything else should wait for everything.
+* Inputs should not be accepted while previous inputs are animated.
+* A held-down move-key (A/D, left/right) should continously trigger move inputs.
 * Add a menu system. To begin with, just "Start". Then "Select Game Mode" and "Select Character" as they get implemented. DOM-based?
 * Add a start and game over/winner screen.
 * Add a time limit to the piece-dropping. 5 seconds initially, and shrinking by a second per minute? After that, the piece will drop automatically whereever the dropper is at the moment.
