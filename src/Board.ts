@@ -201,7 +201,9 @@ export class Board {
 	}
 
 	drop() {
-		this.eventQueue.push(...this.boardLogic.drop(this.dropper));
+		const drops = this.dropper.getDrops();
+		this.eventQueue.push(...this.boardLogic.drop(drops));
+		this.eventQueue.push(this.dropper.charge());
 	}
 
 	*startGameOverEffect() {

@@ -1,5 +1,5 @@
 import { Coord } from "./Coord";
-import { Dropper } from "./Dropper";
+import { Drop } from "./Dropper";
 import { Piece } from "./Piece";
 import { PieceSprite } from "./PieceSprite";
 
@@ -85,9 +85,7 @@ export class BoardLogic {
 		return (BoardLogic.size.y + 2) * PieceSprite.size;
 	}
 
-	drop(dropper: Dropper): ReadonlyArray<Event> {
-		const drops = dropper.getDrops();
-
+	drop(drops: [Drop, Drop]): ReadonlyArray<Event> {
 		// Make sure the positions are not used.
 		if (
 			drops.some((drop) => !!this.pieces[BoardLogic.coordToIndex(drop.coord)])
@@ -114,8 +112,6 @@ export class BoardLogic {
 
 			events.push({ type: "unlocking", unlockings });
 		}
-
-		events.push(dropper.charge());
 
 		return events;
 	}
