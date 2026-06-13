@@ -3,6 +3,8 @@ import { PieceColor } from "./Piece";
 import { PieceSprite } from "./PieceSprite";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
 
+type Variation = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+
 export class UnlockingEffect {
 	color: PieceColor;
 	coord: Coord;
@@ -31,7 +33,9 @@ export class UnlockingEffect {
 	static size: number = 16;
 	static gravity: number = 0.001;
 	static duration: number = 3000;
-	static sprites: SpriteSet | undefined;
+	static sprites:
+		| SpriteSet<`color ${PieceColor}, variation ${Variation}`>
+		| undefined;
 	static spriteSheet: SpriteSheet | undefined;
 
 	static getSprites = () => {
@@ -113,7 +117,7 @@ export class UnlockingEffect {
 
 		for (let i = 0; i < this.initialVelocities.length; i++) {
 			UnlockingEffect.getSprites()[
-				"color " + this.color + ", variation " + i
+				`color ${this.color}, variation ${i as Variation}`
 			].draw(
 				context,
 				new Coord({
