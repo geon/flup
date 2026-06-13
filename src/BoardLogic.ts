@@ -1,6 +1,6 @@
 import { Coord } from "./Coord";
 import { Drop } from "./Dropper";
-import { Piece } from "./Piece";
+import { Piece, PieceColor } from "./Piece";
 import { PieceSprite } from "./PieceSprite";
 
 export interface Movement {
@@ -11,7 +11,7 @@ export interface Movement {
 interface Unlocking {
 	sprite: PieceSprite;
 	depth: number;
-	color: number;
+	color: PieceColor;
 }
 
 export interface ChargePieceMovement {

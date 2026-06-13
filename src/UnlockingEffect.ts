@@ -1,15 +1,16 @@
 import { Coord } from "./Coord";
+import { PieceColor } from "./Piece";
 import { PieceSprite } from "./PieceSprite";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
 
 export class UnlockingEffect {
-	color: number;
+	color: PieceColor;
 	coord: Coord;
 	accumulatedDeltaTime: number;
 	initialVelocities: Array<Coord>;
 	frameCoroutine: Generator<void, void, number>;
 
-	constructor(color: number, position: Coord) {
+	constructor(color: PieceColor, position: Coord) {
 		this.color = color;
 		this.coord = position;
 		this.accumulatedDeltaTime = 0;
