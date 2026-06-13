@@ -1,4 +1,4 @@
-import { InvisiblePiece } from "./Piece";
+import { InvisiblePiece, pieceColors } from "./Piece";
 
 export class PieceCycle {
 	currentIndex: number;
@@ -17,23 +17,23 @@ export class PieceCycle {
 		return piece;
 	}
 
-	static numColors: number = 4;
+	static numColors: number = pieceColors.length;
 	static nonKeyToKeyRatio: number = 4;
 
 	static generate() {
 		// Create list of all colors.
-		const baseColors: Array<InvisiblePiece> = [];
-		const keyColors: Array<InvisiblePiece> = [];
-		for (let i = 0; i < this.numColors; ++i) {
-			baseColors[i] = {
-				color: i,
+		const baseColors = pieceColors.map(
+			(color): InvisiblePiece => ({
+				color,
 				key: false,
-			};
-			keyColors[i] = {
-				color: i,
+			}),
+		);
+		const keyColors = pieceColors.map(
+			(color): InvisiblePiece => ({
+				color,
 				key: true,
-			};
-		}
+			}),
+		);
 
 		// Create a list of all pieces in the proper ratios.
 		let properRatio = keyColors;
