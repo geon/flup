@@ -9,10 +9,7 @@ import { PieceCycle } from "./PieceCycle";
 import { AvatarMonolith } from "./AvatarMonolith";
 import { Tuple } from "./Tuple";
 import { checkedAccess } from "./checked-access";
-
-function randomArrayElement<T>(array: ReadonlyArray<T>): T {
-	return array[Math.floor(Math.random() * array.length)];
-}
+import { randomArrayElement } from "./array";
 
 export class GameMode2pLocal implements GameMode {
 	boards: Tuple<Board, 2>;

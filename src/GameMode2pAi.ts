@@ -10,10 +10,7 @@ import { AvatarMonolith } from "./AvatarMonolith";
 // import { OcdBot } from "./OcdBot";
 import { LocalHuman } from "./LocalHuman";
 import { UnlockBot } from "./UnlockBot";
-
-function randomArrayElement<T>(array: ReadonlyArray<T>): T {
-	return array[Math.floor(Math.random() * array.length)]!;
-}
+import { randomArrayElement } from "./array";
 
 export class GameMode2pAi implements GameMode {
 	boards: Array<Board>;
