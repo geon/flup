@@ -61,8 +61,8 @@ export class PieceCycle {
 		}
 		while (--i) {
 			const j = Math.floor(Math.random() * (i + 1));
-			const tempi = myArray[i];
-			const tempj = myArray[j];
+			const tempi = myArray[i]!;
+			const tempj = myArray[j]!;
 			myArray[i] = tempj;
 			myArray[j] = tempi;
 		}
