@@ -2,16 +2,19 @@ import { Coord } from "./Coord";
 import { PieceCycle } from "./PieceCycle";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
 import { animateInterpolation, queue, AnimationGenerator } from "./Animation";
+import { PieceColor } from "./Piece";
+
+type SpriteName = `${"key" | "piece"}${PieceColor}`;
 
 export class PieceSprite {
-	spriteName: string;
+	spriteName: SpriteName;
 	position: Coord;
 	frameCoroutine: Generator<void, void, number>;
 	animationCoroutine?: AnimationGenerator;
 	accumulatedDeltaTime: number;
 
-	constructor(options: { color: number; key: boolean; position: Coord }) {
-		this.spriteName = (options.key ? "key" : "piece") + options.color;
+	constructor(options: { color: PieceColor; key: boolean; position: Coord }) {
+		this.spriteName = `${options.key ? "key" : "piece"}${options.color}`;
 		this.position = options.position;
 		this.accumulatedDeltaTime = 0;
 		this.frameCoroutine = this.makeFrameCoroutine();
