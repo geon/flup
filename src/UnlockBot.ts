@@ -88,6 +88,9 @@ export class UnlockBot extends Player {
 		const bestMove = maxBy(moves, (move) =>
 			evaluatePose(this.board.boardLogic, pieces, move),
 		);
+		if (!bestMove) {
+			throw new Error("Missing bestMove.");
+		}
 
 		return bestMove;
 	}
@@ -132,7 +135,7 @@ function evaluatePose(
 function maxBy<T>(
 	array: ReadonlyArray<T>,
 	selector: (element: T) => number,
-): T {
+): T | undefined {
 	let maxElement = array[0];
 	let maxValue = -Infinity;
 	for (const element of array) {
