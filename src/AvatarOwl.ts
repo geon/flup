@@ -52,83 +52,77 @@ export class AvatarOwl extends Avatar {
 
 	static getSpriteSheet() {
 		if (!AvatarOwl.spriteSheet) {
-			AvatarOwl.spriteSheet = new SpriteSheet(
-				AvatarOwl.getSpriteSheetSettings(),
-			);
+			const sprites = [
+				{
+					name: "head",
+					sheetPosition: new Coord({ x: 0, y: 0 }),
+					sheetSize: new Coord({ x: 1, y: 1 }),
+				},
+				{
+					name: "headSpin1",
+					sheetPosition: new Coord({ x: 1, y: 0 }),
+					sheetSize: new Coord({ x: 1, y: 1 }),
+				},
+				{
+					name: "headSpin2",
+					sheetPosition: new Coord({ x: 2, y: 0 }),
+					sheetSize: new Coord({ x: 1, y: 1 }),
+				},
+				{
+					name: "headSpin3",
+					sheetPosition: new Coord({ x: 3, y: 0 }),
+					sheetSize: new Coord({ x: 1, y: 1 }),
+				},
+				{
+					name: "headSpin4",
+					sheetPosition: new Coord({ x: 4, y: 0 }),
+					sheetSize: new Coord({ x: 1, y: 1 }),
+				},
+				{
+					name: "headSpin5",
+					sheetPosition: new Coord({ x: 5, y: 0 }),
+					sheetSize: new Coord({ x: 1, y: 1 }),
+				},
+				{
+					name: "body",
+					sheetPosition: new Coord({ x: 0, y: 1 }),
+					sheetSize: new Coord({ x: 1, y: 1 }),
+				},
+				{
+					name: "wingsClosed",
+					sheetPosition: new Coord({ x: 1, y: 1 }),
+					sheetSize: new Coord({ x: 0, y: 0 }),
+				},
+				{
+					name: "wingsTransition1",
+					sheetPosition: new Coord({ x: 2, y: 1 }),
+					sheetSize: new Coord({ x: 0, y: 0 }),
+				},
+				{
+					name: "wingsTransition2",
+					sheetPosition: new Coord({ x: 3, y: 1 }),
+					sheetSize: new Coord({ x: 0, y: 0 }),
+				},
+				{
+					name: "wingsTransition3",
+					sheetPosition: new Coord({ x: 4, y: 1 }),
+					sheetSize: new Coord({ x: 0, y: 0 }),
+				},
+				{
+					name: "wingsOpen",
+					sheetPosition: new Coord({ x: 5, y: 1 }),
+					sheetSize: new Coord({ x: 0, y: 0 }),
+				},
+			];
+
+			AvatarOwl.spriteSheet = new SpriteSheet({
+				imageFileName: "owl.png",
+				gridSize: new Coord({ x: 6, y: 2 }),
+				spriteSettings: sprites,
+			});
 		}
 
 		return AvatarOwl.spriteSheet;
-	}
-
-	static getSpriteSheetSettings() {
-		const sprites = [
-			{
-				name: "head",
-				sheetPosition: new Coord({ x: 0, y: 0 }),
-				sheetSize: new Coord({ x: 1, y: 1 }),
-			},
-			{
-				name: "headSpin1",
-				sheetPosition: new Coord({ x: 1, y: 0 }),
-				sheetSize: new Coord({ x: 1, y: 1 }),
-			},
-			{
-				name: "headSpin2",
-				sheetPosition: new Coord({ x: 2, y: 0 }),
-				sheetSize: new Coord({ x: 1, y: 1 }),
-			},
-			{
-				name: "headSpin3",
-				sheetPosition: new Coord({ x: 3, y: 0 }),
-				sheetSize: new Coord({ x: 1, y: 1 }),
-			},
-			{
-				name: "headSpin4",
-				sheetPosition: new Coord({ x: 4, y: 0 }),
-				sheetSize: new Coord({ x: 1, y: 1 }),
-			},
-			{
-				name: "headSpin5",
-				sheetPosition: new Coord({ x: 5, y: 0 }),
-				sheetSize: new Coord({ x: 1, y: 1 }),
-			},
-			{
-				name: "body",
-				sheetPosition: new Coord({ x: 0, y: 1 }),
-				sheetSize: new Coord({ x: 1, y: 1 }),
-			},
-			{
-				name: "wingsClosed",
-				sheetPosition: new Coord({ x: 1, y: 1 }),
-				sheetSize: new Coord({ x: 0, y: 0 }),
-			},
-			{
-				name: "wingsTransition1",
-				sheetPosition: new Coord({ x: 2, y: 1 }),
-				sheetSize: new Coord({ x: 0, y: 0 }),
-			},
-			{
-				name: "wingsTransition2",
-				sheetPosition: new Coord({ x: 3, y: 1 }),
-				sheetSize: new Coord({ x: 0, y: 0 }),
-			},
-			{
-				name: "wingsTransition3",
-				sheetPosition: new Coord({ x: 4, y: 1 }),
-				sheetSize: new Coord({ x: 0, y: 0 }),
-			},
-			{
-				name: "wingsOpen",
-				sheetPosition: new Coord({ x: 5, y: 1 }),
-				sheetSize: new Coord({ x: 0, y: 0 }),
-			},
-		];
-
-		return {
-			imageFileName: "owl.png",
-			gridSize: new Coord({ x: 6, y: 2 }),
-			spriteSettings: sprites,
-		};
 	}
 
 	onUnlock() {

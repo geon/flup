@@ -43,39 +43,33 @@ export class UnlockingEffect {
 
 	static getSpriteSheet = () => {
 		if (!UnlockingEffect.spriteSheet) {
-			UnlockingEffect.spriteSheet = new SpriteSheet(
-				UnlockingEffect.getSpriteSheetSettings(),
-			);
+			const sprites: Array<{
+				name: string;
+				sheetPosition: Coord;
+				sheetSize: Coord;
+			}> = [];
+
+			for (let i = 0; i < 4; ++i) {
+				for (let j = 0; j < 8; ++j) {
+					sprites.push({
+						name: "color " + i + ", variation " + j,
+						sheetPosition: new Coord({
+							x: 4 + (j % 4),
+							y: i * 2 + Math.floor(j / 4),
+						}),
+						sheetSize: new Coord({ x: 1, y: 1 }),
+					});
+				}
+			}
+
+			UnlockingEffect.spriteSheet = new SpriteSheet({
+				imageFileName: "pieces.png",
+				gridSize: new Coord({ x: 8, y: 8 }),
+				spriteSettings: sprites,
+			});
 		}
 
 		return UnlockingEffect.spriteSheet;
-	};
-
-	static getSpriteSheetSettings = () => {
-		const sprites: Array<{
-			name: string;
-			sheetPosition: Coord;
-			sheetSize: Coord;
-		}> = [];
-
-		for (let i = 0; i < 4; ++i) {
-			for (let j = 0; j < 8; ++j) {
-				sprites.push({
-					name: "color " + i + ", variation " + j,
-					sheetPosition: new Coord({
-						x: 4 + (j % 4),
-						y: i * 2 + Math.floor(j / 4),
-					}),
-					sheetSize: new Coord({ x: 1, y: 1 }),
-				});
-			}
-		}
-
-		return {
-			imageFileName: "pieces.png",
-			gridSize: new Coord({ x: 8, y: 8 }),
-			spriteSettings: sprites,
-		};
 	};
 
 	*makeFrameCoroutine(): Generator<void, void, number> {

@@ -54,31 +54,27 @@ export class App {
 
 	static getSpriteSheet() {
 		if (!this.spriteSheet) {
-			this.spriteSheet = new SpriteSheet(this.getSpriteSheetSettings());
-		}
+			const gridSize = new Coord({ x: 4, y: 2 });
+			const spriteSettings = [];
+			for (let i = 0; i < gridSize.x * gridSize.y; ++i) {
+				spriteSettings.push({
+					name: i.toString(),
+					sheetPosition: new Coord({
+						x: i % gridSize.x,
+						y: Math.floor(i / gridSize.x),
+					}),
+					sheetSize: new Coord({ x: 1, y: 1 }),
+				});
+			}
 
-		return this.spriteSheet;
-	}
-
-	static getSpriteSheetSettings() {
-		const gridSize = new Coord({ x: 4, y: 2 });
-		const spriteSettings = [];
-		for (let i = 0; i < gridSize.x * gridSize.y; ++i) {
-			spriteSettings.push({
-				name: i.toString(),
-				sheetPosition: new Coord({
-					x: i % gridSize.x,
-					y: Math.floor(i / gridSize.x),
-				}),
-				sheetSize: new Coord({ x: 1, y: 1 }),
+			this.spriteSheet = new SpriteSheet({
+				imageFileName: "slates.jpg",
+				gridSize,
+				spriteSettings,
 			});
 		}
 
-		return {
-			imageFileName: "slates.jpg",
-			gridSize,
-			spriteSettings,
-		};
+		return this.spriteSheet;
 	}
 
 	getWidth() {

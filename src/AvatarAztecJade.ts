@@ -49,43 +49,37 @@ export class AvatarAztecJade extends Avatar {
 
 	static getSpriteSheet() {
 		if (!AvatarAztecJade.spriteSheet) {
-			AvatarAztecJade.spriteSheet = new SpriteSheet(
-				AvatarAztecJade.getSpriteSheetSettings(),
-			);
+			const sprites = [
+				{
+					name: "gold",
+					sheetPosition: new Coord({ x: 0, y: 0 }),
+					sheetSize: new Coord({ x: 1, y: 1 }),
+				},
+				{
+					name: "clay",
+					sheetPosition: new Coord({ x: 1, y: 0 }),
+					sheetSize: new Coord({ x: 0, y: 0 }),
+				},
+				{
+					name: "idol",
+					sheetPosition: new Coord({ x: 0, y: 1 }),
+					sheetSize: new Coord({ x: 1, y: 1 }),
+				},
+				{
+					name: "shards",
+					sheetPosition: new Coord({ x: 1, y: 1 }),
+					sheetSize: new Coord({ x: 0, y: 1 }),
+				},
+			];
+
+			AvatarAztecJade.spriteSheet = new SpriteSheet({
+				imageFileName: "aztec-jade.png",
+				gridSize: new Coord({ x: 2, y: 2 }),
+				spriteSettings: sprites,
+			});
 		}
 
 		return AvatarAztecJade.spriteSheet;
-	}
-
-	static getSpriteSheetSettings() {
-		const sprites = [
-			{
-				name: "gold",
-				sheetPosition: new Coord({ x: 0, y: 0 }),
-				sheetSize: new Coord({ x: 1, y: 1 }),
-			},
-			{
-				name: "clay",
-				sheetPosition: new Coord({ x: 1, y: 0 }),
-				sheetSize: new Coord({ x: 0, y: 0 }),
-			},
-			{
-				name: "idol",
-				sheetPosition: new Coord({ x: 0, y: 1 }),
-				sheetSize: new Coord({ x: 1, y: 1 }),
-			},
-			{
-				name: "shards",
-				sheetPosition: new Coord({ x: 1, y: 1 }),
-				sheetSize: new Coord({ x: 0, y: 1 }),
-			},
-		];
-
-		return {
-			imageFileName: "aztec-jade.png",
-			gridSize: new Coord({ x: 2, y: 2 }),
-			spriteSettings: sprites,
-		};
 	}
 
 	onUnlock() {

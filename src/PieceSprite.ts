@@ -31,40 +31,34 @@ export class PieceSprite {
 
 	static getSpriteSheet() {
 		if (!PieceSprite.spriteSheet) {
-			PieceSprite.spriteSheet = new SpriteSheet(
-				PieceSprite.getSpriteSheetSettings(),
-			);
+			const sprites: Array<{
+				name: string;
+				sheetPosition: Coord;
+				sheetSize: Coord;
+			}> = [];
+
+			for (let i = 0; i < PieceCycle.numColors; ++i) {
+				sprites.push({
+					name: "piece" + i,
+					sheetPosition: new Coord({ x: 0, y: i }),
+					sheetSize: new Coord({ x: 1, y: 1 }),
+				});
+
+				sprites.push({
+					name: "key" + i,
+					sheetPosition: new Coord({ x: 1, y: i }),
+					sheetSize: new Coord({ x: 1, y: 1 }),
+				});
+			}
+
+			PieceSprite.spriteSheet = new SpriteSheet({
+				imageFileName: "pieces.png",
+				gridSize: new Coord({ x: 4, y: 4 }),
+				spriteSettings: sprites,
+			});
 		}
 
 		return PieceSprite.spriteSheet;
-	}
-
-	static getSpriteSheetSettings() {
-		const sprites: Array<{
-			name: string;
-			sheetPosition: Coord;
-			sheetSize: Coord;
-		}> = [];
-
-		for (let i = 0; i < PieceCycle.numColors; ++i) {
-			sprites.push({
-				name: "piece" + i,
-				sheetPosition: new Coord({ x: 0, y: i }),
-				sheetSize: new Coord({ x: 1, y: 1 }),
-			});
-
-			sprites.push({
-				name: "key" + i,
-				sheetPosition: new Coord({ x: 1, y: i }),
-				sheetSize: new Coord({ x: 1, y: 1 }),
-			});
-		}
-
-		return {
-			imageFileName: "pieces.png",
-			gridSize: new Coord({ x: 4, y: 4 }),
-			spriteSettings: sprites,
-		};
 	}
 
 	*makeFrameCoroutine(): Generator<void, void, number> {

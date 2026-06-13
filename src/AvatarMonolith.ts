@@ -39,43 +39,37 @@ export class AvatarMonolith extends Avatar {
 
 	static getSpriteSheet() {
 		if (!AvatarMonolith.spriteSheet) {
-			AvatarMonolith.spriteSheet = new SpriteSheet(
-				AvatarMonolith.getSpriteSheetSettings(),
-			);
+			const sprites = [
+				{
+					name: "base",
+					sheetPosition: new Coord({ x: 0, y: 0 }),
+					sheetSize: new Coord({ x: 1, y: 1 }),
+				},
+				{
+					name: "writing",
+					sheetPosition: new Coord({ x: 1, y: 0 }),
+					sheetSize: new Coord({ x: 1, y: 1 }),
+				},
+				{
+					name: "glass",
+					sheetPosition: new Coord({ x: 2, y: 0 }),
+					sheetSize: new Coord({ x: 1, y: 1 }),
+				},
+				{
+					name: "galaxy",
+					sheetPosition: new Coord({ x: 3, y: 0 }),
+					sheetSize: new Coord({ x: 1, y: 1 }),
+				},
+			];
+
+			AvatarMonolith.spriteSheet = new SpriteSheet({
+				imageFileName: "monolith.png",
+				gridSize: new Coord({ x: 4, y: 1 }),
+				spriteSettings: sprites,
+			});
 		}
 
 		return AvatarMonolith.spriteSheet;
-	}
-
-	static getSpriteSheetSettings() {
-		const sprites = [
-			{
-				name: "base",
-				sheetPosition: new Coord({ x: 0, y: 0 }),
-				sheetSize: new Coord({ x: 1, y: 1 }),
-			},
-			{
-				name: "writing",
-				sheetPosition: new Coord({ x: 1, y: 0 }),
-				sheetSize: new Coord({ x: 1, y: 1 }),
-			},
-			{
-				name: "glass",
-				sheetPosition: new Coord({ x: 2, y: 0 }),
-				sheetSize: new Coord({ x: 1, y: 1 }),
-			},
-			{
-				name: "galaxy",
-				sheetPosition: new Coord({ x: 3, y: 0 }),
-				sheetSize: new Coord({ x: 1, y: 1 }),
-			},
-		];
-
-		return {
-			imageFileName: "monolith.png",
-			gridSize: new Coord({ x: 4, y: 1 }),
-			spriteSettings: sprites,
-		};
 	}
 
 	onUnlock() {
