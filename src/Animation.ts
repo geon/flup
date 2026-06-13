@@ -34,8 +34,8 @@ export function* parallel(
 	while (incompleteBranches.length) {
 		const deltaTime = yield;
 
-		for (let i = 0; i < incompleteBranches.length; ++i) {
-			if (incompleteBranches[i].next(deltaTime).done) {
+		for (const [i, branch] of incompleteBranches.entries()) {
+			if (branch.next(deltaTime).done) {
 				incompleteBranches.splice(i, 1);
 			}
 		}
