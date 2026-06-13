@@ -1,9 +1,10 @@
 import { Coord } from "./Coord";
 import { Sprite } from "./Sprite";
 
-export interface SpriteSet {
-	[name: string]: Sprite;
-}
+export type SpriteSet<SpriteName extends string = string> = Record<
+	SpriteName,
+	Sprite
+>;
 
 export class SpriteSheet {
 	imageFileName: string;
