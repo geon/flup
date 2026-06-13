@@ -12,7 +12,7 @@ import { LocalHuman } from "./LocalHuman";
 import { UnlockBot } from "./UnlockBot";
 
 function randomArrayElement<T>(array: ReadonlyArray<T>): T {
-	return array[Math.floor(Math.random() * array.length)];
+	return array[Math.floor(Math.random() * array.length)]!;
 }
 
 export class GameMode2pAi implements GameMode {
