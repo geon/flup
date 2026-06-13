@@ -1,6 +1,5 @@
 import { Coord } from "./Coord";
 import { Sprite } from "./Sprite";
-/// <reference path="jquery.d.ts" />
 
 export interface SpriteSet {
 	[name: string]: Sprite;
