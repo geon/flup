@@ -7,14 +7,15 @@ import { Coord } from "./Coord";
 import { GameMode } from "./GameMode";
 import { PieceCycle } from "./PieceCycle";
 import { AvatarMonolith } from "./AvatarMonolith";
+import { Tuple } from "./Tuple";
 
 function randomArrayElement<T>(array: ReadonlyArray<T>): T {
 	return array[Math.floor(Math.random() * array.length)];
 }
 
 export class GameMode2pLocal implements GameMode {
-	boards: Array<Board>;
-	avatars: Array<Avatar>;
+	boards: Tuple<Board, 2>;
+	avatars: Tuple<Avatar, 2>;
 	isGameOver: boolean;
 	frameCoroutine: Generator<void, void, number>;
 
