@@ -9,7 +9,10 @@ export class UnlockingEffect {
 	color: PieceColor;
 	coord: Coord;
 	accumulatedDeltaTime: number;
-	initialVelocities: Array<Coord>;
+	particles: {
+		readonly variation: Variation;
+		readonly initialVelocity: Coord;
+	}[];
 	frameCoroutine: Generator<void, void, number>;
 
 	constructor(color: PieceColor, position: Coord) {
@@ -17,14 +20,17 @@ export class UnlockingEffect {
 		this.coord = position;
 		this.accumulatedDeltaTime = 0;
 
-		this.initialVelocities = [];
+		this.particles = [];
 		for (let i = 0; i < 8; i++) {
-			this.initialVelocities[i] = new Coord({
-				// Spread a little less sideways.
-				x: (Math.random() * 2 - 1) * 1.5,
-				// Spray up a bit more than down.
-				y: (Math.random() * 2 - 1) * 2 - 0.4,
-			}).scaled(0.35);
+			this.particles.push({
+				variation: i as Variation,
+				initialVelocity: new Coord({
+					// Spread a little less sideways.
+					x: (Math.random() * 2 - 1) * 1.5,
+					// Spray up a bit more than down.
+					y: (Math.random() * 2 - 1) * 2 - 0.4,
+				}).scaled(0.35),
+			});
 		}
 
 		this.frameCoroutine = this.makeFrameCoroutine();
@@ -115,16 +121,16 @@ export class UnlockingEffect {
 				0.5 * UnlockingEffect.size,
 		});
 
-		for (let i = 0; i < this.initialVelocities.length; i++) {
+		for (const particle of this.particles) {
 			UnlockingEffect.getSprites()[
-				`color ${this.color}, variation ${i as Variation}`
+				`color ${this.color}, variation ${particle.variation}`
 			].draw(
 				context,
 				new Coord({
-					x: origin.x + this.initialVelocities[i].x * this.accumulatedDeltaTime,
+					x: origin.x + particle.initialVelocity.x * this.accumulatedDeltaTime,
 					y:
 						origin.y +
-						this.initialVelocities[i].y * this.accumulatedDeltaTime +
+						particle.initialVelocity.y * this.accumulatedDeltaTime +
 						UnlockingEffect.gravity *
 							this.accumulatedDeltaTime *
 							this.accumulatedDeltaTime,
