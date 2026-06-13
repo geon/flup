@@ -4,6 +4,7 @@ import { Coord } from "./Coord";
 import { PieceCycle } from "./PieceCycle";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
 import { animateInterpolation, easings, waitMs } from "./Animation";
+import { parsePieceColor, PieceColor } from "./Piece";
 
 const baseDiskSize = 1;
 const slightlySmallerDiskSize = baseDiskSize * 0.98;
@@ -95,14 +96,18 @@ export class AvatarAztecJade extends Avatar {
 		this.animationQueue.push(this.makeLoseCoroutine());
 	}
 
-	*generatePunishColors(): Generator<Array<number>, never, void> {
+	*generatePunishColors(): Generator<Array<PieceColor>, never, void> {
 		let rowNumber = 0;
 		for (;;) {
 			++rowNumber;
 
-			const colors = [];
+			const colors: PieceColor[] = [];
 			for (let x = 0; x < BoardLogic.size.x; x++) {
-				colors.push(Math.floor((rowNumber + x) / 2) % PieceCycle.numColors);
+				colors.push(
+					parsePieceColor(
+						Math.floor((rowNumber + x) / 2) % PieceCycle.numColors,
+					),
+				);
 			}
 			yield colors;
 		}

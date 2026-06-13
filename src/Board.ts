@@ -4,7 +4,7 @@ import { Avatar } from "./Avatar";
 import { Coord } from "./Coord";
 import { DropperQueue } from "./DropperQueue";
 import { GameMode } from "./GameMode";
-import { Piece } from "./Piece";
+import { Piece, PieceColor } from "./Piece";
 import { PieceSprite } from "./PieceSprite";
 import { PieceCycle } from "./PieceCycle";
 import { UnlockingEffect } from "./UnlockingEffect";
@@ -51,7 +51,7 @@ export class Board {
 		this.slateRandomExp = 2 + Math.random();
 	}
 
-	makePiece(options: { color: number; key: boolean; position: Coord }) {
+	makePiece(options: { color: PieceColor; key: boolean; position: Coord }) {
 		const sprite = new PieceSprite(options);
 		this.piecesSprites.add(sprite);
 		const piece: Piece = { color: options.color, key: options.key, sprite };

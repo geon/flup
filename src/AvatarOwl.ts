@@ -4,6 +4,7 @@ import { Coord } from "./Coord";
 import { PieceCycle } from "./PieceCycle";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
 import { waitMs, animateInterpolation, easings } from "./Animation";
+import { parsePieceColor, PieceColor } from "./Piece";
 
 type WingSpriteName =
 	| "wingsClosed"
@@ -138,11 +139,11 @@ export class AvatarOwl extends Avatar {
 		this.animationQueue.push(this.makeLoseCoroutine());
 	}
 
-	*generatePunishColors(): Generator<Array<number>, never, void> {
+	*generatePunishColors(): Generator<Array<PieceColor>, never, void> {
 		for (;;) {
-			const colors = [];
+			const colors: PieceColor[] = [];
 			for (let x = 0; x < BoardLogic.size.x; x++) {
-				colors.push(x % PieceCycle.numColors);
+				colors.push(parsePieceColor(x % PieceCycle.numColors));
 			}
 			yield colors;
 		}

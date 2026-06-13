@@ -4,6 +4,7 @@ import { Coord } from "./Coord";
 import { PieceCycle } from "./PieceCycle";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
 import { waitMs } from "./Animation";
+import { parsePieceColor, PieceColor } from "./Piece";
 
 type BaseSpriteName = "base" | "glass";
 
@@ -85,13 +86,17 @@ export class AvatarMonolith extends Avatar {
 		this.animationQueue.push(this.makeLoseCoroutine());
 	}
 
-	*generatePunishColors(): Generator<Array<number>, never, void> {
+	*generatePunishColors(): Generator<Array<PieceColor>, never, void> {
 		let cycleShift = 0;
 		for (;;) {
 			for (let i = 0; i < 2; ++i) {
-				const colors = [];
+				const colors: PieceColor[] = [];
 				for (let x = 0; x < BoardLogic.size.x; x++) {
-					colors.push(Math.floor((cycleShift + x) / 2) % PieceCycle.numColors);
+					colors.push(
+						parsePieceColor(
+							Math.floor((cycleShift + x) / 2) % PieceCycle.numColors,
+						),
+					);
 				}
 				yield colors;
 			}
