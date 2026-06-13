@@ -33,7 +33,7 @@ export class AvatarAztecJade extends Avatar {
 	}
 
 	static size: number = 256;
-	static sprites: SpriteSet;
+	static sprites: SpriteSet<DiskSpriteName | BodySpriteName>;
 	static spriteSheet: SpriteSheet;
 
 	getSize() {

@@ -23,7 +23,7 @@ export class AvatarMonolith extends Avatar {
 	}
 
 	static size: number = 256;
-	static sprites: SpriteSet;
+	static sprites: SpriteSet<"galaxy" | "writing" | BaseSpriteName>;
 	static spriteSheet: SpriteSheet;
 
 	getSize() {

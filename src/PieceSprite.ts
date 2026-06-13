@@ -21,7 +21,7 @@ export class PieceSprite {
 	}
 
 	static size = 32;
-	static sprites: SpriteSet | undefined;
+	static sprites: SpriteSet<SpriteName> | undefined;
 	static spriteSheet: SpriteSheet | undefined;
 
 	static getSprites() {

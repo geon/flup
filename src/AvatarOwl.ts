@@ -36,7 +36,7 @@ export class AvatarOwl extends Avatar {
 	}
 
 	static size: number = 256;
-	static sprites: SpriteSet;
+	static sprites: SpriteSet<"body" | WingSpriteName | HeadSpriteName>;
 	static spriteSheet: SpriteSheet;
 
 	getSize() {
