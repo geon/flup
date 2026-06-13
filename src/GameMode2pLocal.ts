@@ -8,6 +8,7 @@ import { GameMode } from "./GameMode";
 import { PieceCycle } from "./PieceCycle";
 import { AvatarMonolith } from "./AvatarMonolith";
 import { Tuple } from "./Tuple";
+import { checkedAccess } from "./checked-access";
 
 function randomArrayElement<T>(array: ReadonlyArray<T>): T {
 	return array[Math.floor(Math.random() * array.length)];
@@ -49,16 +50,17 @@ export class GameMode2pLocal implements GameMode {
 		this.punishOpponents(board, chainCount);
 
 		const playerIndex = this.boards.indexOf(board);
-		this.avatars[playerIndex].onUnlock();
+		checkedAccess(this.avatars, playerIndex).onUnlock();
 	}
 
 	punishOpponents(board: Board, chainCount: number) {
-		for (let i = 0; i < this.boards.length; i++) {
-			if (this.boards[i] !== board) {
+		for (const [i, otherBoard] of this.boards.entries()) {
+			if (otherBoard !== board) {
+				const otherAvatar = checkedAccess(this.avatars, i);
 				const punishCount = Math.max(0, chainCount - 1);
 				if (punishCount) {
-					this.boards[i].punish(this.avatars[i], punishCount);
-					this.avatars[i].onPunish();
+					otherBoard.punish(otherAvatar, punishCount);
+					otherAvatar.onPunish();
 				}
 			}
 		}
@@ -68,7 +70,7 @@ export class GameMode2pLocal implements GameMode {
 		this.isGameOver = true;
 
 		const playerIndex = this.boards.indexOf(board);
-		this.avatars[playerIndex].onLose();
+		checkedAccess(this.avatars, playerIndex).onLose();
 		this.avatars
 			.filter((_, index) => index != playerIndex)
 			.forEach((opponentAvatar) => {
