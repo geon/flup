@@ -1,4 +1,4 @@
-export type AnimationGenerator = Generator<void, number | void, number>;
+export type AnimationGenerator = Generator<void, void, number>;
 
 export function* waitMs(duration: number): AnimationGenerator {
 	let elapsedTime = 0;
@@ -7,8 +7,6 @@ export function* waitMs(duration: number): AnimationGenerator {
 		const deltaTime = yield;
 		elapsedTime += deltaTime;
 	}
-
-	return elapsedTime;
 }
 
 export function* animateInterpolation(
@@ -23,8 +21,6 @@ export function* animateInterpolation(
 		elapsedTime += deltaTime;
 	}
 	frame(1);
-
-	return elapsedTime;
 }
 
 export function* parallel(
