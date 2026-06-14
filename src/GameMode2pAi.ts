@@ -61,8 +61,9 @@ export class GameMode2pAi implements GameMode {
 			if (otherBoard !== board) {
 				const punishCount = Math.max(0, chainCount - 1);
 				if (punishCount) {
-					otherBoard.punish(this.avatars[i], punishCount);
-					this.avatars[i].onPunish();
+					const otherAvatar = this.avatars[i];
+					otherBoard.punish(otherAvatar, punishCount);
+					otherAvatar.onPunish();
 				}
 			}
 		}
