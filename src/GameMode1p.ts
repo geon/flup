@@ -25,7 +25,7 @@ export class GameMode1p implements GameMode {
 		this.avatar = new (randomArrayElement(avatarClasses))();
 		this.isGameOver = false;
 
-		this.frameCoroutine = this.board.frameCoroutine;
+		this.frameCoroutine = this.makeFrameCoroutine();
 
 		// 38, 37, 40, 39 : ^, <, v, >
 		this.human = new LocalHuman(this.board, [38, 37, 40, 39]);
