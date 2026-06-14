@@ -71,7 +71,7 @@ export class GameMode1p implements GameMode {
 		this.avatar.draw(
 			context,
 			new Coord({
-				x: appSize.x / 2 + (BoardLogic.getWidth() * -1.1) / 2,
+				x: appSize.x / 2 + (BoardLogic.getWidth() * -1.5) / 2,
 				y: appSize.y / 2 + BoardLogic.getWidth() * 0.65,
 			}),
 		);
