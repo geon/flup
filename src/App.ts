@@ -3,11 +3,12 @@ import { AvatarOwl } from "./AvatarOwl";
 import { Coord } from "./Coord";
 import { GameMode } from "./GameMode";
 // import { GameMode2pLocal } from "./GameMode2pLocal";
-import { GameMode2pAi } from "./GameMode2pAi";
+// import { GameMode2pAi } from "./GameMode2pAi";
 import { PieceSprite } from "./PieceSprite";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
 import { UnlockingEffect } from "./UnlockingEffect";
 import { AvatarMonolith } from "./AvatarMonolith";
+import { GameMode2pAiDemo } from "./GameMode2pAiDemo";
 
 export class App {
 	context: CanvasRenderingContext2D;
@@ -22,7 +23,8 @@ export class App {
 		this.context = options.context;
 
 		// this.gameMode = new GameMode2pLocal();
-		this.gameMode = new GameMode2pAi();
+		// this.gameMode = new GameMode2pAi();
+		this.gameMode = new GameMode2pAiDemo();
 
 		this.lastRenderTime = 0;
 
