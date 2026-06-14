@@ -10,6 +10,7 @@ import { PieceCycle } from "./PieceCycle";
 import { UnlockingEffect } from "./UnlockingEffect";
 import { BoardLogic, Event } from "./BoardLogic";
 import { Dropper } from "./Dropper";
+import { checkedAccess } from "./checked-access";
 
 export class Board {
 	gameMode: GameMode;
@@ -304,7 +305,10 @@ export class Board {
 					(pseudoRandomByXY % numTiles) - numBaseTiles + numBaseTiles;
 				const useDetail = !(Math.floor(pseudoRandomByXY / 13) % 10);
 
-				slateSprites[useDetail ? details : basePattern].draw(
+				checkedAccess(
+					slateSprites,
+					(useDetail ? details : basePattern).toString(),
+				).draw(
 					context,
 					new Coord({
 						x:
