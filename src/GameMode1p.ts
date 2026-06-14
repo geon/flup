@@ -4,6 +4,7 @@ import { Board } from "./Board";
 import { BoardLogic } from "./BoardLogic";
 import { Coord } from "./Coord";
 import { GameMode } from "./GameMode";
+import { LocalHuman } from "./LocalHuman";
 import { PieceCycle } from "./PieceCycle";
 
 export class GameMode1p implements GameMode {
@@ -11,6 +12,7 @@ export class GameMode1p implements GameMode {
 	avatar: Avatar;
 	isGameOver: boolean;
 	frameCoroutine: Generator<void, void, number>;
+	human: LocalHuman;
 
 	constructor() {
 		const pieceCycle = new PieceCycle(PieceCycle.generate());
@@ -20,6 +22,9 @@ export class GameMode1p implements GameMode {
 		this.isGameOver = false;
 
 		this.frameCoroutine = this.board.frameCoroutine;
+
+		// 38, 37, 40, 39 : ^, <, v, >
+		this.human = new LocalHuman(this.board, [38, 37, 40, 39]);
 	}
 
 	onUnlockedChains(_board: Board) {
@@ -31,28 +36,12 @@ export class GameMode1p implements GameMode {
 		this.isGameOver = true;
 	}
 
-	onKeyDown(_keyCode: number) {
+	onKeyDown(keyCode: number) {
 		if (this.isGameOver) {
 			return;
 		}
 
-		switch ((event as KeyboardEvent).keyCode) {
-			case 37: // Left
-				this.board.moveLeft();
-				break;
-
-			case 39: // Right
-				this.board.moveRight();
-				break;
-
-			case 38: // Up
-				this.board.rotate();
-				break;
-
-			case 40: // Down
-				this.board.drop();
-				break;
-		}
+		this.human.onKeyDown(keyCode);
 	}
 
 	*makeFrameCoroutine(): Generator<void, void, number> {

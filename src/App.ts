@@ -8,7 +8,8 @@ import { PieceSprite } from "./PieceSprite";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
 import { UnlockingEffect } from "./UnlockingEffect";
 import { AvatarMonolith } from "./AvatarMonolith";
-import { GameMode2pAiDemo } from "./GameMode2pAiDemo";
+// import { GameMode2pAiDemo } from "./GameMode2pAiDemo";
+import { GameMode1p } from "./GameMode1p";
 
 export class App {
 	context: CanvasRenderingContext2D;
@@ -24,7 +25,8 @@ export class App {
 
 		// this.gameMode = new GameMode2pLocal();
 		// this.gameMode = new GameMode2pAi();
-		this.gameMode = new GameMode2pAiDemo();
+		// this.gameMode = new GameMode2pAiDemo();
+		this.gameMode = new GameMode1p();
 
 		this.lastRenderTime = 0;
 
