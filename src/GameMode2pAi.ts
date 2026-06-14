@@ -57,11 +57,11 @@ export class GameMode2pAi implements GameMode {
 	}
 
 	punishOpponents(board: Board, chainCount: number) {
-		for (let i = 0; i < this.boards.length; i++) {
-			if (this.boards[i] !== board) {
+		for (const [i, otherBoard] of this.boards.entries()) {
+			if (otherBoard !== board) {
 				const punishCount = Math.max(0, chainCount - 1);
 				if (punishCount) {
-					this.boards[i].punish(this.avatars[i], punishCount);
+					otherBoard.punish(this.avatars[i], punishCount);
 					this.avatars[i].onPunish();
 				}
 			}
