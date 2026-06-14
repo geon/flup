@@ -52,10 +52,25 @@ export class GameMode1p implements GameMode {
 		const boardCoroutine = this.board.frameCoroutine;
 		const avatarCoroutine = this.avatar.frameCoroutine;
 
+		let timeSinceLastPunish = 0;
+		let punishInterval = 10000;
+
 		for (;;) {
 			const deltaTime = yield;
 			boardCoroutine.next(deltaTime);
 			avatarCoroutine.next(deltaTime);
+
+			if (!this.isGameOver) {
+				timeSinceLastPunish += deltaTime;
+				if (timeSinceLastPunish > punishInterval) {
+					const punishCount = Math.floor(timeSinceLastPunish / punishInterval);
+					for (let i = 0; i < punishCount; ++i) {
+						this.board.punish(this.avatar, 1);
+						timeSinceLastPunish -= punishInterval;
+					}
+					punishInterval *= 0.9;
+				}
+			}
 		}
 	}
 
