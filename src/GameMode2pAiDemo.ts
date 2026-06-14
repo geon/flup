@@ -1,6 +1,7 @@
 import { OcdBot } from "./OcdBot";
 import { UnlockBot } from "./UnlockBot";
 import { GameMode2pBase } from "./GameMode2pBase";
+import { AnimationGenerator } from "./Animation";
 
 export class GameMode2pAiDemo extends GameMode2pBase {
 	constructor() {
@@ -9,7 +10,7 @@ export class GameMode2pAiDemo extends GameMode2pBase {
 
 	onKeyDown() {}
 
-	*makeFrameCoroutine(): Generator<void, void, number> {
+	*makeFrameCoroutine(): AnimationGenerator {
 		const bots = [
 			//
 			new OcdBot(this.boards[0]),

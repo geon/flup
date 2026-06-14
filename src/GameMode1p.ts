@@ -1,3 +1,4 @@
+import { AnimationGenerator } from "./Animation";
 import { randomArrayElement } from "./array";
 import { Avatar } from "./Avatar";
 import { AvatarAztecJade } from "./AvatarAztecJade";
@@ -14,7 +15,7 @@ export class GameMode1p implements GameMode {
 	board: Board;
 	avatar: Avatar;
 	isGameOver: boolean;
-	frameCoroutine: Generator<void, void, number>;
+	frameCoroutine: AnimationGenerator;
 	human: LocalHuman;
 
 	constructor() {
@@ -48,7 +49,7 @@ export class GameMode1p implements GameMode {
 		this.human.onKeyDown(keyCode);
 	}
 
-	*makeFrameCoroutine(): Generator<void, void, number> {
+	*makeFrameCoroutine(): AnimationGenerator {
 		const boardCoroutine = this.board.frameCoroutine;
 		const avatarCoroutine = this.avatar.frameCoroutine;
 

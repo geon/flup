@@ -1,8 +1,9 @@
+import { AnimationGenerator } from "./Animation";
 import { Board } from "./Board";
 import { Coord } from "./Coord";
 
 export abstract class GameMode {
-	abstract frameCoroutine: Generator<void, void, number>;
+	abstract frameCoroutine: AnimationGenerator;
 	abstract onGameOver(board: Board): void;
 	abstract onUnlockedChains(board: Board, chainCount: number): void;
 	abstract onKeyDown(keyCode: number): void;

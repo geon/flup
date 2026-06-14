@@ -3,7 +3,12 @@ import { BoardLogic } from "./BoardLogic";
 import { Coord } from "./Coord";
 import { PieceCycle } from "./PieceCycle";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
-import { waitMs, animateInterpolation, easings } from "./Animation";
+import {
+	waitMs,
+	animateInterpolation,
+	easings,
+	AnimationGenerator,
+} from "./Animation";
 import { parsePieceColor, PieceColor } from "./Piece";
 
 type WingSpriteName =
@@ -149,14 +154,14 @@ export class AvatarOwl extends Avatar {
 		}
 	}
 
-	*makeFrameCoroutine(): Generator<void, void, number> {
+	*makeFrameCoroutine(): AnimationGenerator {
 		for (;;) {
 			const animation = this.animationQueue.shift() || this.makeIdleCoroutine();
 			yield* animation;
 		}
 	}
 
-	*makeUnlockCoroutine(): Generator<void, void, number> {
+	*makeUnlockCoroutine(): AnimationGenerator {
 		const wingFlapCycle: ReadonlyArray<{
 			name: WingSpriteName;
 			time: number;
@@ -177,11 +182,11 @@ export class AvatarOwl extends Avatar {
 		}
 	}
 
-	*makePunishCoroutine(): Generator<void, void, number> {
+	*makePunishCoroutine(): AnimationGenerator {
 		// TODO
 	}
 
-	*makeWinCoroutine(): Generator<void, void, number> {
+	*makeWinCoroutine(): AnimationGenerator {
 		const wingFlapCycle: ReadonlyArray<{
 			name: WingSpriteName;
 			time: number;
@@ -204,7 +209,7 @@ export class AvatarOwl extends Avatar {
 		}
 	}
 
-	*makeLoseCoroutine(): Generator<void, void, number> {
+	*makeLoseCoroutine(): AnimationGenerator {
 		const headSpinCycle: ReadonlyArray<HeadSpriteName> = [
 			"headSpin1",
 			"headSpin2",
@@ -224,7 +229,7 @@ export class AvatarOwl extends Avatar {
 		}
 	}
 
-	*makeIdleCoroutine(): Generator<void, void, number> {
+	*makeIdleCoroutine(): AnimationGenerator {
 		const stepTime = 300;
 
 		yield* waitMs(stepTime * 2);

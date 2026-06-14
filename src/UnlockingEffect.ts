@@ -1,3 +1,4 @@
+import { AnimationGenerator } from "./Animation";
 import { Coord } from "./Coord";
 import { PieceColor } from "./Piece";
 import { PieceSprite } from "./PieceSprite";
@@ -13,7 +14,7 @@ export class UnlockingEffect {
 		readonly variation: Variation;
 		readonly initialVelocity: Coord;
 	}[];
-	frameCoroutine: Generator<void, void, number>;
+	frameCoroutine: AnimationGenerator;
 
 	constructor(color: PieceColor, position: Coord) {
 		this.color = color;
@@ -83,7 +84,7 @@ export class UnlockingEffect {
 		return UnlockingEffect.spriteSheet;
 	};
 
-	*makeFrameCoroutine(): Generator<void, void, number> {
+	*makeFrameCoroutine(): AnimationGenerator {
 		// TODO: Move the animation here.
 
 		for (;;) {

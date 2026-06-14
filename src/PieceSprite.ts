@@ -9,7 +9,7 @@ type SpriteName = `${"key" | "piece"}${PieceColor}`;
 export class PieceSprite {
 	spriteName: SpriteName;
 	position: Coord;
-	frameCoroutine: Generator<void, void, number>;
+	frameCoroutine: AnimationGenerator;
 	animationCoroutine?: AnimationGenerator;
 	accumulatedDeltaTime: number;
 
@@ -64,7 +64,7 @@ export class PieceSprite {
 		return PieceSprite.spriteSheet;
 	}
 
-	*makeFrameCoroutine(): Generator<void, void, number> {
+	*makeFrameCoroutine(): AnimationGenerator {
 		// I would just `yield*`, but `animationCoroutine` may be replaced at any frame.
 		for (;;) {
 			const deltaTime = yield;
@@ -80,7 +80,7 @@ export class PieceSprite {
 		}
 	}
 
-	queueUpAnimation(newPart: Generator<void, void, number>) {
+	queueUpAnimation(newPart: AnimationGenerator) {
 		this.animationCoroutine = this.animationCoroutine
 			? queue([this.animationCoroutine, newPart])
 			: newPart;
@@ -94,7 +94,7 @@ export class PieceSprite {
 		to: Coord;
 		duration: number;
 		easing: (t: number) => number;
-	}): Generator<void, void, number> {
+	}): AnimationGenerator {
 		const from = this.position;
 
 		yield* animateInterpolation(duration, (timeFactor) => {

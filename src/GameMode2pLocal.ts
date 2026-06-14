@@ -1,3 +1,4 @@
+import { AnimationGenerator } from "./Animation";
 import { GameMode2pBase } from "./GameMode2pBase";
 
 export class GameMode2pLocal extends GameMode2pBase {
@@ -50,7 +51,7 @@ export class GameMode2pLocal extends GameMode2pBase {
 		}
 	}
 
-	*makeFrameCoroutine(): Generator<void, void, number> {
+	*makeFrameCoroutine(): AnimationGenerator {
 		const superCoroutine = super.makeFrameCoroutine();
 
 		// Run board coroutines concurrently.

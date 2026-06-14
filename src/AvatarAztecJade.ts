@@ -3,7 +3,12 @@ import { BoardLogic } from "./BoardLogic";
 import { Coord } from "./Coord";
 import { PieceCycle } from "./PieceCycle";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
-import { animateInterpolation, easings, waitMs } from "./Animation";
+import {
+	animateInterpolation,
+	AnimationGenerator,
+	easings,
+	waitMs,
+} from "./Animation";
 import { parsePieceColor, PieceColor } from "./Piece";
 
 const baseDiskSize = 1;
@@ -113,14 +118,14 @@ export class AvatarAztecJade extends Avatar {
 		}
 	}
 
-	*makeFrameCoroutine(): Generator<void, void, number> {
+	*makeFrameCoroutine(): AnimationGenerator {
 		for (;;) {
 			const animation = this.animationQueue.shift() || this.makeIdleCoroutine();
 			yield* animation;
 		}
 	}
 
-	*makeUnlockCoroutine(): Generator<void, void, number> {
+	*makeUnlockCoroutine(): AnimationGenerator {
 		const stepTime = 200;
 
 		const interpolator = makeNumberInterpolator(baseDiskSize, smallDiskSize);
@@ -133,11 +138,11 @@ export class AvatarAztecJade extends Avatar {
 		});
 	}
 
-	*makePunishCoroutine(): Generator<void, void, number> {
+	*makePunishCoroutine(): AnimationGenerator {
 		// TODO
 	}
 
-	*makeWinCoroutine(): Generator<void, void, number> {
+	*makeWinCoroutine(): AnimationGenerator {
 		const stepTime = 200;
 
 		yield* animateInterpolation(stepTime, (factor) => {
@@ -161,12 +166,12 @@ export class AvatarAztecJade extends Avatar {
 		}
 	}
 
-	*makeLoseCoroutine(): Generator<void, void, number> {
+	*makeLoseCoroutine(): AnimationGenerator {
 		this.currentDiskSprite = "clay";
 		this.currentBodySprite = "shards";
 	}
 
-	*makeIdleCoroutine(): Generator<void, void, number> {
+	*makeIdleCoroutine(): AnimationGenerator {
 		const stepTime = 100;
 
 		const interpolator = makeNumberInterpolator(

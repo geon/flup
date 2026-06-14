@@ -1,9 +1,10 @@
+import { AnimationGenerator } from "./Animation";
 import { Coord } from "./Coord";
 import { PieceColor } from "./Piece";
 
 export abstract class Avatar {
 	colorGenerator: Generator<Array<PieceColor>, never, void>;
-	frameCoroutine: Generator<void, void, number>;
+	frameCoroutine: AnimationGenerator;
 
 	constructor() {
 		this.colorGenerator = this.generatePunishColors();
@@ -22,7 +23,7 @@ export abstract class Avatar {
 	abstract getSize(): number;
 
 	abstract generatePunishColors(): Generator<Array<PieceColor>, never, void>;
-	abstract makeFrameCoroutine(): Generator<void, void, number>;
+	abstract makeFrameCoroutine(): AnimationGenerator;
 
 	abstract draw(context: CanvasRenderingContext2D, avatarCenter: Coord): void;
 }

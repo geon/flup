@@ -1,9 +1,9 @@
-import { waitMs } from "./Animation";
+import { AnimationGenerator, waitMs } from "./Animation";
 import { DropperPose, Dropper } from "./Dropper";
 import { Player } from "./Player";
 
 export class OcdBot extends Player {
-	*makeCoroutine(): Generator<void, void, number> {
+	*makeCoroutine(): AnimationGenerator {
 		for (;;) {
 			// Simulate thinking time.
 			yield* waitMs(500);

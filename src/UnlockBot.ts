@@ -1,4 +1,4 @@
-import { waitMs } from "./Animation";
+import { AnimationGenerator, waitMs } from "./Animation";
 import { BoardLogic } from "./BoardLogic";
 import { Coord } from "./Coord";
 import { DropperPose } from "./Dropper";
@@ -6,7 +6,7 @@ import { Piece } from "./Piece";
 import { Player } from "./Player";
 
 export class UnlockBot extends Player {
-	*makeCoroutine(): Generator<void, void, number> {
+	*makeCoroutine(): AnimationGenerator {
 		for (;;) {
 			// Simulate thinking time.
 			yield* waitMs(500);

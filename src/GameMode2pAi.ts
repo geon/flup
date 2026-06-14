@@ -2,6 +2,7 @@
 import { LocalHuman } from "./LocalHuman";
 import { UnlockBot } from "./UnlockBot";
 import { GameMode2pBase } from "./GameMode2pBase";
+import { AnimationGenerator } from "./Animation";
 
 export class GameMode2pAi extends GameMode2pBase {
 	human: LocalHuman;
@@ -21,7 +22,7 @@ export class GameMode2pAi extends GameMode2pBase {
 		this.human.onKeyDown(keyCode);
 	}
 
-	*makeFrameCoroutine(): Generator<void, void, number> {
+	*makeFrameCoroutine(): AnimationGenerator {
 		// const bot = new OcdBot(this.boards[0]);
 		const bot = new UnlockBot(this.boards[0]);
 		const aiCoroutine = bot.makeCoroutine();

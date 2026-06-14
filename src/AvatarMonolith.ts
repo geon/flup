@@ -3,7 +3,7 @@ import { BoardLogic } from "./BoardLogic";
 import { Coord } from "./Coord";
 import { PieceCycle } from "./PieceCycle";
 import { SpriteSet, SpriteSheet } from "./SpriteSheet";
-import { waitMs } from "./Animation";
+import { AnimationGenerator, waitMs } from "./Animation";
 import { parsePieceColor, PieceColor } from "./Piece";
 
 type BaseSpriteName = "base" | "glass";
@@ -104,14 +104,14 @@ export class AvatarMonolith extends Avatar {
 		}
 	}
 
-	*makeFrameCoroutine(): Generator<void, void, number> {
+	*makeFrameCoroutine(): AnimationGenerator {
 		for (;;) {
 			const animation = this.animationQueue.shift() || this.makeIdleCoroutine();
 			yield* animation;
 		}
 	}
 
-	*makeUnlockCoroutine(): Generator<void, void, number> {
+	*makeUnlockCoroutine(): AnimationGenerator {
 		const blinkTime = 50;
 		for (let i = 0; i < 3; ++i) {
 			this.hasGalaxy = true;
@@ -124,7 +124,7 @@ export class AvatarMonolith extends Avatar {
 		this.hasGalaxy = false;
 	}
 
-	*makePunishCoroutine(): Generator<void, void, number> {
+	*makePunishCoroutine(): AnimationGenerator {
 		const blinkTime = 50;
 		for (let i = 0; i < 3; ++i) {
 			this.hasWriting = true;
@@ -137,16 +137,16 @@ export class AvatarMonolith extends Avatar {
 		this.hasWriting = false;
 	}
 
-	*makeWinCoroutine(): Generator<void, void, number> {
+	*makeWinCoroutine(): AnimationGenerator {
 		this.hasGalaxy = true;
 		this.currentBaseSprite = "glass";
 	}
 
-	*makeLoseCoroutine(): Generator<void, void, number> {
+	*makeLoseCoroutine(): AnimationGenerator {
 		this.hasWriting = true;
 	}
 
-	*makeIdleCoroutine(): Generator<void, void, number> {
+	*makeIdleCoroutine(): AnimationGenerator {
 		yield;
 	}
 

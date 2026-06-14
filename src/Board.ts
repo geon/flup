@@ -1,4 +1,11 @@
-import { easings, waitMs, queue, parallel, makeIterable } from "./Animation";
+import {
+	easings,
+	waitMs,
+	queue,
+	parallel,
+	makeIterable,
+	AnimationGenerator,
+} from "./Animation";
 import { App } from "./App";
 import { Avatar } from "./Avatar";
 import { Coord } from "./Coord";
@@ -14,7 +21,7 @@ import { checkedAccess } from "./checked-access";
 
 export class Board {
 	gameMode: GameMode;
-	frameCoroutine: Generator<void, void, number>;
+	frameCoroutine: AnimationGenerator;
 
 	dropper: Dropper;
 	boardLogic: BoardLogic;
@@ -59,7 +66,7 @@ export class Board {
 		return piece;
 	}
 
-	*makeGameLogicCoroutine(): Generator<void, void, number> {
+	*makeGameLogicCoroutine(): AnimationGenerator {
 		for (;;) {
 			let chainCount = 0;
 
@@ -264,7 +271,7 @@ export class Board {
 		this.eventQueue.push({ type: "punish", movements });
 	}
 
-	*makeFrameCoroutine(): Generator<void, void, number> {
+	*makeFrameCoroutine(): AnimationGenerator {
 		const gameLogicCoroutine = this.makeGameLogicCoroutine();
 
 		// Run pieces coroutines concurrently.

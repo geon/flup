@@ -10,12 +10,13 @@ import { AvatarMonolith } from "./AvatarMonolith";
 import { randomArrayElement } from "./array";
 import { Tuple } from "./Tuple";
 import { checkedAccess } from "./checked-access";
+import { AnimationGenerator } from "./Animation";
 
 export abstract class GameMode2pBase extends GameMode {
 	boards: Tuple<Board, 2>;
 	avatars: Tuple<Avatar, 2>;
 	isGameOver: boolean;
-	frameCoroutine: Generator<void, void, number>;
+	frameCoroutine: AnimationGenerator;
 
 	constructor() {
 		super();
@@ -76,7 +77,7 @@ export abstract class GameMode2pBase extends GameMode {
 			});
 	}
 
-	*makeFrameCoroutine(): Generator<void, void, number> {
+	*makeFrameCoroutine(): AnimationGenerator {
 		// Run board coroutines concurrently.
 		for (;;) {
 			const deltaTime = yield;
