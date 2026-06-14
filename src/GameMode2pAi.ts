@@ -11,10 +11,12 @@ import { AvatarMonolith } from "./AvatarMonolith";
 import { LocalHuman } from "./LocalHuman";
 import { UnlockBot } from "./UnlockBot";
 import { randomArrayElement } from "./array";
+import { Tuple } from "./Tuple";
+import { checkedAccess } from "./checked-access";
 
 export class GameMode2pAi implements GameMode {
-	boards: Array<Board>;
-	avatars: Array<Avatar>;
+	boards: Tuple<Board, 2>;
+	avatars: Tuple<Avatar, 2>;
 	isGameOver: boolean;
 	frameCoroutine: Generator<void, void, number>;
 
@@ -53,7 +55,7 @@ export class GameMode2pAi implements GameMode {
 		this.punishOpponents(board, chainCount);
 
 		const playerIndex = this.boards.indexOf(board);
-		this.avatars[playerIndex].onUnlock();
+		checkedAccess(this.avatars, playerIndex).onUnlock();
 	}
 
 	punishOpponents(board: Board, chainCount: number) {
@@ -61,7 +63,7 @@ export class GameMode2pAi implements GameMode {
 			if (otherBoard !== board) {
 				const punishCount = Math.max(0, chainCount - 1);
 				if (punishCount) {
-					const otherAvatar = this.avatars[i];
+					const otherAvatar = checkedAccess(this.avatars, i);
 					otherBoard.punish(otherAvatar, punishCount);
 					otherAvatar.onPunish();
 				}
@@ -73,7 +75,7 @@ export class GameMode2pAi implements GameMode {
 		this.isGameOver = true;
 
 		const playerIndex = this.boards.indexOf(board);
-		this.avatars[playerIndex].onLose();
+		checkedAccess(this.avatars, playerIndex).onLose();
 		this.avatars
 			.filter((_, index) => index != playerIndex)
 			.forEach((opponentAvatar) => {
