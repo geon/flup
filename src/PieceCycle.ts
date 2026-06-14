@@ -1,3 +1,4 @@
+import { checkedAccess } from "./checked-access";
 import { InvisiblePiece, pieceColors } from "./Piece";
 
 export class PieceCycle {
@@ -10,7 +11,7 @@ export class PieceCycle {
 	}
 
 	pop() {
-		const piece = this.pieces[this.currentIndex];
+		const piece = checkedAccess(this.pieces, this.currentIndex);
 
 		this.currentIndex = (this.currentIndex + 1) % this.pieces.length;
 
