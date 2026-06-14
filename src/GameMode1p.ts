@@ -1,4 +1,7 @@
+import { randomArrayElement } from "./array";
 import { Avatar } from "./Avatar";
+import { AvatarAztecJade } from "./AvatarAztecJade";
+import { AvatarMonolith } from "./AvatarMonolith";
 import { AvatarOwl } from "./AvatarOwl";
 import { Board } from "./Board";
 import { BoardLogic } from "./BoardLogic";
@@ -18,7 +21,8 @@ export class GameMode1p implements GameMode {
 		const pieceCycle = new PieceCycle(PieceCycle.generate());
 
 		this.board = new Board({ pieceCycle, gameMode: this, dropperSide: "left" });
-		this.avatar = new AvatarOwl();
+		const avatarClasses = [AvatarOwl, AvatarAztecJade, AvatarMonolith];
+		this.avatar = new (randomArrayElement(avatarClasses))();
 		this.isGameOver = false;
 
 		this.frameCoroutine = this.board.frameCoroutine;
