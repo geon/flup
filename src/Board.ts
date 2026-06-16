@@ -28,6 +28,7 @@ export class Board {
 
 	piecesSprites: Set<PieceSprite>;
 	unlockingEffects: Set<UnlockingEffect>;
+	punishFrameCoroutines: Set<AnimationGenerator>;
 	eventQueue: Array<Event>;
 
 	slateRandomExp: number;
@@ -39,6 +40,7 @@ export class Board {
 	}) {
 		this.gameMode = options.gameMode;
 		this.frameCoroutine = this.makeFrameCoroutine();
+		this.punishFrameCoroutines = new Set();
 
 		this.piecesSprites = new Set();
 
@@ -158,22 +160,6 @@ export class Board {
 						);
 						break;
 
-					case "punish":
-						yield* queue(
-							event.movements.map((collumn) =>
-								parallel(
-									collumn.map((movement) =>
-										movement.sprite.makeMoveCoroutine({
-											to: movement.to,
-											duration: 100,
-											easing: easings.sine,
-										}),
-									),
-								),
-							),
-						);
-						break;
-
 					default:
 						exhaustionChecker(event);
 						break;
@@ -268,7 +254,21 @@ export class Board {
 			movements.push(rowMovements);
 		}
 
-		this.eventQueue.push({ type: "punish", movements });
+		this.punishFrameCoroutines.add(
+			queue(
+				movements.map((collumn) =>
+					parallel(
+						collumn.map((movement) =>
+							movement.sprite.makeMoveCoroutine({
+								to: movement.to,
+								duration: 100,
+								easing: easings.sine,
+							}),
+						),
+					),
+				),
+			),
+		);
 	}
 
 	*makeFrameCoroutine(): AnimationGenerator {
@@ -289,6 +289,14 @@ export class Board {
 				if (done) {
 					// Remove the unlockingEffect.
 					this.unlockingEffects.delete(unlockingEffect);
+				}
+			}
+
+			for (const punishFrameCoroutine of this.punishFrameCoroutines) {
+				const done = punishFrameCoroutine.next(deltaTime).done;
+				if (done) {
+					// Remove the unlockingEffect.
+					this.punishFrameCoroutines.delete(punishFrameCoroutine);
 				}
 			}
 		}

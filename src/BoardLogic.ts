@@ -41,14 +41,8 @@ interface UnlockingEvent {
 	unlockings: ReadonlyArray<Unlocking>;
 }
 
-export interface PunishEvent {
-	type: "punish";
-	movements: ReadonlyArray<ReadonlyArray<Movement>>;
-}
-
 export type Event =
-	| PunishEvent
-	| ChargeEvent
+	| ChargeEvent //
 	| MoveEvent
 	| FallEvent
 	| UnlockingEvent;
