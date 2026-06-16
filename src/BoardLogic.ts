@@ -19,13 +19,6 @@ export interface ChargePieceMovement {
 	to: Coord;
 }
 
-export interface ChargeEvent {
-	type: "charge";
-	a: ChargePieceMovement;
-	b: ChargePieceMovement;
-	queueMovements: ReadonlyArray<Movement>;
-}
-
 export interface MoveEvent {
 	type: "move";
 	movements: ReadonlyArray<Movement>;
@@ -42,8 +35,7 @@ interface UnlockingEvent {
 }
 
 export type Event =
-	| ChargeEvent //
-	| MoveEvent
+	| MoveEvent //
 	| FallEvent
 	| UnlockingEvent;
 

@@ -29,6 +29,7 @@ export class Board {
 	piecesSprites: Set<PieceSprite>;
 	unlockingEffects: Set<UnlockingEffect>;
 	punishFrameCoroutines: Set<AnimationGenerator>;
+	chargeFrameCoroutines: AnimationGenerator[];
 	eventQueue: Array<Event>;
 
 	slateRandomExp: number;
@@ -50,13 +51,13 @@ export class Board {
 		);
 		this.dropper = new Dropper(dropperQueue);
 
+		// The first charge must be done here, where the event can be handled.
+		this.chargeFrameCoroutines = [this.dropper.charge()];
+
 		this.boardLogic = new BoardLogic();
 
 		this.unlockingEffects = new Set();
 		this.eventQueue = [];
-
-		// The first charge must be done here, where the event can be handled.
-		this.eventQueue.push(this.dropper.charge());
 
 		this.slateRandomExp = 2 + Math.random();
 	}
@@ -75,30 +76,6 @@ export class Board {
 			let event: Event | undefined;
 			while ((event = this.eventQueue.shift())) {
 				switch (event.type) {
-					case "charge":
-						yield* parallel([
-							event.a.sprite.makeMoveCoroutine({
-								to: event.a.to,
-								duration:
-									Coord.distance(event.a.sprite.position, event.a.to) * 50,
-								easing: easings.sine,
-							}),
-							event.b.sprite.makeMoveCoroutine({
-								to: event.b.to,
-								duration:
-									Coord.distance(event.b.sprite.position, event.b.to) * 50,
-								easing: easings.sine,
-							}),
-							...event.queueMovements.map((movement) =>
-								movement.sprite.makeMoveCoroutine({
-									to: movement.to,
-									duration: 150,
-									easing: easings.sine,
-								}),
-							),
-						]);
-						break;
-
 					case "move":
 						yield* parallel(
 							event.movements.map((movement) =>
@@ -197,7 +174,7 @@ export class Board {
 	drop() {
 		const drops = this.dropper.getDrops();
 		this.eventQueue.push(...this.boardLogic.drop(drops));
-		this.eventQueue.push(this.dropper.charge());
+		this.chargeFrameCoroutines.push(this.dropper.charge());
 	}
 
 	*startGameOverEffect() {
@@ -297,6 +274,14 @@ export class Board {
 				if (done) {
 					// Remove the unlockingEffect.
 					this.punishFrameCoroutines.delete(punishFrameCoroutine);
+				}
+			}
+
+			const chargeFrameCoroutine = this.chargeFrameCoroutines[0];
+			if (chargeFrameCoroutine) {
+				const done = chargeFrameCoroutine.next(deltaTime).done;
+				if (done) {
+					this.chargeFrameCoroutines.shift();
 				}
 			}
 		}

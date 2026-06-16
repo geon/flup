@@ -1,4 +1,5 @@
-import { BoardLogic, ChargeEvent, MoveEvent } from "./BoardLogic";
+import { AnimationGenerator, easings, parallel } from "./Animation";
+import { BoardLogic, MoveEvent } from "./BoardLogic";
 import { Coord } from "./Coord";
 import { DropperQueue } from "./DropperQueue";
 import { Piece } from "./Piece";
@@ -95,7 +96,7 @@ export class Dropper {
 		};
 	}
 
-	charge(): ChargeEvent {
+	charge(): AnimationGenerator {
 		const coords = this.getCoordinates();
 
 		const pieces = this.dropperQueue.pop();
@@ -110,12 +111,25 @@ export class Dropper {
 			this.pieceB = pieces.b;
 		}
 
-		return {
-			type: "charge",
-			a: { sprite: this.pieceA.sprite, to: coords.a },
-			b: { sprite: this.pieceB.sprite, to: coords.b },
-			queueMovements: pieces.queueMovements,
-		};
+		return parallel([
+			this.pieceA.sprite.makeMoveCoroutine({
+				to: coords.a,
+				duration: Coord.distance(this.pieceA.sprite.position, coords.a) * 50,
+				easing: easings.sine,
+			}),
+			this.pieceB.sprite.makeMoveCoroutine({
+				to: coords.b,
+				duration: Coord.distance(this.pieceB.sprite.position, coords.b) * 50,
+				easing: easings.sine,
+			}),
+			...pieces.queueMovements.map((movement) =>
+				movement.sprite.makeMoveCoroutine({
+					to: movement.to,
+					duration: 150,
+					easing: easings.sine,
+				}),
+			),
+		]);
 	}
 
 	private animate(): MoveEvent {
